@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import Lottie from 'lottie-react';
 import { BlindboxWheel, ComicButton, Panel, Shout, Stamp } from '@cpm/ui';
+import goldDust from './goldDust.json';
 
 interface DrawResp {
   win: boolean;
@@ -61,6 +63,7 @@ export function BlindboxDrawPage() {
 
   return (
     <div className="min-h-screen bg-paper p-4 flex flex-col items-center">
+      {result?.win && <Lottie animationData={goldDust} loop={false} className="fixed inset-0 pointer-events-none" />}
       <Panel shadow="purple">
         <Shout tone="pink">盲盒抽奖 · {boxId}</Shout>
       </Panel>
