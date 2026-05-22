@@ -1,4 +1,10 @@
+import { AuthGate } from './auth/AuthGate';
 import { AppRouter } from './router';
+
 export function App() {
-  return <AppRouter />;
+  return (
+    <AuthGate>
+      <AppRouter />
+    </AuthGate>
+  );
 }
