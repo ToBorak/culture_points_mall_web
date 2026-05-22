@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Panel, ComicButton } from '@cpm/ui';
 import { useAgentChat } from './useAgentChat';
 import { StepBubble } from './StepBubble';
+import { SessionsSidebar } from './SessionsSidebar';
 
 export function ChatPage() {
   const { turns, busy, send } = useAgentChat();
@@ -18,30 +19,38 @@ export function ChatPage() {
     setText('');
   };
 
+  const onPickSession = (_id: number) => {
+    // Phase 3 暂只刷新当前 hook 的 sessionId 行为不变；后续 Phase 可补完整加载历史会话
+    // 这里仅作为 UI 演示，点击不实际切换会话
+  };
+
   return (
-    <div className="flex flex-col h-full">
-      <div ref={scrollRef} className="flex-1 overflow-auto min-h-0 px-4 py-2 space-y-4">
-        {turns.map((t, i) => (
-          <div key={i}>
-            <div className="text-right mb-2">
-              <Panel shadow="pink" style={{ display: 'inline-block', maxWidth: '70%' }}>
-                <div className="font-kuaile">{t.userText}</div>
-              </Panel>
+    <div className="flex h-full">
+      <SessionsSidebar onPick={onPickSession} />
+      <div className="flex-1 flex flex-col min-w-0">
+        <div ref={scrollRef} className="flex-1 overflow-auto min-h-0 px-4 py-2 space-y-4">
+          {turns.map((t, i) => (
+            <div key={i}>
+              <div className="text-right mb-2">
+                <Panel shadow="pink" style={{ display: 'inline-block', maxWidth: '70%' }}>
+                  <div className="font-kuaile">{t.userText}</div>
+                </Panel>
+              </div>
+              {t.steps.map((s, j) => <StepBubble key={j} step={s} />)}
             </div>
-            {t.steps.map((s, j) => <StepBubble key={j} step={s} />)}
-          </div>
-        ))}
-      </div>
-      <div className="border-t-3 border-ink p-3 flex gap-2">
-        <textarea
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) submit(); }}
-          placeholder="对 HR-Agent 说点什么...（Cmd/Ctrl+Enter 发送）"
-          className="flex-1 border-3 border-ink rounded p-2 font-kuaile"
-          rows={2}
-        />
-        <ComicButton onClick={submit} tone="red">{busy ? '思考中…' : '发送'}</ComicButton>
+          ))}
+        </div>
+        <div className="border-t-3 border-ink p-3 flex gap-2">
+          <textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) submit(); }}
+            placeholder="对 HR-Agent 说点什么...（Cmd/Ctrl+Enter 发送）"
+            className="flex-1 border-3 border-ink rounded p-2 font-kuaile"
+            rows={2}
+          />
+          <ComicButton onClick={submit} tone="red">{busy ? '思考中…' : '发送'}</ComicButton>
+        </div>
       </div>
     </div>
   );
