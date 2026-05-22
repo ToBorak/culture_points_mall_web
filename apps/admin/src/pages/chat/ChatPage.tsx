@@ -1,8 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
-import { Panel, ComicButton } from '@cpm/ui';
-import { useAgentChat } from './useAgentChat';
-import { StepBubble } from './StepBubble';
+import { ComicButton, Panel } from '@cpm/ui';
+import { useEffect, useRef, useState } from 'react';
 import { SessionsSidebar } from './SessionsSidebar';
+import { StepBubble } from './StepBubble';
+import { useAgentChat } from './useAgentChat';
 
 export function ChatPage() {
   const { turns, busy, send } = useAgentChat();
@@ -11,7 +11,7 @@ export function ChatPage() {
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: 1e6, behavior: 'smooth' });
-  }, [turns]);
+  });
 
   const submit = () => {
     if (!text.trim() || busy) return;
@@ -29,14 +29,17 @@ export function ChatPage() {
       <SessionsSidebar onPick={onPickSession} />
       <div className="flex-1 flex flex-col min-w-0">
         <div ref={scrollRef} className="flex-1 overflow-auto min-h-0 px-4 py-2 space-y-4">
-          {turns.map((t, i) => (
-            <div key={i}>
+          {turns.map((t) => (
+            <div key={t.id}>
               <div className="text-right mb-2">
                 <Panel shadow="pink" style={{ display: 'inline-block', maxWidth: '70%' }}>
                   <div className="font-kuaile">{t.userText}</div>
                 </Panel>
               </div>
-              {t.steps.map((s, j) => <StepBubble key={j} step={s} />)}
+              {t.steps.map((s, j) => (
+                // biome-ignore lint/suspicious/noArrayIndexKey: steps have no stable ID; order-stable within a turn
+                <StepBubble key={j} step={s} />
+              ))}
             </div>
           ))}
         </div>
@@ -44,12 +47,16 @@ export function ChatPage() {
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) submit(); }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) submit();
+            }}
             placeholder="对 HR-Agent 说点什么...（Cmd/Ctrl+Enter 发送）"
             className="flex-1 border-3 border-ink rounded p-2 font-kuaile"
             rows={2}
           />
-          <ComicButton onClick={submit} tone="red">{busy ? '思考中…' : '发送'}</ComicButton>
+          <ComicButton onClick={submit} tone="red">
+            {busy ? '思考中…' : '发送'}
+          </ComicButton>
         </div>
       </div>
     </div>

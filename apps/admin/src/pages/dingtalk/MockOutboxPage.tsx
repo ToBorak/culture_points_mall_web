@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
 import { Panel, Shout } from '@cpm/ui';
+import axios from 'axios';
 import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 
 interface Outbox {
   id: number;
@@ -23,10 +23,11 @@ export function MockOutboxPage() {
   const [rows, setRows] = useState<Outbox[]>([]);
   useEffect(() => {
     const token = localStorage.getItem('cpm_admin_jwt');
-    const refresh = () => axios.get<{ items: Outbox[] }>(
-      '/admin/dingtalk/mock-outbox',
-      { headers: { Authorization: `Bearer ${token}` } },
-    ).then((r) => setRows(r.data.items)).catch(() => {});
+    const refresh = () =>
+      axios
+        .get<{ items: Outbox[] }>('/admin/dingtalk/mock-outbox', { headers: { Authorization: `Bearer ${token}` } })
+        .then((r) => setRows(r.data.items))
+        .catch(() => {});
     refresh();
     const es = new EventSource('/admin/dingtalk/mock-outbox/stream');
     es.onmessage = () => refresh();
@@ -41,14 +42,23 @@ export function MockOutboxPage() {
       </p>
       <div className="space-y-3">
         {rows.map((r, i) => (
-          <motion.div key={r.id} initial={{ x: 40, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: Math.min(i, 10) * 0.02 }}>
+          <motion.div
+            key={r.id}
+            initial={{ x: 40, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: Math.min(i, 10) * 0.02 }}
+          >
             <Panel shadow="green">
               <div className="flex items-center justify-between">
                 <span className="font-kuaile">{apiTitle[r.api] ?? r.api}</span>
                 <span className="text-xs text-ink/50">{r.createdAt.slice(0, 19)}</span>
               </div>
-              <div className="text-sm mt-2">→ 目标：<span className="font-mono">{r.target || '（无）'}</span></div>
-              <pre className="text-xs bg-paper border border-ink rounded p-2 mt-2 overflow-auto">{JSON.stringify(r.payload, null, 2)}</pre>
+              <div className="text-sm mt-2">
+                → 目标：<span className="font-mono">{r.target || '（无）'}</span>
+              </div>
+              <pre className="text-xs bg-paper border border-ink rounded p-2 mt-2 overflow-auto">
+                {JSON.stringify(r.payload, null, 2)}
+              </pre>
             </Panel>
           </motion.div>
         ))}

@@ -1,4 +1,4 @@
-import { Panel, Stamp, Shout } from '@cpm/ui';
+import { Panel, Shout, Stamp } from '@cpm/ui';
 import { motion } from 'framer-motion';
 import type { Step } from './types';
 
@@ -6,7 +6,9 @@ export function StepBubble({ step }: { step: Step }) {
   if (step.kind === 'llm_text') {
     return (
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="my-2">
-        <Panel shadow="yellow"><div className="whitespace-pre-wrap font-kuaile">{step.text}</div></Panel>
+        <Panel shadow="yellow">
+          <div className="whitespace-pre-wrap font-kuaile">{step.text}</div>
+        </Panel>
       </motion.div>
     );
   }
@@ -15,7 +17,9 @@ export function StepBubble({ step }: { step: Step }) {
       <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="my-2 ml-6">
         <Panel shadow="blue">
           <div className="flex items-center gap-2 mb-1">
-            <Shout tone="blue" rotation={-2}>调用 {step.toolName}</Shout>
+            <Shout tone="blue" rotation={-2}>
+              调用 {step.toolName}
+            </Shout>
           </div>
           <pre className="text-xs bg-paper border border-ink p-2 rounded">{JSON.stringify(step.input, null, 2)}</pre>
         </Panel>
@@ -41,7 +45,11 @@ export function StepBubble({ step }: { step: Step }) {
   }
   if (step.kind === 'error') {
     return (
-      <div className="my-2"><Panel shadow="red"><div className="text-cRed">{step.error}</div></Panel></div>
+      <div className="my-2">
+        <Panel shadow="red">
+          <div className="text-cRed">{step.error}</div>
+        </Panel>
+      </div>
     );
   }
   if (step.kind === 'done') {

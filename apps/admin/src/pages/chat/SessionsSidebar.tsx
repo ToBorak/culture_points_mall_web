@@ -1,13 +1,18 @@
-import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useEffect, useState } from 'react';
 
-interface Sess { id: number; title: string; createdAt: string }
+interface Sess {
+  id: number;
+  title: string;
+  createdAt: string;
+}
 
 export function SessionsSidebar({ onPick }: { onPick: (id: number) => void }) {
   const [rows, setRows] = useState<Sess[]>([]);
   useEffect(() => {
     const token = localStorage.getItem('cpm_admin_jwt');
-    axios.get<{ items: Sess[] }>('/admin/agent/sessions', { headers: { Authorization: `Bearer ${token}` } })
+    axios
+      .get<{ items: Sess[] }>('/admin/agent/sessions', { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => setRows(r.data.items))
       .catch(() => {});
   }, []);
@@ -17,7 +22,11 @@ export function SessionsSidebar({ onPick }: { onPick: (id: number) => void }) {
       <ul className="space-y-1">
         {rows.map((s) => (
           <li key={s.id}>
-            <button type="button" onClick={() => onPick(s.id)} className="block w-full text-left p-2 border-2 border-ink rounded">
+            <button
+              type="button"
+              onClick={() => onPick(s.id)}
+              className="block w-full text-left p-2 border-2 border-ink rounded"
+            >
               <div className="text-xs">{s.createdAt.slice(0, 10)}</div>
               <div className="font-kuaile">{s.title || '未命名'}</div>
             </button>

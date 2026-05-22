@@ -2,10 +2,10 @@ import type { ReactNode } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { AdminLoginPage } from './auth/AdminLoginPage';
 import { AdminLayout } from './layout/AdminLayout';
-import { AdminHomePage } from './pages/home/AdminHomePage';
-import { ValuesPage } from './pages/values/ValuesPage';
 import { ChatPage } from './pages/chat/ChatPage';
 import { MockOutboxPage } from './pages/dingtalk/MockOutboxPage';
+import { AdminHomePage } from './pages/home/AdminHomePage';
+import { ValuesPage } from './pages/values/ValuesPage';
 
 const wrap = (el: ReactNode) => <AdminLayout>{el}</AdminLayout>;
 
