@@ -8,7 +8,16 @@ interface Dim {
   code: string;
   name: string;
   description?: string;
-  keywords?: string[];
+  keywords?: string[] | string;
+}
+
+function parseKeywords(kw: string[] | string | undefined): string[] | undefined {
+  if (!kw) return undefined;
+  if (Array.isArray(kw)) return kw;
+  return kw
+    .split(/[,，]/)
+    .map((s) => s.trim())
+    .filter(Boolean);
 }
 
 interface LbResp {
@@ -106,7 +115,7 @@ export function ValuesPage() {
         {dims.map((d) => {
           const color = colorByCode[d.code] ?? '#7c3aed';
           const bgGrad = bgByCode[d.code] ?? 'linear-gradient(135deg, #f9f7ff, #f0e9ff)';
-          const keywords = d.keywords ?? keywordsByCode[d.code] ?? [];
+          const keywords = parseKeywords(d.keywords) ?? keywordsByCode[d.code] ?? [];
           const score = dimScores[d.id] ?? 0;
 
           return (
