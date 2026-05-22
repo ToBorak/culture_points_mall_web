@@ -1,1 +1,1 @@
-export { cpmUnoConfig } from '../uno.config';
+export { cpmUnoConfig } from '../uno.config.ts';
