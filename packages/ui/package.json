@@ -15,11 +15,11 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.6.1",
     "framer-motion": "^11.11.0",
     "gsap": "^3.12.5",
     "lottie-react": "^2.4.0",
-    "@react-three/fiber": "^9.6.1",
-    "@react-three/drei": "^10.7.7",
     "three": "^0.169.0"
   },
   "peerDependencies": {
@@ -27,11 +27,12 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@storybook/react": "^8.6.18",
+    "@storybook/react-vite": "^8.3.0",
+    "@storybook/test": "^8.3.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@types/three": "^0.169.0",
-    "@storybook/react-vite": "^8.3.0",
-    "@storybook/test": "^8.3.0",
     "@unocss/preset-uno": "^0.62.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
