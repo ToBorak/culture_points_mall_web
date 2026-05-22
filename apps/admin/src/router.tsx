@@ -4,6 +4,7 @@ import { AdminLoginPage } from './auth/AdminLoginPage';
 import { AdminLayout } from './layout/AdminLayout';
 import { AdminHomePage } from './pages/home/AdminHomePage';
 import { ValuesPage } from './pages/values/ValuesPage';
+import { ChatPage } from './pages/chat/ChatPage';
 
 const wrap = (el: ReactNode) => <AdminLayout>{el}</AdminLayout>;
 
@@ -12,7 +13,7 @@ export function AdminRouter() {
     <Routes>
       <Route path="/login" element={<AdminLoginPage />} />
       <Route path="/" element={wrap(<AdminHomePage />)} />
-      <Route path="/chat" element={wrap(<div>chat · Phase 3 实现</div>)} />
+      <Route path="/chat" element={wrap(<ChatPage />)} />
       <Route path="/values" element={wrap(<ValuesPage />)} />
       <Route path="/activities" element={wrap(<div>activities · Phase 3 实现</div>)} />
       <Route path="/mall" element={wrap(<div>mall · Phase 4 实现</div>)} />
