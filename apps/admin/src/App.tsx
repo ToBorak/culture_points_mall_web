@@ -1,2 +1,4 @@
 import { AdminRouter } from './router';
-export function App() { return <AdminRouter />; }
+export function App() {
+  return <AdminRouter />;
+}

@@ -1,3 +1,2 @@
-export { cpmUnoConfig } from '../uno.config.ts';
-export * from './primitives';
-export * from './components';
+export * from './primitives/index.ts';
+export * from './components/index.ts';

@@ -1,2 +1,2 @@
-export * from './ComicButton';
-export * from './DimChip';
+export * from './ComicButton.tsx';
+export * from './DimChip.tsx';
