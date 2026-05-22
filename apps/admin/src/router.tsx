@@ -6,6 +6,7 @@ import { ChatPage } from './pages/chat/ChatPage';
 import { MockOutboxPage } from './pages/dingtalk/MockOutboxPage';
 import { AdminHomePage } from './pages/home/AdminHomePage';
 import { ValuesPage } from './pages/values/ValuesPage';
+import { ActivityCodePage } from './pages/activities/ActivityCodePage';
 
 const wrap = (el: ReactNode) => <AdminLayout>{el}</AdminLayout>;
 
@@ -17,6 +18,7 @@ export function AdminRouter() {
       <Route path="/chat" element={wrap(<ChatPage />)} />
       <Route path="/values" element={wrap(<ValuesPage />)} />
       <Route path="/activities" element={wrap(<div>activities · Phase 3 实现</div>)} />
+      <Route path="/activities/:id/code" element={wrap(<ActivityCodePage />)} />
       <Route path="/mall" element={wrap(<div>mall · Phase 4 实现</div>)} />
       <Route path="/insights" element={wrap(<div>insights · 占位</div>)} />
       <Route path="/dingtalk/mock-outbox" element={wrap(<MockOutboxPage />)} />
