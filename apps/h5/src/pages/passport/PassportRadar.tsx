@@ -1,4 +1,4 @@
-import { RadarChart3D, RadarChart2D } from '@cpm/ui';
+import { RadarChart2D, RadarChart3D } from '@cpm/ui';
 import { useMemo } from 'react';
 
 export interface PassportRadarProps {
@@ -21,13 +21,14 @@ const colorByCode: Record<string, string> = {
 
 export function PassportRadar({ scoresByDimension }: PassportRadarProps) {
   const data = useMemo(
-    () => scoresByDimension.map((s) => ({
-      code: s.dimensionCode,
-      name: s.dimensionName,
-      score: s.totalScore,
-      max: 200,
-      color: colorByCode[s.dimensionCode] ?? '#1a1a1a',
-    })),
+    () =>
+      scoresByDimension.map((s) => ({
+        code: s.dimensionCode,
+        name: s.dimensionName,
+        score: s.totalScore,
+        max: 200,
+        color: colorByCode[s.dimensionCode] ?? '#1a1a1a',
+      })),
     [scoresByDimension],
   );
   const low = isLowEndDevice();

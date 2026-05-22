@@ -1,8 +1,8 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
 import type { ReactNode } from 'react';
-import { AdminHomePage } from './pages/home/AdminHomePage';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { AdminLoginPage } from './auth/AdminLoginPage';
 import { AdminLayout } from './layout/AdminLayout';
+import { AdminHomePage } from './pages/home/AdminHomePage';
 import { ValuesPage } from './pages/values/ValuesPage';
 
 const wrap = (el: ReactNode) => <AdminLayout>{el}</AdminLayout>;

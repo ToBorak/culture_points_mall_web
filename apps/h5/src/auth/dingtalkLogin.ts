@@ -1,11 +1,20 @@
-import dd from 'dingtalk-jsapi';
 import axios from 'axios';
+import dd from 'dingtalk-jsapi';
 
-interface LoginResp { token: string; userId: number; tenantId: number; name: string }
+interface LoginResp {
+  token: string;
+  userId: number;
+  tenantId: number;
+  name: string;
+}
+
+interface DingtalkWindow {
+  dd?: { runtime?: unknown };
+}
 
 export async function dingtalkLogin(): Promise<LoginResp> {
   let code: string;
-  if (typeof window !== 'undefined' && (window as any).dd?.runtime) {
+  if (typeof window !== 'undefined' && (window as unknown as DingtalkWindow).dd?.runtime) {
     const result = await dd.runtime.permission.requestAuthCode({
       corpId: import.meta.env.VITE_DING_CORP_ID ?? 'mock-corp',
     });

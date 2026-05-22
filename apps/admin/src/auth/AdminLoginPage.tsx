@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { ComicButton, Panel } from '@cpm/ui';
 import axios from 'axios';
-import { Panel, ComicButton } from '@cpm/ui';
+import { useState } from 'react';
 import { useAuth } from '../store/auth';
 
 export function AdminLoginPage() {
@@ -16,8 +16,9 @@ export function AdminLoginPage() {
       );
       setSession(data.token, data.userId, data.tenantId, data.name);
       window.location.href = '/';
-    } catch (e: any) {
-      setErr(e?.response?.data?.error ?? String(e));
+    } catch (e) {
+      const err = e as { response?: { data?: { error?: string } } };
+      setErr(err?.response?.data?.error ?? String(e));
     }
   };
 

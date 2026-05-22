@@ -22,7 +22,9 @@ export const useAuth = create<AuthState>((set) => ({
     set({ token: t, userId: uid, tenantId: tid, name });
   },
   clear() {
-    ['cpm_admin_jwt', 'cpm_admin_uid', 'cpm_admin_tid', 'cpm_admin_name'].forEach((k) => localStorage.removeItem(k));
+    for (const k of ['cpm_admin_jwt', 'cpm_admin_uid', 'cpm_admin_tid', 'cpm_admin_name']) {
+      localStorage.removeItem(k);
+    }
     set({ token: null, userId: null, tenantId: null, name: null });
   },
 }));

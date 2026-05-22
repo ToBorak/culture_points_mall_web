@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { HomePage } from './pages/home/HomePage';
-import { PassportPage } from './pages/passport/PassportPage';
 import { LeaderboardPage } from './pages/leaderboard/LeaderboardPage';
+import { PassportPage } from './pages/passport/PassportPage';
 
 export function AppRouter() {
   return (

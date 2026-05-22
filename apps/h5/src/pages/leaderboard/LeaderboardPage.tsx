@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { useLeaderboard, useDimensions } from '@cpm/api-client';
-import { Panel, ComicButton, DimChip, Halftone } from '@cpm/ui';
-import { TopThree } from './TopThree';
-import { motion } from 'framer-motion';
+import { useDimensions, useLeaderboard } from '@cpm/api-client';
 import type { LeaderboardEntry } from '@cpm/types';
+import { ComicButton, DimChip, Halftone, Panel } from '@cpm/ui';
+import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { TopThree } from './TopThree';
 
 type Scope = 'total' | 'dim' | 'dept';
 type Win = 'week' | 'month' | 'quarter' | 'year';
@@ -36,7 +36,13 @@ export function LeaderboardPage() {
           {scope === 'dim' && dims.data && (
             <div className="flex gap-2 flex-wrap mt-2">
               {dims.data.map((d) => (
-                <DimChip key={d.id} code={d.code} name={d.name} active={d.id === dimId} onClick={() => setDimId(d.id)} />
+                <DimChip
+                  key={d.id}
+                  code={d.code}
+                  name={d.name}
+                  active={d.id === dimId}
+                  onClick={() => setDimId(d.id)}
+                />
               ))}
             </div>
           )}
@@ -46,7 +52,10 @@ export function LeaderboardPage() {
         {q.data && q.data.entries.length >= 3 && (
           <TopThree
             entries={q.data.entries.slice(0, 3).map((e: LeaderboardEntry) => ({
-              rank: e.rank, name: e.name, avatarUrl: e.avatarUrl, score: e.score,
+              rank: e.rank,
+              name: e.name,
+              avatarUrl: e.avatarUrl,
+              score: e.score,
             }))}
           />
         )}
@@ -62,7 +71,9 @@ export function LeaderboardPage() {
               className="flex items-center gap-3 border-3 border-ink rounded-xl bg-paper p-2 shadow-[3px_3px_0_var(--cpm-ink)]"
             >
               <span className="font-bangers text-2xl w-8 text-center">#{e.rank}</span>
-              {e.avatarUrl && <img src={e.avatarUrl} className="w-10 h-10 rounded-full border-2 border-ink" alt={e.name} />}
+              {e.avatarUrl && (
+                <img src={e.avatarUrl} className="w-10 h-10 rounded-full border-2 border-ink" alt={e.name} />
+              )}
               <div className="flex-1">
                 <div className="font-kuaile">{e.name}</div>
                 <div className="text-xs text-ink/60">{e.deptName}</div>
