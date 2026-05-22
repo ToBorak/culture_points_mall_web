@@ -3,6 +3,8 @@ import { HomePage } from './pages/home/HomePage';
 import { LeaderboardPage } from './pages/leaderboard/LeaderboardPage';
 import { PassportPage } from './pages/passport/PassportPage';
 import { SigninPage } from './pages/signin/SigninPage';
+import { MallPage } from './pages/mall/MallPage';
+import { BlindboxDrawPage } from './pages/mall/BlindboxDrawPage';
 
 export function AppRouter() {
   return (
@@ -12,7 +14,8 @@ export function AppRouter() {
       <Route path="/leaderboard" element={<LeaderboardPage />} />
       <Route path="/activities" element={<div>activities · 占位 · Phase 3 实现</div>} />
       <Route path="/signin" element={<SigninPage />} />
-      <Route path="/mall" element={<div>mall · 占位 · Phase 4 实现</div>} />
+      <Route path="/mall" element={<MallPage />} />
+      <Route path="/mall/blindbox/:id" element={<BlindboxDrawPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
