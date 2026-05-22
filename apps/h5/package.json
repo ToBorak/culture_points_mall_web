@@ -16,12 +16,13 @@
     "@cpm/ui": "workspace:*",
     "@tanstack/react-query": "^5.59.0",
     "axios": "^1.7.0",
+    "dingtalk-jsapi": "^3.0.42",
     "framer-motion": "^11.11.0",
+    "gsap": "^3.15.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^6.26.0",
-    "zustand": "^4.5.0",
-    "dingtalk-jsapi": "^3.0.42"
+    "zustand": "^4.5.0"
   },
   "devDependencies": {
     "@types/react": "^19.0.0",
