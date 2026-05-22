@@ -1,0 +1,15 @@
+:root {
+  --cpm-shadow-panel: 6px 6px 0 var(--cpm-ink);
+  --cpm-shadow-card: 4px 4px 0 var(--cpm-ink);
+  --cpm-shadow-button: 3px 3px 0 var(--cpm-ink);
+  --cpm-shadow-panel-red: 6px 6px 0 var(--cpm-red);
+  --cpm-shadow-panel-blue: 6px 6px 0 var(--cpm-blue);
+  --cpm-shadow-panel-yellow: 6px 6px 0 var(--cpm-yellow);
+  --cpm-radius-panel: 14px;
+  --cpm-radius-card: 12px;
+  --cpm-radius-button: 8px;
+
+  --cpm-halftone-bg:
+    radial-gradient(circle at 20% 30%, var(--cpm-halftone) 1px, transparent 1.6px) 0 0 / 18px 18px,
+    radial-gradient(circle at 70% 70%, var(--cpm-halftone) 1px, transparent 1.6px) 0 0 / 26px 26px;
+}

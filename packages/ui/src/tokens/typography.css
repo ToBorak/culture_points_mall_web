@@ -1,0 +1,9 @@
+@import url('https://fonts.font.im/css2?family=Bangers&family=Permanent+Marker&family=ZCOOL+KuaiLe&family=ZCOOL+QingKe+HuangYou&family=Ma+Shan+Zheng&display=swap');
+
+:root {
+  --cpm-font-h1: 64px;
+  --cpm-font-h2: 40px;
+  --cpm-font-h3: 24px;
+  --cpm-font-body: 16px;
+  --cpm-font-sm: 13px;
+}

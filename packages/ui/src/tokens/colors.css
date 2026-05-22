@@ -1,0 +1,20 @@
+:root {
+  --cpm-ink: #1a1a1a;
+  --cpm-paper: #fffef8;
+  --cpm-red: #ff4757;
+  --cpm-orange: #ff9f43;
+  --cpm-yellow: #ffd93d;
+  --cpm-blue: #4facfe;
+  --cpm-pink: #ff7eb3;
+  --cpm-green: #6dd5a3;
+  --cpm-purple: #a55eea;
+  --cpm-teal: #38b6a8;
+  --cpm-halftone: rgba(0, 0, 0, 0.08);
+
+  --cpm-dim-customer_first: var(--cpm-orange);
+  --cpm-dim-team_collab: var(--cpm-blue);
+  --cpm-dim-innovation: var(--cpm-pink);
+  --cpm-dim-integrity: var(--cpm-green);
+  --cpm-dim-craftsmanship: var(--cpm-purple);
+  --cpm-dim-growth: var(--cpm-yellow);
+}

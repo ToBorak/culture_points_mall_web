@@ -3,3 +3,7 @@ packages:
   - "packages/*"
 allowBuilds:
   '@biomejs/biome': true
+  storybook: true
+  '@storybook/react-vite': true
+  'three': true
+  esbuild: true
