@@ -1,8 +1,14 @@
+import { Panel, Shout } from '@cpm/ui';
+
 export function AdminHomePage() {
   return (
-    <main className="min-h-screen bg-paper text-ink p-6 font-kuaile">
-      <h1 className="text-4xl font-qingke">文化积分商城 · 管理后台</h1>
-      <p>骨架阶段 · HR 后台各模块将在后续 Phase 实现</p>
-    </main>
+    <div className="space-y-4">
+      <Panel shadow="yellow">
+        <Shout>欢迎回到 CPM 后台</Shout>
+        <p className="mt-4 font-kuaile">
+          骨架 + 双屏已就绪。下个 Phase 上线 HR-Agent 与 MCP；再下一个 Phase 上线签到与盲盒。
+        </p>
+      </Panel>
+    </div>
   );
 }
