@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import type { Step } from './types';
 
 interface Props {
@@ -41,6 +41,16 @@ function CollapseBtn({
     </button>
   );
 }
+
+const codeStyle: CSSProperties = {
+  padding: '1px 6px',
+  borderRadius: 4,
+  background: 'rgba(255,255,255,0.7)',
+  border: '1px solid rgba(217,119,6,0.18)',
+  fontFamily: 'monospace',
+  fontSize: 11.5,
+  color: '#9a3412',
+};
 
 export function StepBubble({ step }: Props) {
   const [open, setOpen] = useState(false);
@@ -245,6 +255,59 @@ export function StepBubble({ step }: Props) {
   }
 
   if (step.kind === 'error') {
+    const raw = step.error ?? '';
+    const isAuthErr =
+      /x-api-key|authentication_error|401|api[_-]?key/i.test(raw) ||
+      /未配置.*api/i.test(raw);
+    if (isAuthErr) {
+      return (
+        <motion.div
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          style={{
+            maxWidth: '88%',
+            borderRadius: 16,
+            border: '1.5px solid rgba(217,119,6,0.25)',
+            background: 'linear-gradient(135deg, rgba(254,243,199,0.6) 0%, rgba(254,215,170,0.4) 100%)',
+            padding: '14px 18px',
+            display: 'flex',
+            gap: 12,
+            alignItems: 'flex-start',
+            fontFamily: 'var(--cpm-font-sans)',
+          }}
+        >
+          <span
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: 10,
+              background: '#fff',
+              color: '#d97706',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 16,
+              fontWeight: 700,
+              flexShrink: 0,
+              border: '1px solid rgba(217,119,6,0.2)',
+            }}
+          >
+            ⚡
+          </span>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 14, fontWeight: 600, color: '#9a3412', marginBottom: 4 }}>
+              LLM 尚未配置
+            </div>
+            <div style={{ fontSize: 12.5, color: '#7c2d12', lineHeight: 1.6 }}>
+              HR-Agent 依赖大模型推理，需要在后端 <code style={codeStyle}>configs/config.yaml</code> 配置{' '}
+              <code style={codeStyle}>llm.claude.api_key</code>，或导出环境变量{' '}
+              <code style={codeStyle}>ANTHROPIC_API_KEY</code> 后重启服务。除此之外的功能（活动、商城、签到、积分、徽章、排行榜、维度、钉钉推送）均已就绪。
+            </div>
+          </div>
+        </motion.div>
+      );
+    }
     return (
       <motion.div
         initial={{ opacity: 0 }}
@@ -260,7 +323,7 @@ export function StepBubble({ step }: Props) {
           fontFamily: 'var(--cpm-font-sans)',
         }}
       >
-        {step.error}
+        {raw}
       </motion.div>
     );
   }
