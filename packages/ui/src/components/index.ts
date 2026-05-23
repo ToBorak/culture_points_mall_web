@@ -12,6 +12,8 @@ export * from './EmptyState.tsx';
 export * from './RadarChart3D.tsx';
 export * from './RadarChart2D.tsx';
 export * from './BlindboxWheel.tsx';
+export * from './BlindboxBox3D.tsx';
+export * from './PrizeRevealModal.tsx';
 
 // 旧动漫风兼容层
 export * from './ComicButton.tsx';
