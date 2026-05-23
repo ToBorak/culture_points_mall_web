@@ -68,13 +68,15 @@ export function RadarChart3D({ data, size = 320 }: RadarChart3DProps) {
         {/* 漂浮粒子尘 */}
         <ParticleDust count={80} />
 
-        {/* 慢转 */}
+        {/* 可拖拽旋转 + 松手后继续自动慢转 */}
         <OrbitControls
           enableZoom={false}
           enablePan={false}
-          enableRotate={false}
+          enableRotate
           autoRotate
           autoRotateSpeed={0.5}
+          minPolarAngle={Math.PI / 4}
+          maxPolarAngle={Math.PI / 2.1}
           target={[0, 0.8, 0]}
         />
       </Canvas>
