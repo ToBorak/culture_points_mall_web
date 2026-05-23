@@ -52,13 +52,15 @@ export function useAgentChat() {
           } else if (event === 'step') {
             const step = JSON.parse(data) as Step;
             setTurns((prev) => {
-              const next = [...prev];
-              const last = next[next.length - 1];
-              if (last) {
-                last.steps = [...last.steps, step];
-                if (step.kind === 'done' || step.kind === 'error') last.done = true;
-              }
-              return next;
+              if (prev.length === 0) return prev;
+              const last = prev[prev.length - 1];
+              const updated: ChatTurn = {
+                ...last,
+                steps: [...last.steps, step],
+                done:
+                  step.kind === 'done' || step.kind === 'error' ? true : last.done,
+              };
+              return [...prev.slice(0, -1), updated];
             });
           }
         }
