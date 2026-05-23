@@ -1,20 +1,102 @@
 :root {
-  --cpm-ink: #1a1a1a;
-  --cpm-paper: #fffef8;
-  --cpm-red: #ff4757;
-  --cpm-orange: #ff9f43;
-  --cpm-yellow: #ffd93d;
-  --cpm-blue: #4facfe;
-  --cpm-pink: #ff7eb3;
-  --cpm-green: #6dd5a3;
-  --cpm-purple: #a55eea;
-  --cpm-teal: #38b6a8;
-  --cpm-halftone: rgba(0, 0, 0, 0.08);
+  /* === 背景 · 暖白 + 淡彩 mesh === */
+  --cpm-bg-0: #f9f7ff;
+  --cpm-bg-1: #ffffff;
+  --cpm-bg-2: #f3eeff;
+  --cpm-bg-3: #fef0f4;
 
-  --cpm-dim-customer_first: var(--cpm-orange);
-  --cpm-dim-team_collab: var(--cpm-blue);
-  --cpm-dim-innovation: var(--cpm-pink);
-  --cpm-dim-integrity: var(--cpm-green);
-  --cpm-dim-craftsmanship: var(--cpm-purple);
-  --cpm-dim-growth: var(--cpm-yellow);
+  /* === 卡片 · 干净白 + 细线边 === */
+  --cpm-card-bg: rgba(255, 255, 255, 0.85);
+  --cpm-card-bg-solid: #ffffff;
+  --cpm-card-border: rgba(15, 23, 42, 0.06);
+  --cpm-card-border-strong: rgba(15, 23, 42, 0.10);
+  --cpm-card-shine: rgba(255, 255, 255, 0.8);
+
+  /* === 文本层级（深色文字，浅底反差强） === */
+  --cpm-text-primary: #0f172a;
+  --cpm-text-secondary: rgba(15, 23, 42, 0.65);
+  --cpm-text-tertiary: rgba(15, 23, 42, 0.45);
+  --cpm-text-muted: rgba(15, 23, 42, 0.28);
+
+  /* === 品牌主色 === */
+  --cpm-brand-violet: #7c3aed;
+  --cpm-brand-violet-light: #a78bfa;
+  --cpm-brand-violet-bg: rgba(124, 58, 237, 0.08);
+  --cpm-brand-cyan: #0891b2;
+  --cpm-brand-cyan-light: #67e8f9;
+  --cpm-brand-cyan-bg: rgba(8, 145, 178, 0.08);
+  --cpm-brand-rose: #e11d48;
+  --cpm-brand-rose-light: #fda4af;
+  --cpm-brand-rose-bg: rgba(225, 29, 72, 0.08);
+  --cpm-brand-amber: #d97706;
+  --cpm-brand-amber-bg: rgba(217, 119, 6, 0.08);
+
+  /* === 6 维度色 === */
+  --cpm-dim-customer_first: #f97316;
+  --cpm-dim-team_collab: #0ea5e9;
+  --cpm-dim-innovation: #ec4899;
+  --cpm-dim-integrity: #10b981;
+  --cpm-dim-craftsmanship: #8b5cf6;
+  --cpm-dim-growth: #eab308;
+
+  /* === Mesh gradient 渲染色 === */
+  --cpm-mesh-1: rgba(167, 139, 250, 0.35);   /* violet */
+  --cpm-mesh-2: rgba(125, 211, 252, 0.30);   /* cyan */
+  --cpm-mesh-3: rgba(253, 164, 175, 0.35);   /* rose */
+  --cpm-mesh-4: rgba(254, 215, 170, 0.32);   /* amber */
+
+  /* === 状态色 === */
+  --cpm-success: #10b981;
+  --cpm-warning: #f59e0b;
+  --cpm-danger: #ef4444;
+  --cpm-info: #3b82f6;
+
+  /* === 旧 token 兼容 === */
+  --cpm-ink: var(--cpm-text-primary);
+  --cpm-paper: var(--cpm-bg-1);
+  --cpm-red: var(--cpm-brand-rose);
+  --cpm-orange: var(--cpm-dim-customer_first);
+  --cpm-yellow: var(--cpm-dim-growth);
+  --cpm-blue: var(--cpm-brand-cyan);
+  --cpm-pink: var(--cpm-dim-innovation);
+  --cpm-green: var(--cpm-success);
+  --cpm-purple: var(--cpm-brand-violet);
+  --cpm-teal: var(--cpm-brand-cyan);
+  --cpm-halftone: rgba(15, 23, 42, 0.04);
+
+  /* === 玻璃 token 适配浅色 === */
+  --cpm-glass-bg: var(--cpm-card-bg);
+  --cpm-glass-bg-hover: rgba(255, 255, 255, 0.95);
+  --cpm-glass-border: var(--cpm-card-border);
+  --cpm-glass-border-strong: var(--cpm-card-border-strong);
+  --cpm-glass-shine: var(--cpm-card-shine);
+
+  /* === Aurora 残留兼容 === */
+  --cpm-aurora-1: var(--cpm-mesh-1);
+  --cpm-aurora-2: var(--cpm-mesh-2);
+  --cpm-aurora-3: var(--cpm-mesh-3);
+  --cpm-aurora-4: var(--cpm-mesh-4);
+
+  /* === Bento 阴影 === */
+  --cpm-shadow-soft:
+    0 1px 0 rgba(255, 255, 255, 0.6) inset,
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 8px 24px -8px rgba(15, 23, 42, 0.08);
+  --cpm-shadow-pop:
+    0 1px 0 rgba(255, 255, 255, 0.8) inset,
+    0 4px 12px -4px rgba(15, 23, 42, 0.10),
+    0 20px 40px -16px rgba(124, 58, 237, 0.20);
+  --cpm-shadow-glow-violet: 0 12px 32px -8px rgba(124, 58, 237, 0.35);
+  --cpm-shadow-glow-cyan: 0 12px 32px -8px rgba(8, 145, 178, 0.32);
+  --cpm-shadow-glow-rose: 0 12px 32px -8px rgba(225, 29, 72, 0.30);
+  --cpm-shadow-glow-amber: 0 12px 32px -8px rgba(217, 119, 6, 0.32);
+
+  /* === 玻璃旧 shadow 兼容 === */
+  --cpm-shadow-glass: var(--cpm-shadow-soft);
+  --cpm-shadow-glass-hover: var(--cpm-shadow-pop);
+}
+
+html, body {
+  background: var(--cpm-bg-0);
+  color: var(--cpm-text-primary);
 }

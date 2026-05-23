@@ -5,3 +5,6 @@ dist/
 .env.local
 .DS_Store
 storybook-static/
+
+# Vite cache 残留
+**/vite.config.ts.timestamp-*

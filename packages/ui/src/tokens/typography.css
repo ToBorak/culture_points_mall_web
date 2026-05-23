@@ -1,9 +1,32 @@
-@import url('https://fonts.font.im/css2?family=Bangers&family=Permanent+Marker&family=ZCOOL+KuaiLe&family=ZCOOL+QingKe+HuangYou&family=Ma+Shan+Zheng&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Serif+Display&display=swap');
 
 :root {
-  --cpm-font-h1: 64px;
-  --cpm-font-h2: 40px;
-  --cpm-font-h3: 24px;
-  --cpm-font-body: 16px;
-  --cpm-font-sm: 13px;
+  --cpm-font-sans:
+    'Inter', 'HarmonyOS Sans SC', 'PingFang SC', -apple-system, BlinkMacSystemFont,
+    'Helvetica Neue', 'Microsoft YaHei', sans-serif;
+  --cpm-font-serif: 'DM Serif Display', 'Source Han Serif SC', 'Noto Serif SC', serif;
+  --cpm-font-mono: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
+
+  --cpm-text-display: 56px;
+  --cpm-text-h1: 36px;
+  --cpm-text-h2: 28px;
+  --cpm-text-h3: 22px;
+  --cpm-text-body: 15px;
+  --cpm-text-sm: 13px;
+  --cpm-text-xs: 11px;
+
+  --cpm-leading-tight: 1.15;
+  --cpm-leading-normal: 1.5;
+  --cpm-leading-relaxed: 1.7;
+
+  --cpm-tracking-tight: -0.02em;
+  --cpm-tracking-normal: 0;
+  --cpm-tracking-wide: 0.04em;
+}
+
+html, body {
+  font-family: var(--cpm-font-sans);
+  font-feature-settings: 'ss01', 'cv11';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
