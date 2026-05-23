@@ -277,7 +277,10 @@ export function ChatPage() {
               value={text}
               onChange={(e) => setText(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) submit();
+                if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
+                  e.preventDefault();
+                  submit();
+                }
               }}
               placeholder="对 HR-Agent 说点什么..."
               rows={2}
@@ -318,7 +321,7 @@ export function ChatPage() {
                 pointerEvents: 'none',
               }}
             >
-              ⌘/Ctrl+Enter 发送
+              Enter 发送 · Shift+Enter 换行
             </div>
           </div>
           <Button
