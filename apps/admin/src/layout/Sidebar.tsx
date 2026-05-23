@@ -5,10 +5,10 @@ import { useAuth } from '../store/auth';
 const items = [
   { to: '/', label: '首页', icon: '✦', end: true },
   { to: '/chat', label: 'HR-Agent', icon: '⚡', end: false },
+  { to: '/layout', label: '首页编排', icon: '▦', end: false },
   { to: '/activities', label: '活动管理', icon: '◐', end: false },
   { to: '/values', label: '价值观维度', icon: '✧', end: false },
   { to: '/mall', label: '商城/盲盒', icon: '◈', end: false },
-  { to: '/layout', label: '首页编排', icon: '▦', end: false },
   { to: '/insights', label: '数据洞察', icon: '⌬', end: false },
   { to: '/dingtalk/mock-outbox', label: '钉钉推送', icon: '⊕', end: false },
 ];
