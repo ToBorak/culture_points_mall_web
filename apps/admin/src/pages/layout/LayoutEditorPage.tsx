@@ -362,11 +362,12 @@ function SortableModule({
         type="button"
         onClick={onToggle}
         style={{
-          width: 38,
-          height: 22,
+          width: 42,
+          height: 24,
           borderRadius: 999,
           border: 'none',
-          background: module.visible ? meta.tint : 'rgba(15,23,42,0.15)',
+          padding: 0,
+          background: module.visible ? meta.tint : 'rgba(15,23,42,0.18)',
           position: 'relative',
           cursor: 'pointer',
           transition: 'background 0.2s',
@@ -375,16 +376,16 @@ function SortableModule({
         aria-label={module.visible ? '隐藏' : '显示'}
       >
         <motion.span
-          animate={{ x: module.visible ? 18 : 2 }}
+          animate={{ left: module.visible ? 20 : 2 }}
           transition={{ type: 'spring', stiffness: 350, damping: 25 }}
           style={{
             position: 'absolute',
             top: 2,
-            width: 18,
-            height: 18,
+            width: 20,
+            height: 20,
             borderRadius: '50%',
             background: '#fff',
-            boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.25)',
           }}
         />
       </button>
