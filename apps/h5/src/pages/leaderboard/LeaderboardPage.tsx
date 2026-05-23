@@ -1,9 +1,10 @@
 import { useDimensions, useLeaderboard } from '@cpm/api-client';
 import type { LeaderboardEntry } from '@cpm/types';
-import { AuroraBg } from '@cpm/ui';
+import { AuroraBg, LeaderboardInsightCard, type LeaderboardInsightData } from '@cpm/ui';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 type Scope = 'total' | 'dim' | 'dept';
 type Win = 'week' | 'month' | 'quarter' | 'year';
@@ -185,6 +186,18 @@ export function LeaderboardPage() {
   const dims = useDimensions();
   const q = useLeaderboard({ scope, window: win, dimensionId: dimId });
 
+  // AI 解读
+  const [insight, setInsight] = useState<LeaderboardInsightData | null>(null);
+  useEffect(() => {
+    const token = localStorage.getItem('cpm_jwt');
+    axios
+      .get<LeaderboardInsightData>('/api/v1/me/leaderboard-insight', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((r) => setInsight(r.data))
+      .catch(() => {});
+  }, []);
+
   const entries: LeaderboardEntry[] = q.data?.entries ?? [];
   const myUserId = Number(localStorage.getItem('cpm_user_id') ?? 0);
   const myEntry = entries.find((e) => e.userId === myUserId);
@@ -235,6 +248,11 @@ export function LeaderboardPage() {
             排行榜
           </span>
           <div style={{ width: 60 }} />
+        </div>
+
+        {/* AI 排行解读 */}
+        <div style={{ marginBottom: 16 }}>
+          <LeaderboardInsightCard data={insight} loading={!insight} />
         </div>
 
         {/* 我的排名卡（紫渐变） */}

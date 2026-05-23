@@ -5,6 +5,7 @@ import { PassportPage } from './pages/passport/PassportPage';
 import { SigninPage } from './pages/signin/SigninPage';
 import { MallPage } from './pages/mall/MallPage';
 import { BlindboxDrawPage } from './pages/mall/BlindboxDrawPage';
+import { DNAReportPage } from './pages/dna/DNAReportPage';
 
 export function AppRouter() {
   return (
@@ -16,6 +17,7 @@ export function AppRouter() {
       <Route path="/signin" element={<SigninPage />} />
       <Route path="/mall" element={<MallPage />} />
       <Route path="/mall/blindbox/:id" element={<BlindboxDrawPage />} />
+      <Route path="/dna" element={<DNAReportPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

@@ -15,6 +15,11 @@ export * from './BlindboxWheel.tsx';
 export * from './BlindboxBox3D.tsx';
 export * from './PrizeRevealModal.tsx';
 
+// AI 智能洞察卡
+export * from './AiCoachCard.tsx';
+export * from './ChallengeCard.tsx';
+export * from './LeaderboardInsightCard.tsx';
+
 // 旧动漫风兼容层
 export * from './ComicButton.tsx';
 export * from './DimChip.tsx';
