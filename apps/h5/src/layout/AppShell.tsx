@@ -33,7 +33,7 @@ export function AppShell() {
 
   if (isDesktop) {
     return (
-      <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--cpm-app-bg)' }}>
+      <div style={{ display: 'flex', height: '100dvh', background: 'var(--cpm-app-bg)' }}>
         <SideNav
           items={TABS}
           activeKey={activeKey}
@@ -74,7 +74,7 @@ export function AppShell() {
             <div style={{ flex: 1 }} />
             <PointsPill value={PLACEHOLDER_POINTS} />
           </header>
-          <div style={{ flex: 1, overflowY: 'auto' }}>
+          <div style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
             <Outlet />
           </div>
         </main>
@@ -83,8 +83,8 @@ export function AppShell() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: 'var(--cpm-app-bg)' }}>
-      <div style={{ flex: 1 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', background: 'var(--cpm-app-bg)' }}>
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
         <Outlet />
       </div>
       <BottomTabBar items={TABS} activeKey={activeKey} onSelect={go} />
