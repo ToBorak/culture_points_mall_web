@@ -1,3 +1,4 @@
+import { usePassport } from '@cpm/api-client';
 import { BottomTabBar, PointsPill, SideNav, type TabItem, useBreakpoint } from '@cpm/ui';
 import { Gift, Sparkles, Target, Trophy, User } from 'lucide-react';
 import { useMemo } from 'react';
@@ -14,11 +15,9 @@ const TABS: ShellTab[] = [
   { key: 'me', label: '我的', icon: <User size={22} />, path: '/me' },
 ];
 
-// TODO(计划 5)：积分余额改为来自接口（usePassport），当前为占位值。
-const PLACEHOLDER_POINTS = 1540;
-
 export function AppShell() {
   const { isDesktop } = useBreakpoint();
+  const points = usePassport().data?.totalScore ?? 0;
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -72,7 +71,7 @@ export function AppShell() {
             }}
           >
             <div style={{ flex: 1 }} />
-            <PointsPill value={PLACEHOLDER_POINTS} />
+            <PointsPill value={points} />
           </header>
           <div style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
             <Outlet />

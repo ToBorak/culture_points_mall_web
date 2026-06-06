@@ -36,3 +36,7 @@ export * from './TrendIndicator.tsx';
 export * from './SegmentedControl.tsx';
 export * from './PodiumTop3.tsx';
 export * from './LeaderboardRow.tsx';
+
+// 重设计 · 我的组件 (2026-06)
+export * from './PointLedgerRow.tsx';
+export * from './BadgeCard.tsx';
