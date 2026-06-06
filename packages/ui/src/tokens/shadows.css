@@ -12,4 +12,13 @@
   --cpm-halftone-bg:
     radial-gradient(circle at 20% 30%, var(--cpm-halftone) 1px, transparent 1.6px) 0 0 / 18px 18px,
     radial-gradient(circle at 70% 70%, var(--cpm-halftone) 1px, transparent 1.6px) 0 0 / 26px 26px;
+
+  /* === 重设计 · 圆角与立体阴影 (2026-06) === */
+  --cpm-r-sm: 10px;
+  --cpm-r-md: 16px;
+  --cpm-r-lg: 22px;
+  --cpm-r-xl: 28px;
+  --cpm-r-pill: 999px;
+  --cpm-elev-candy: 0 14px 28px -8px rgba(106, 92, 255, 0.4);
+  --cpm-elev-soft: 0 6px 18px -8px rgba(25, 26, 44, 0.18);
 }
