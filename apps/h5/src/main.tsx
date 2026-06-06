@@ -1,11 +1,12 @@
 import 'virtual:uno.css';
 import '@cpm/ui/tokens.css';
+import './index.css';
 import { setupHttp } from '@cpm/api-client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import axios from 'axios';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import axios from 'axios';
 import { App } from './App';
 
 setupHttp('/', () => localStorage.getItem('cpm_jwt'));
@@ -22,7 +23,7 @@ axios.interceptors.response.use(
   (err) => {
     const url: string = err?.config?.url ?? '';
     if (err?.response?.status === 401 && !url.includes('/auth/')) {
-      ['cpm_jwt', 'cpm_uid', 'cpm_tid', 'cpm_name'].forEach((k) => localStorage.removeItem(k));
+      for (const k of ['cpm_jwt', 'cpm_uid', 'cpm_tid', 'cpm_name']) localStorage.removeItem(k);
       if (!sessionStorage.getItem('cpm_reloading')) {
         sessionStorage.setItem('cpm_reloading', '1');
         window.location.reload();

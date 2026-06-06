@@ -16,10 +16,14 @@ export function BottomTabBar({ items, activeKey, onSelect }: BottomTabBarProps) 
   return (
     <nav
       style={{
+        position: 'relative',
+        zIndex: 20,
+        flexShrink: 0,
         display: 'flex',
         background: 'var(--cpm-surface)',
         padding: '8px 10px max(22px, env(safe-area-inset-bottom))',
         borderTop: '1px solid var(--cpm-border-subtle)',
+        boxShadow: '0 -4px 16px -8px rgba(25,26,44,0.12)',
       }}
     >
       {items.map((it) => {

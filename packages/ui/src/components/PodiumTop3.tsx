@@ -76,7 +76,7 @@ export function PodiumTop3({ entries }: PodiumTop3Props) {
         }}
       >
         <Trophy size={16} style={{ color: '#fff' }} />
-        本周 · 文化分 TOP 3
+        文化分 TOP 3
       </div>
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: 12, marginTop: 14 }}>
         <Column entry={second} place={2} />

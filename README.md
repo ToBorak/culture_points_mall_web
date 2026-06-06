@@ -14,11 +14,11 @@
 
 自动完成：
 1. 检测/安装 Node + pnpm（macOS 走 brew，Linux 走 apt）
-2. 检查后端是否在 `http://localhost:8080`（不在会警告但仍启动）
+2. 检查后端是否在 `http://localhost:18080`（不在会警告但仍启动）
 3. `pnpm install`
 4. 并行启动 H5 :5173 + Admin :5174
 
-需要不同后端地址：`BACKEND_URL=http://192.168.1.5:8080 ./scripts/dev.sh`
+需要不同后端地址：`BACKEND_URL=http://192.168.1.5:18080 ./scripts/dev.sh`
 
 ## 包结构
 

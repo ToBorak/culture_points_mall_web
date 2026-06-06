@@ -1,461 +1,631 @@
-import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { motion } from 'framer-motion';
-import { AuroraBg } from '@cpm/ui';
+import { useMallItems, useMyOrders, usePassport, useRedeemItem } from '@cpm/api-client';
+import type { MallItem } from '@cpm/types';
+import { PointsPill, useBreakpoint } from '@cpm/ui';
+import { Coins, Gift, Package, Sparkles, X } from 'lucide-react';
+import { type CSSProperties, type ReactNode, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-interface Item {
-  ID: number;
-  Type: string;
-  Name: string;
-  Cost: number;
-  ImageURL: string;
+const orderBtnStyle: CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 5,
+  padding: '7px 12px',
+  borderRadius: 999,
+  border: '1px solid var(--cpm-border-subtle)',
+  background: 'var(--cpm-surface)',
+  color: 'var(--cpm-ink-2)',
+  cursor: 'pointer',
+  fontFamily: 'var(--cpm-font-sans)',
+  fontSize: 12,
+  fontWeight: 700,
+};
+
+const cardStyle: CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 12,
+  padding: 12,
+  borderRadius: 16,
+  background: 'var(--cpm-surface)',
+  border: '1px solid var(--cpm-border-subtle)',
+  boxShadow: 'var(--cpm-elev-soft)',
+};
+
+const mallShellStyle = (isDesktop: boolean): CSSProperties => ({
+  width: '100%',
+  maxWidth: isDesktop ? 1120 : 640,
+  margin: '0 auto',
+  boxSizing: 'border-box',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: isDesktop ? 18 : 16,
+  padding: isDesktop ? '20px 24px 34px' : '12px 16px 24px',
+});
+
+const gridStyle = (isDesktop: boolean, min = 240): CSSProperties => ({
+  display: 'grid',
+  gridTemplateColumns: isDesktop ? `repeat(auto-fit, minmax(${min}px, 1fr))` : '1fr',
+  gap: isDesktop ? 14 : 10,
+});
+
+function Empty({ text }: { text: string }) {
+  return (
+    <div
+      style={{ textAlign: 'center', padding: '48px 0', color: 'var(--cpm-ink-2)', fontFamily: 'var(--cpm-font-sans)' }}
+    >
+      {text}
+    </div>
+  );
 }
 
-type Tab = 'blindbox' | 'products';
-
-const blindboxGradients = [
-  'linear-gradient(135deg,#f3e8ff,#e0e7ff)',
-  'linear-gradient(135deg,#fce7f3,#ffe4e6)',
-  'linear-gradient(135deg,#ecfeff,#dbeafe)',
-  'linear-gradient(135deg,#fef9c3,#fef3c7)',
-];
-
-const blindboxAccent = ['#7c3aed', '#e11d48', '#0891b2', '#d97706'];
-
-export function MallPage() {
-  const [items, setItems] = useState<Item[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<Tab>('blindbox');
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const token = localStorage.getItem('cpm_jwt');
-    axios
-      .get<{ items: Item[] }>('/api/v1/mall/items', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((r) => setItems(r.data.items))
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
-
-  const blindboxes = items.filter((it) => it.Type === 'blindbox');
-  const products = items.filter((it) => it.Type !== 'blindbox');
-
-  const myPoints = Number(localStorage.getItem('cpm_points') ?? 0);
-
+function SectionTitle({ icon, text }: { icon: ReactNode; text: string }) {
   return (
-    <AuroraBg>
-      <main style={{ padding: '20px 16px 80px', maxWidth: 460, margin: '0 auto' }}>
-        {/* 顶部状态栏 */}
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 6,
+        fontFamily: 'var(--cpm-font-sans)',
+        fontWeight: 800,
+        fontSize: 15,
+        color: 'var(--cpm-ink-1)',
+      }}
+    >
+      {icon}
+      {text}
+    </div>
+  );
+}
+
+function GoodRow({
+  item,
+  affordable,
+  redeeming,
+  onRedeem,
+}: { item: MallItem; affordable: boolean; redeeming: boolean; onRedeem: (item: MallItem) => void }) {
+  const out = item.Stock !== null && item.Stock <= 0;
+  const disabled = out || !affordable || redeeming;
+  const handleRedeem = () => {
+    if (disabled) return;
+    onRedeem(item);
+  };
+  return (
+    <div style={cardStyle}>
+      <img
+        src={item.ImageURL}
+        alt={item.Name}
+        style={{
+          width: 56,
+          height: 56,
+          borderRadius: 12,
+          objectFit: 'cover',
+          background: 'var(--cpm-sunken)',
+          flexShrink: 0,
+        }}
+      />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontFamily: 'var(--cpm-font-sans)', fontWeight: 600, fontSize: 14, color: 'var(--cpm-ink-1)' }}>
+          {item.Name}
+        </div>
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
+            marginTop: 3,
+            fontFamily: 'var(--cpm-font-num)',
+            fontWeight: 800,
+            fontSize: 15,
+            color: 'var(--cpm-gold-ink)',
+          }}
+        >
+          <Coins size={14} style={{ color: 'var(--cpm-gold)' }} />
+          {item.Cost}
+          {item.Stock !== null && (
+            <span
+              style={{
+                fontFamily: 'var(--cpm-font-sans)',
+                fontWeight: 500,
+                fontSize: 11,
+                color: 'var(--cpm-ink-2)',
+                marginLeft: 6,
+              }}
+            >
+              库存 {item.Stock}
+            </span>
+          )}
+        </div>
+      </div>
+      <button
+        type="button"
+        onClick={handleRedeem}
+        disabled={disabled}
+        style={{
+          flexShrink: 0,
+          minHeight: 36,
+          padding: '8px 16px',
+          borderRadius: 999,
+          border: 'none',
+          cursor: disabled ? 'not-allowed' : 'pointer',
+          fontFamily: 'var(--cpm-font-sans)',
+          fontSize: 13,
+          fontWeight: 700,
+          background: disabled ? 'var(--cpm-sunken)' : 'var(--cpm-primary)',
+          color: disabled ? 'var(--cpm-ink-2)' : 'var(--cpm-on-primary)',
+          boxShadow: disabled ? 'none' : 'var(--cpm-elev-candy)',
+          transition: 'all 200ms ease',
+        }}
+      >
+        {redeeming ? '兑换中…' : out ? '已售罄' : !affordable ? '积分不足' : '兑换'}
+      </button>
+    </div>
+  );
+}
+
+function ShopView({
+  items,
+  points,
+  onOpenBox,
+  onRedeem,
+  redeemingId,
+  isDesktop,
+}: {
+  items: MallItem[];
+  points: number;
+  onOpenBox: (id: number) => void;
+  onRedeem: (item: MallItem) => void;
+  redeemingId: number | null;
+  isDesktop: boolean;
+}) {
+  const blindboxes = items.filter((i) => i.Type === 'blindbox');
+  const goods = items.filter((i) => i.Type === 'item');
+  if (items.length === 0) return <Empty text="商城暂无商品" />;
+  return (
+    <>
+      {blindboxes.length > 0 && (
+        <section style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <SectionTitle icon={<Sparkles size={16} style={{ color: 'var(--cpm-primary)' }} />} text="盲盒抽奖" />
+          <div style={gridStyle(isDesktop, 320)}>
+            {blindboxes.map((b) => (
+              <button
+                key={b.ID}
+                type="button"
+                aria-label={`${b.Name}，${b.Cost} 分 / 次，进入盲盒抽奖`}
+                onClick={() => onOpenBox(b.ID)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 14,
+                  textAlign: 'left',
+                  minHeight: isDesktop ? 118 : 112,
+                  padding: isDesktop ? 14 : 12,
+                  borderRadius: 18,
+                  border: '1px solid var(--cpm-border-subtle)',
+                  background: 'linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.88) 100%)',
+                  boxShadow: 'var(--cpm-elev-soft)',
+                  cursor: 'pointer',
+                  transition: 'border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease',
+                }}
+              >
+                <div
+                  style={{
+                    width: isDesktop ? 86 : 76,
+                    height: isDesktop ? 86 : 76,
+                    borderRadius: 14,
+                    background: 'var(--cpm-grad-brand)',
+                    display: 'grid',
+                    placeItems: 'center',
+                    boxShadow: 'var(--cpm-elev-candy)',
+                    flexShrink: 0,
+                  }}
+                >
+                  <Gift size={isDesktop ? 34 : 30} style={{ color: '#fff' }} />
+                </div>
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <div
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 5,
+                      padding: '4px 8px',
+                      borderRadius: 999,
+                      background: 'var(--cpm-primary-soft)',
+                      color: 'var(--cpm-primary-strong)',
+                      fontFamily: 'var(--cpm-font-sans)',
+                      fontWeight: 800,
+                      fontSize: 11,
+                    }}
+                  >
+                    <Sparkles size={12} aria-hidden />
+                    限时抽奖
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: 'var(--cpm-font-sans)',
+                      fontWeight: 800,
+                      fontSize: isDesktop ? 16 : 15,
+                      color: 'var(--cpm-ink-1)',
+                      marginTop: 8,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {b.Name}
+                  </div>
+                  <div
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 4,
+                      marginTop: 6,
+                      fontFamily: 'var(--cpm-font-num)',
+                      fontWeight: 800,
+                      color: 'var(--cpm-gold-ink)',
+                    }}
+                  >
+                    <Coins size={14} style={{ color: 'var(--cpm-gold)' }} />
+                    {b.Cost} 分 / 次
+                  </div>
+                </div>
+                <div
+                  style={{
+                    flexShrink: 0,
+                    width: 34,
+                    height: 34,
+                    borderRadius: 999,
+                    display: 'grid',
+                    placeItems: 'center',
+                    background: 'var(--cpm-primary)',
+                    color: 'var(--cpm-on-primary)',
+                    boxShadow: 'var(--cpm-elev-candy)',
+                  }}
+                >
+                  <Sparkles size={16} aria-hidden />
+                </div>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {goods.length > 0 && (
+        <section style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <SectionTitle icon={<Gift size={16} style={{ color: 'var(--cpm-primary)' }} />} text="积分好物" />
+          <div style={gridStyle(isDesktop, 300)}>
+            {goods.map((g) => (
+              <GoodRow
+                key={g.ID}
+                item={g}
+                affordable={points >= g.Cost}
+                redeeming={redeemingId === g.ID}
+                onRedeem={onRedeem}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+    </>
+  );
+}
+
+function OrdersView() {
+  const ordersQ = useMyOrders();
+  const orders = ordersQ.data ?? [];
+  if (ordersQ.isLoading) return <Empty text="加载中…" />;
+  if (orders.length === 0) return <Empty text="还没有订单，去商城逛逛吧" />;
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      {orders.map((o) => (
+        <div key={o.id} style={cardStyle}>
+          <div
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: 12,
+              background: 'var(--cpm-primary-soft)',
+              display: 'grid',
+              placeItems: 'center',
+              flexShrink: 0,
+            }}
+          >
+            {o.prizeName ? (
+              <Sparkles size={20} style={{ color: 'var(--cpm-primary)' }} />
+            ) : (
+              <Package size={20} style={{ color: 'var(--cpm-primary)' }} />
+            )}
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div
+              style={{ fontFamily: 'var(--cpm-font-sans)', fontWeight: 600, fontSize: 14, color: 'var(--cpm-ink-1)' }}
+            >
+              {o.prizeName || o.itemName || '商品'}
+            </div>
+            <div style={{ fontFamily: 'var(--cpm-font-sans)', fontSize: 11, color: 'var(--cpm-ink-2)', marginTop: 2 }}>
+              订单 #{o.id} · {o.status === 'paid' ? '已兑换' : o.status}
+            </div>
+          </div>
+          <div
+            style={{ fontFamily: 'var(--cpm-font-num)', fontWeight: 800, fontSize: 15, color: 'var(--cpm-gold-ink)' }}
+          >
+            -{o.cost}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function RedeemConfirmDialog({
+  item,
+  pending,
+  error,
+  onClose,
+  onConfirm,
+}: {
+  item: MallItem | null;
+  pending: boolean;
+  error: string | null;
+  onClose: () => void;
+  onConfirm: () => void;
+}) {
+  if (!item) return null;
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 80,
+        display: 'grid',
+        placeItems: 'center',
+        padding: 18,
+        background: 'rgba(25,26,44,0.42)',
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
+      }}
+    >
+      <dialog
+        open
+        aria-modal="true"
+        aria-label="确认兑换"
+        style={{
+          position: 'relative',
+          inset: 'auto',
+          margin: 0,
+          width: '100%',
+          maxWidth: 360,
+          boxSizing: 'border-box',
+          borderRadius: 22,
+          border: '1px solid rgba(255,255,255,0.72)',
+          background: 'linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.92))',
+          boxShadow: '0 24px 70px -28px rgba(25,26,44,0.45), 0 0 0 1px rgba(255,255,255,0.45) inset',
+          padding: 18,
+          fontFamily: 'var(--cpm-font-sans)',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+          <div>
+            <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--cpm-ink-1)' }}>确认兑换</div>
+            <div style={{ marginTop: 4, fontSize: 13, color: 'var(--cpm-ink-2)', lineHeight: 1.55 }}>
+              兑换成功后会生成订单并扣除积分。
+            </div>
+          </div>
+          <button
+            type="button"
+            aria-label="关闭"
+            onClick={onClose}
+            disabled={pending}
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: 999,
+              border: '1px solid var(--cpm-border-subtle)',
+              background: 'var(--cpm-surface)',
+              color: 'var(--cpm-ink-2)',
+              display: 'grid',
+              placeItems: 'center',
+              cursor: pending ? 'not-allowed' : 'pointer',
+              flexShrink: 0,
+            }}
+          >
+            <X size={16} aria-hidden />
+          </button>
+        </div>
+
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: 16,
+            gap: 12,
+            marginTop: 16,
+            padding: 12,
+            borderRadius: 16,
+            background: 'var(--cpm-primary-soft)',
           }}
         >
-          <motion.button
-            onClick={() => navigate(-1)}
-            whileTap={{ scale: 0.88 }}
+          <img
+            src={item.ImageURL}
+            alt={item.Name}
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              padding: '6px 12px',
-              borderRadius: 10,
-              background: '#fff',
-              border: '1px solid var(--cpm-card-border)',
-              boxShadow: 'var(--cpm-shadow-soft)',
-              cursor: 'pointer',
-              fontSize: 13,
-              fontWeight: 500,
-              color: 'var(--cpm-text-primary)',
+              width: 58,
+              height: 58,
+              borderRadius: 14,
+              objectFit: 'cover',
+              background: 'var(--cpm-surface)',
+              flexShrink: 0,
             }}
-          >
-            ← 返回
-          </motion.button>
-          <span
-            style={{
-              fontSize: 15,
-              fontWeight: 600,
-              color: 'var(--cpm-text-primary)',
-              letterSpacing: '-0.01em',
-            }}
-          >
-            积分商城
-          </span>
-          {/* 我的积分 chip */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 5,
-              padding: '5px 12px',
-              borderRadius: 999,
-              background: 'var(--cpm-brand-violet)',
-              color: '#fff',
-              fontSize: 12,
-              fontWeight: 700,
-              boxShadow: 'var(--cpm-shadow-glow-violet)',
-              fontFeatureSettings: '"tnum"',
-            }}
-          >
-            ◆ {myPoints > 0 ? myPoints.toLocaleString() : '–'}
+          />
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--cpm-ink-1)' }}>{item.Name}</div>
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5,
+                marginTop: 6,
+                fontFamily: 'var(--cpm-font-num)',
+                fontSize: 16,
+                fontWeight: 800,
+                color: 'var(--cpm-gold-ink)',
+              }}
+            >
+              <Coins size={15} style={{ color: 'var(--cpm-gold)' }} aria-hidden />
+              {item.Cost} 积分
+            </div>
           </div>
         </div>
 
-        {/* Tab 切换 */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          style={{
-            display: 'flex',
-            gap: 6,
-            background: '#fff',
-            borderRadius: 14,
-            padding: 4,
-            border: '1px solid var(--cpm-card-border)',
-            boxShadow: 'var(--cpm-shadow-soft)',
-            marginBottom: 16,
-          }}
-        >
-          {([['blindbox', '盲盒'], ['products', '商品']] as [Tab, string][]).map(([key, label]) => (
-            <motion.button
-              key={key}
-              onClick={() => setTab(key)}
-              whileTap={{ scale: 0.94 }}
-              style={{
-                flex: 1,
-                padding: '10px 4px',
-                borderRadius: 10,
-                fontSize: 14,
-                fontWeight: 600,
-                fontFamily: 'var(--cpm-font-sans)',
-                cursor: 'pointer',
-                border: 'none',
-                background:
-                  tab === key
-                    ? 'linear-gradient(135deg, var(--cpm-brand-violet), var(--cpm-brand-cyan))'
-                    : 'transparent',
-                color: tab === key ? '#fff' : 'var(--cpm-text-tertiary)',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              {label}
-            </motion.button>
-          ))}
-        </motion.div>
-
-        {loading && (
-          <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--cpm-text-tertiary)', fontSize: 14 }}>
-            加载中...
+        {error && (
+          <div
+            style={{
+              marginTop: 12,
+              padding: '10px 12px',
+              borderRadius: 12,
+              background: 'rgba(239,68,68,0.08)',
+              border: '1px solid rgba(239,68,68,0.18)',
+              color: 'var(--cpm-danger)',
+              fontSize: 13,
+              fontWeight: 700,
+              lineHeight: 1.5,
+            }}
+          >
+            {error}
           </div>
         )}
 
-        {/* 盲盒 Tab - 2列大卡 */}
-        {tab === 'blindbox' && !loading && (
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={{
-              hidden: {},
-              visible: { transition: { staggerChildren: 0.07 } },
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.25fr', gap: 10, marginTop: 16 }}>
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={pending}
+            style={{
+              minHeight: 46,
+              borderRadius: 14,
+              border: '1px solid var(--cpm-border-subtle)',
+              background: 'var(--cpm-surface)',
+              color: 'var(--cpm-ink-2)',
+              fontFamily: 'var(--cpm-font-sans)',
+              fontWeight: 800,
+              cursor: pending ? 'not-allowed' : 'pointer',
             }}
-            style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}
           >
-            {blindboxes.length === 0 && (
-              <div
-                style={{
-                  gridColumn: '1/-1',
-                  textAlign: 'center',
-                  padding: '60px 0',
-                  color: 'var(--cpm-text-muted)',
-                  fontSize: 14,
-                }}
-              >
-                暂无盲盒
-              </div>
-            )}
-            {blindboxes.map((box, idx) => {
-              const grad = blindboxGradients[idx % blindboxGradients.length];
-              const accent = blindboxAccent[idx % blindboxAccent.length];
-              return (
-                <motion.div
-                  key={box.ID}
-                  variants={{
-                    hidden: { opacity: 0, y: 16 },
-                    visible: { opacity: 1, y: 0 },
-                  }}
-                >
-                  <Link to={`/mall/blindbox/${box.ID}`} style={{ textDecoration: 'none' }}>
-                    <motion.div
-                      whileHover={{ y: -4 }}
-                      whileTap={{ scale: 0.96 }}
-                      transition={{ type: 'spring', stiffness: 320, damping: 20 }}
-                      style={{
-                        borderRadius: 20,
-                        padding: '18px 14px 14px',
-                        background: grad,
-                        border: '1px solid rgba(255,255,255,0.7)',
-                        boxShadow: 'var(--cpm-shadow-soft)',
-                        position: 'relative',
-                        overflow: 'hidden',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      {/* 装饰大字背景 */}
-                      <div
-                        aria-hidden
-                        style={{
-                          position: 'absolute',
-                          right: -10,
-                          bottom: -10,
-                          fontSize: 80,
-                          opacity: 0.12,
-                          fontWeight: 900,
-                          color: accent,
-                          lineHeight: 1,
-                          pointerEvents: 'none',
-                          letterSpacing: '-0.05em',
-                        }}
-                      >
-                        ◈
-                      </div>
-
-                      <div
-                        style={{
-                          fontSize: 10,
-                          fontWeight: 700,
-                          letterSpacing: '0.12em',
-                          color: accent,
-                          marginBottom: 6,
-                        }}
-                      >
-                        BLIND BOX
-                      </div>
-                      <div
-                        style={{
-                          fontSize: 15,
-                          fontWeight: 700,
-                          color: 'var(--cpm-text-primary)',
-                          lineHeight: 1.3,
-                          marginBottom: 10,
-                        }}
-                      >
-                        {box.Name}
-                      </div>
-                      <div style={{ fontSize: 11, color: 'var(--cpm-text-secondary)', marginBottom: 10 }}>
-                        查看奖品池 →
-                      </div>
-
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        {/* 价格 chip */}
-                        <span
-                          style={{
-                            fontSize: 12,
-                            fontWeight: 700,
-                            padding: '4px 10px',
-                            borderRadius: 999,
-                            background: `${accent}18`,
-                            color: accent,
-                            fontFeatureSettings: '"tnum"',
-                          }}
-                        >
-                          {box.Cost} 分
-                        </span>
-                        {/* CTA */}
-                        <span
-                          style={{
-                            fontSize: 13,
-                            fontWeight: 700,
-                            padding: '6px 12px',
-                            borderRadius: 999,
-                            background: accent,
-                            color: '#fff',
-                            boxShadow: `0 4px 12px -4px ${accent}60`,
-                          }}
-                        >
-                          抽！
-                        </span>
-                      </div>
-                    </motion.div>
-                  </Link>
-                </motion.div>
-              );
-            })}
-          </motion.div>
-        )}
-
-        {/* 商品 Tab - 3列小卡 */}
-        {tab === 'products' && !loading && (
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={{
-              hidden: {},
-              visible: { transition: { staggerChildren: 0.05 } },
+            取消
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            disabled={pending}
+            style={{
+              minHeight: 46,
+              borderRadius: 14,
+              border: 'none',
+              background: pending ? 'var(--cpm-sunken)' : 'var(--cpm-primary)',
+              color: pending ? 'var(--cpm-ink-2)' : 'var(--cpm-on-primary)',
+              boxShadow: pending ? 'none' : 'var(--cpm-elev-candy)',
+              fontFamily: 'var(--cpm-font-sans)',
+              fontWeight: 800,
+              cursor: pending ? 'not-allowed' : 'pointer',
             }}
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}
           >
-            {products.length === 0 && (
-              <div
-                style={{
-                  gridColumn: '1/-1',
-                  textAlign: 'center',
-                  padding: '60px 0',
-                  color: 'var(--cpm-text-muted)',
-                  fontSize: 14,
-                }}
-              >
-                暂无商品
-              </div>
-            )}
-            {products.map((prod, idx) => (
-              <motion.div
-                key={prod.ID}
-                variants={{
-                  hidden: { opacity: 0, scale: 0.9 },
-                  visible: { opacity: 1, scale: 1 },
-                }}
-              >
-                <motion.div
-                  whileHover={{ y: -3 }}
-                  whileTap={{ scale: 0.94 }}
-                  transition={{ type: 'spring', stiffness: 320, damping: 20 }}
-                  style={{
-                    background: '#fff',
-                    borderRadius: 16,
-                    border: '1px solid var(--cpm-card-border)',
-                    boxShadow: 'var(--cpm-shadow-soft)',
-                    overflow: 'hidden',
-                    display: 'flex',
-                    flexDirection: 'column',
-                  }}
-                >
-                  {prod.ImageURL ? (
-                    <img
-                      src={prod.ImageURL}
-                      alt={prod.Name}
-                      style={{
-                        width: '100%',
-                        height: 90,
-                        objectFit: 'cover',
-                        background: 'var(--cpm-bg-2)',
-                      }}
-                    />
-                  ) : (
-                    <div
-                      style={{
-                        height: 90,
-                        background: blindboxGradients[idx % blindboxGradients.length],
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: 36,
-                        color: blindboxAccent[idx % blindboxAccent.length],
-                        opacity: 0.6,
-                      }}
-                    >
-                      ◈
-                    </div>
-                  )}
-                  <div style={{ padding: '10px 10px 12px' }}>
-                    <div
-                      style={{
-                        fontSize: 12,
-                        fontWeight: 600,
-                        color: 'var(--cpm-text-primary)',
-                        marginBottom: 4,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {prod.Name}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: 13,
-                        fontWeight: 700,
-                        color: 'var(--cpm-brand-violet)',
-                        marginBottom: 8,
-                        fontFeatureSettings: '"tnum"',
-                      }}
-                    >
-                      {prod.Cost} 分
-                    </div>
-                    <motion.button
-                      whileTap={{ scale: 0.92 }}
-                      style={{
-                        width: '100%',
-                        padding: '6px 0',
-                        borderRadius: 8,
-                        fontSize: 12,
-                        fontWeight: 600,
-                        fontFamily: 'var(--cpm-font-sans)',
-                        border: 'none',
-                        background: 'var(--cpm-brand-violet-bg)',
-                        color: 'var(--cpm-brand-violet)',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      兑换
-                    </motion.button>
-                  </div>
-                </motion.div>
-              </motion.div>
-            ))}
-          </motion.div>
-        )}
+            {pending ? '兑换中…' : '确认兑换'}
+          </button>
+        </div>
+      </dialog>
+    </div>
+  );
+}
 
-        {/* 底部我的订单 */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
+export function MallPage() {
+  const [view, setView] = useState<'shop' | 'orders'>('shop');
+  const [redeemItem, setRedeemItem] = useState<MallItem | null>(null);
+  const [redeemError, setRedeemError] = useState<string | null>(null);
+  const itemsQ = useMallItems();
+  const points = usePassport().data?.totalScore ?? 0;
+  const redeem = useRedeemItem();
+  const navigate = useNavigate();
+  const { isDesktop } = useBreakpoint();
+  const redeemingId = redeem.isPending ? (redeemItem?.ID ?? null) : null;
+
+  const openRedeem = (item: MallItem) => {
+    setRedeemError(null);
+    setRedeemItem(item);
+  };
+
+  const closeRedeem = () => {
+    if (redeem.isPending) return;
+    setRedeemError(null);
+    setRedeemItem(null);
+  };
+
+  const confirmRedeem = () => {
+    if (!redeemItem || redeem.isPending) return;
+    setRedeemError(null);
+    redeem.mutate(redeemItem.ID, {
+      onSuccess: () => {
+        setRedeemItem(null);
+      },
+      onError: (e) => {
+        setRedeemError(`兑换失败：${e.message || '请稍后再试'}`);
+      },
+    });
+  };
+
+  return (
+    <div data-testid="mall-content" style={mallShellStyle(isDesktop)}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: isDesktop ? 'center' : 'flex-start',
+          justifyContent: 'space-between',
+          gap: 10,
+          flexWrap: 'wrap',
+        }}
+      >
+        <h1
           style={{
-            position: 'fixed',
-            bottom: 0,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: '100%',
-            maxWidth: 460,
-            padding: '12px 16px',
-            background: 'rgba(249,247,255,0.88)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
-            borderTop: '1px solid var(--cpm-card-border)',
-            zIndex: 50,
+            fontFamily: 'var(--cpm-font-sans)',
+            fontSize: 22,
+            fontWeight: 800,
+            color: 'var(--cpm-ink-1)',
+            margin: 0,
           }}
         >
-          <motion.button
-            whileTap={{ scale: 0.97 }}
-            style={{
-              width: '100%',
-              padding: '12px 0',
-              borderRadius: 14,
-              fontSize: 14,
-              fontWeight: 600,
-              fontFamily: 'var(--cpm-font-sans)',
-              border: '1px solid var(--cpm-card-border)',
-              background: '#fff',
-              color: 'var(--cpm-text-primary)',
-              cursor: 'pointer',
-              boxShadow: 'var(--cpm-shadow-soft)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 8,
-            }}
+          积分商城
+        </h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <PointsPill value={points} />
+          <button
+            type="button"
+            onClick={() => setView((v) => (v === 'shop' ? 'orders' : 'shop'))}
+            style={orderBtnStyle}
           >
-            📦 我的订单
-          </motion.button>
-        </motion.div>
-      </main>
-    </AuroraBg>
+            <Package size={15} />
+            {view === 'shop' ? '我的订单' : '返回商城'}
+          </button>
+        </div>
+      </div>
+
+      {view === 'orders' ? (
+        <OrdersView />
+      ) : itemsQ.isLoading ? (
+        <Empty text="加载中…" />
+      ) : (
+        <ShopView
+          items={itemsQ.data ?? []}
+          points={points}
+          isDesktop={isDesktop}
+          onOpenBox={(id) => navigate(`/mall/blindbox/${id}`)}
+          onRedeem={openRedeem}
+          redeemingId={redeemingId}
+        />
+      )}
+      <RedeemConfirmDialog
+        item={redeemItem}
+        pending={redeem.isPending}
+        error={redeemError}
+        onClose={closeRedeem}
+        onConfirm={confirmRedeem}
+      />
+    </div>
   );
 }

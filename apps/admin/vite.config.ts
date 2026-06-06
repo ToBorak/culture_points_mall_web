@@ -7,12 +7,11 @@ export default defineConfig({
   plugins: [react(), unocss(cpmUnoConfig)],
   server: {
     host: true,
-    allowedHosts: true,
     port: 5174,
     proxy: {
-      '/api': { target: 'http://localhost:8080', changeOrigin: true },
-      '/admin': { target: 'http://localhost:8080', changeOrigin: true },
-      '/auth': { target: 'http://localhost:8080', changeOrigin: true },
+      '/api': { target: 'http://localhost:18080', changeOrigin: true },
+      '/admin': { target: 'http://localhost:18080', changeOrigin: true },
+      '/auth': { target: 'http://localhost:18080', changeOrigin: true },
     },
   },
 });

@@ -32,7 +32,7 @@ export function AppShell() {
 
   if (isDesktop) {
     return (
-      <div style={{ display: 'flex', height: '100dvh', background: 'var(--cpm-app-bg)' }}>
+      <div style={{ display: 'flex', height: '100%', background: 'var(--cpm-app-bg)' }}>
         <SideNav
           items={TABS}
           activeKey={activeKey}
@@ -82,7 +82,7 @@ export function AppShell() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', background: 'var(--cpm-app-bg)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: 'var(--cpm-app-bg)' }}>
       <div style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
         <Outlet />
       </div>

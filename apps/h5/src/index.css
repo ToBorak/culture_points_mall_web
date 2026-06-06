@@ -1,0 +1,12 @@
+/* H5 全局：外层不滚动，滚动只发生在 AppShell 内容区，底部 Tab 始终固定可见 */
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+}

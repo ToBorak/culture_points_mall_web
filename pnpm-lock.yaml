@@ -145,6 +145,9 @@ importers:
       vite:
         specifier: ^5.4.0
         version: 5.4.21
+      vitest:
+        specifier: 3.2.6
+        version: 3.2.6(jsdom@29.1.1)
 
   e2e:
     devDependencies:

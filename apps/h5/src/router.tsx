@@ -17,10 +17,10 @@ export function AppRouter() {
         <Route path="/leaderboard" element={<LeaderboardPage />} />
         <Route path="/activities" element={<ActivitiesPage />} />
         <Route path="/mall" element={<MallPage />} />
+        <Route path="/mall/blindbox/:id" element={<BlindboxDrawPage />} />
         <Route path="/me" element={<MePage />} />
       </Route>
       {/* 全屏路由（不带外壳） */}
-      <Route path="/mall/blindbox/:id" element={<BlindboxDrawPage />} />
       <Route path="/dna" element={<DNAReportPage />} />
       <Route path="/signin" element={<SigninPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />

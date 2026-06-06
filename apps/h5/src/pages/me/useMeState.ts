@@ -1,9 +1,10 @@
-import { useMyBadges, useMyTransactions, usePassport } from '@cpm/api-client';
+import { useMe, useMyBadges, useMyTransactions, usePassport } from '@cpm/api-client';
 import type { Badge, DimensionScore, PointTransaction } from '@cpm/types';
 import { useAuth } from '../../store/auth';
 
 export interface MeState {
   name: string;
+  avatarUrl: string;
   total: number;
   badgeCount: number;
   dims: DimensionScore[];
@@ -15,16 +16,20 @@ export interface MeState {
 }
 
 export function useMeState(): MeState {
+  const authUserId = useAuth((s) => s.userId);
+  const me = useMe(authUserId);
   const p = usePassport();
   const b = useMyBadges();
   const txQ = useMyTransactions(20);
-  const name = useAuth((s) => s.name) ?? '伙伴';
+  const fallbackName = useAuth((s) => s.name);
 
+  const name = me.data?.name ?? fallbackName ?? '伙伴';
+  const avatarUrl = me.data?.avatarUrl ?? '';
   const total = p.data?.totalScore ?? 0;
   const badgeCount = p.data?.badgeCount ?? 0;
   const dims = p.data?.scoresByDimension ?? [];
   const badges = b.data?.items ?? [];
   const txItems = (txQ.data?.pages ?? []).flatMap((pg) => pg.items);
 
-  return { name, total, badgeCount, dims, badges, txItems, txQ, p, b };
+  return { name, avatarUrl, total, badgeCount, dims, badges, txItems, txQ, p, b };
 }
