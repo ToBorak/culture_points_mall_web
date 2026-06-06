@@ -1,18 +1,13 @@
-import { useDimensions, useLeaderboard } from '@cpm/api-client';
-import type { LeaderboardEntry, LeaderboardScope, LeaderboardWindow } from '@cpm/types';
+import { useLeaderboard } from '@cpm/api-client';
+import type { LeaderboardEntry, LeaderboardScope } from '@cpm/types';
 import type { LeaderboardInsightData } from '@cpm/ui';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../store/auth';
 
 export interface LeaderboardState {
-  scope: LeaderboardScope;
+  scope: LeaderboardScope; // 仅 'total' | 'dept'
   setScope: (s: LeaderboardScope) => void;
-  win: LeaderboardWindow;
-  setWin: (w: LeaderboardWindow) => void;
-  dimId: number | undefined;
-  setDimId: (id: number | undefined) => void;
-  dims: ReturnType<typeof useDimensions>;
   q: ReturnType<typeof useLeaderboard>;
   entries: LeaderboardEntry[];
   myEntry: LeaderboardEntry | null;
@@ -22,11 +17,8 @@ export interface LeaderboardState {
 
 export function useLeaderboardState(): LeaderboardState {
   const [scope, setScope] = useState<LeaderboardScope>('total');
-  const [win, setWin] = useState<LeaderboardWindow>('week');
-  const [dimId, setDimId] = useState<number | undefined>();
-  const dims = useDimensions();
-  const q = useLeaderboard({ scope, window: win, dimensionId: dimId });
-  // 修 bug：旧代码读 'cpm_user_id'（不存在），实际 key 是 'cpm_uid'，统一走 auth store。
+  // 不再有维度榜与周/月/季/年：后端忽略 window，这里固定占位。
+  const q = useLeaderboard({ scope, window: 'year' });
   const myUserId = useAuth((s) => s.userId);
 
   const [insight, setInsight] = useState<LeaderboardInsightData | null>(null);
@@ -44,5 +36,5 @@ export function useLeaderboardState(): LeaderboardState {
   const myEntry = entries.find((e) => e.userId === myUserId) ?? null;
   const total = q.data?.total ?? entries.length;
 
-  return { scope, setScope, win, setWin, dimId, setDimId, dims, q, entries, myEntry, total, insight };
+  return { scope, setScope, q, entries, myEntry, total, insight };
 }
