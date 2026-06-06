@@ -1,12 +1,6 @@
 import type { LeaderboardScope, LeaderboardWindow } from '@cpm/types';
+import { LeaderboardInsightCard, LeaderboardRow, PodiumTop3, SegmentedControl, TrendIndicator } from '@cpm/ui';
 import type { CSSProperties } from 'react';
-import {
-  LeaderboardInsightCard,
-  LeaderboardRow,
-  PodiumTop3,
-  SegmentedControl,
-  TrendIndicator,
-} from '@cpm/ui';
 import type { LeaderboardState } from './useLeaderboardState';
 
 const SCOPES: { key: LeaderboardScope; label: string }[] = [
@@ -38,9 +32,27 @@ const chipStyle = (on: boolean): CSSProperties => ({
 export function LeaderboardDesktop(s: LeaderboardState) {
   const { entries, myEntry } = s;
   return (
-    <div style={{ maxWidth: 1180, margin: '0 auto', padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: 22 }}>
+    <div
+      style={{
+        maxWidth: 1180,
+        margin: '0 auto',
+        padding: '24px 28px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 22,
+      }}
+    >
       <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
-        <h1 style={{ fontFamily: 'var(--cpm-font-sans)', fontSize: 24, fontWeight: 800, color: 'var(--cpm-ink-1)', flex: 1, margin: 0 }}>
+        <h1
+          style={{
+            fontFamily: 'var(--cpm-font-sans)',
+            fontSize: 24,
+            fontWeight: 800,
+            color: 'var(--cpm-ink-1)',
+            flex: 1,
+            margin: 0,
+          }}
+        >
           排行榜
         </h1>
         <div style={{ width: 300 }}>
@@ -57,7 +69,13 @@ export function LeaderboardDesktop(s: LeaderboardState) {
 
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
         {WINDOWS.map((w) => (
-          <button key={w.key} type="button" aria-pressed={s.win === w.key} onClick={() => s.setWin(w.key)} style={chipStyle(s.win === w.key)}>
+          <button
+            key={w.key}
+            type="button"
+            aria-pressed={s.win === w.key}
+            onClick={() => s.setWin(w.key)}
+            style={chipStyle(s.win === w.key)}
+          >
             {w.label}
           </button>
         ))}
@@ -76,9 +94,27 @@ export function LeaderboardDesktop(s: LeaderboardState) {
       </div>
 
       {s.q.isLoading ? (
-        <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--cpm-ink-2)', fontFamily: 'var(--cpm-font-sans)' }}>加载中…</div>
+        <div
+          style={{
+            textAlign: 'center',
+            padding: '60px 0',
+            color: 'var(--cpm-ink-2)',
+            fontFamily: 'var(--cpm-font-sans)',
+          }}
+        >
+          加载中…
+        </div>
       ) : entries.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '80px 0', color: 'var(--cpm-ink-2)', fontFamily: 'var(--cpm-font-sans)' }}>暂无数据</div>
+        <div
+          style={{
+            textAlign: 'center',
+            padding: '80px 0',
+            color: 'var(--cpm-ink-2)',
+            fontFamily: 'var(--cpm-font-sans)',
+          }}
+        >
+          暂无数据
+        </div>
       ) : (
         <>
           {entries.length >= 3 && <PodiumTop3 entries={entries} />}
@@ -92,7 +128,15 @@ export function LeaderboardDesktop(s: LeaderboardState) {
                 border: '1px solid var(--cpm-border-subtle)',
               }}
             >
-              <div style={{ fontFamily: 'var(--cpm-font-sans)', fontWeight: 800, fontSize: 15, color: 'var(--cpm-ink-1)', marginBottom: 14 }}>
+              <div
+                style={{
+                  fontFamily: 'var(--cpm-font-sans)',
+                  fontWeight: 800,
+                  fontSize: 15,
+                  color: 'var(--cpm-ink-1)',
+                  marginBottom: 14,
+                }}
+              >
                 完整榜单
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -114,7 +158,15 @@ export function LeaderboardDesktop(s: LeaderboardState) {
                   }}
                 >
                   <div style={{ fontSize: 12, opacity: 0.85, fontWeight: 700 }}>我的排名</div>
-                  <div style={{ fontFamily: 'var(--cpm-font-num)', fontWeight: 800, fontSize: 46, lineHeight: 1.1, margin: '6px 0 2px' }}>
+                  <div
+                    style={{
+                      fontFamily: 'var(--cpm-font-num)',
+                      fontWeight: 800,
+                      fontSize: 46,
+                      lineHeight: 1.1,
+                      margin: '6px 0 2px',
+                    }}
+                  >
                     #{myEntry.rank}
                   </div>
                   <div style={{ fontSize: 12, opacity: 0.85 }}>

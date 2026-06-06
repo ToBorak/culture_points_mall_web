@@ -105,11 +105,25 @@ export function LeaderboardMobile(s: LeaderboardState) {
         <LeaderboardInsightCard data={s.insight} loading={!s.insight} />
 
         {s.q.isLoading ? (
-          <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--cpm-ink-2)', fontFamily: 'var(--cpm-font-sans)' }}>
+          <div
+            style={{
+              textAlign: 'center',
+              padding: '40px 0',
+              color: 'var(--cpm-ink-2)',
+              fontFamily: 'var(--cpm-font-sans)',
+            }}
+          >
             加载中…
           </div>
         ) : entries.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--cpm-ink-2)', fontFamily: 'var(--cpm-font-sans)' }}>
+          <div
+            style={{
+              textAlign: 'center',
+              padding: '60px 0',
+              color: 'var(--cpm-ink-2)',
+              fontFamily: 'var(--cpm-font-sans)',
+            }}
+          >
             暂无数据
           </div>
         ) : (
@@ -155,13 +169,19 @@ export function LeaderboardMobile(s: LeaderboardState) {
           </span>
           <Avatar name={myEntry.name} avatarUrl={myEntry.avatarUrl || undefined} size={38} />
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontFamily: 'var(--cpm-font-sans)', fontWeight: 700, fontSize: 14, color: 'var(--cpm-ink-1)' }}>
+            <div
+              style={{ fontFamily: 'var(--cpm-font-sans)', fontWeight: 700, fontSize: 14, color: 'var(--cpm-ink-1)' }}
+            >
               {myEntry.name} · 第 {myEntry.rank} 名
             </div>
-            <div style={{ fontFamily: 'var(--cpm-font-sans)', fontSize: 11, color: 'var(--cpm-ink-2)' }}>本期文化分</div>
+            <div style={{ fontFamily: 'var(--cpm-font-sans)', fontSize: 11, color: 'var(--cpm-ink-2)' }}>
+              本期文化分
+            </div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
-            <span style={{ fontFamily: 'var(--cpm-font-num)', fontWeight: 800, fontSize: 16, color: 'var(--cpm-gold-ink)' }}>
+            <span
+              style={{ fontFamily: 'var(--cpm-font-num)', fontWeight: 800, fontSize: 16, color: 'var(--cpm-gold-ink)' }}
+            >
               {myEntry.score.toLocaleString('en-US')}
             </span>
             <TrendIndicator value={myEntry.trend} />
