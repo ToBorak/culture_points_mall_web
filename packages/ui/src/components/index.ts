@@ -24,3 +24,8 @@ export * from './LeaderboardInsightCard.tsx';
 export * from './ComicButton.tsx';
 export * from './DimChip.tsx';
 export * from './BadgeWall.tsx';
+
+// 重设计 · 紫蓝外壳组件 (2026-06)
+export * from './PointsPill.tsx';
+export * from './BottomTabBar.tsx';
+export * from './SideNav.tsx';
