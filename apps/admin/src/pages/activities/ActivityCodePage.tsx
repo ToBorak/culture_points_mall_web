@@ -13,7 +13,7 @@ export function ActivityCodePage() {
 
   // WebSocket 连接
   useEffect(() => {
-    const wsURL = `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host.replace(':5174', ':8080')}/admin/activities/${activityId}/signin-codes/stream`;
+    const wsURL = `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host.replace(':5174', ':18080')}/admin/activities/${activityId}/signin-codes/stream`;
     const ws = new WebSocket(wsURL);
 
     ws.onopen = () => setConnected(true);

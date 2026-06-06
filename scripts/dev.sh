@@ -2,7 +2,7 @@
 # 前端独立开发脚本：装依赖 → 并行启 H5 + Admin
 # 适合只改前端、后端已经跑着的场景
 #
-# 后端默认在 :8080，可改 BACKEND_URL 环境变量
+# 后端默认在 :18080，可改 BACKEND_URL 环境变量
 
 set -euo pipefail
 
@@ -16,7 +16,7 @@ warn(){ printf '%s⚠ %s%s\n' "$YELLOW" "$*" "$RESET"; }
 err() { printf '%s✗ %s%s\n' "$RED" "$*" "$RESET" >&2; }
 
 OS_TYPE="$(uname -s)"
-BACKEND_URL="${BACKEND_URL:-http://localhost:8080}"
+BACKEND_URL="${BACKEND_URL:-http://localhost:18080}"
 
 install_brew_if_missing() {
   if command -v brew >/dev/null 2>&1; then return; fi
