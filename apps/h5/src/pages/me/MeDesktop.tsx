@@ -1,5 +1,4 @@
 import { BadgeCard, PointLedgerRow } from '@cpm/ui';
-import { PassportRadar } from '../passport/PassportRadar';
 import { DnaEntry, MeEmpty, MeHero, MePanel, loadMoreStyle } from './MeParts';
 import type { MeState } from './useMeState';
 
@@ -27,31 +26,27 @@ export function MeDesktop(s: MeState) {
       >
         我的
       </h1>
-      <MeHero name={s.name} total={s.total} badgeCount={s.badgeCount} dimCount={dimCount} loading={s.p.isLoading} />
+      <MeHero
+        name={s.name}
+        avatarUrl={s.avatarUrl}
+        total={s.total}
+        badgeCount={s.badgeCount}
+        dimCount={dimCount}
+        loading={s.p.isLoading}
+      />
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 1fr', gap: 22, alignItems: 'start' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
-          <MePanel title="价值观雷达">
-            {s.p.data ? (
-              <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <PassportRadar scoresByDimension={s.p.data.scoresByDimension} />
-              </div>
-            ) : (
-              <MeEmpty text="加载中…" />
-            )}
-          </MePanel>
-          <MePanel title="徽章墙">
-            {s.badges.length === 0 ? (
-              <MeEmpty text="还没有徽章" />
-            ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
-                {s.badges.map((bd) => (
-                  <BadgeCard key={bd.id} badge={bd} />
-                ))}
-              </div>
-            )}
-          </MePanel>
-        </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 22, alignItems: 'start' }}>
+        <MePanel title="徽章墙">
+          {s.badges.length === 0 ? (
+            <MeEmpty text="还没有徽章" />
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+              {s.badges.map((bd) => (
+                <BadgeCard key={bd.id} badge={bd} />
+              ))}
+            </div>
+          )}
+        </MePanel>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
           <DnaEntry />
