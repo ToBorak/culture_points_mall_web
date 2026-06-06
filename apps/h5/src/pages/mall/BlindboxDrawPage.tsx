@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { BlindboxBox3D, PrizeRevealModal, useBreakpoint } from '@cpm/ui';
 import axios from 'axios';
-import { motion, AnimatePresence } from 'framer-motion';
-import { BlindboxBox3D, PrizeRevealModal } from '@cpm/ui';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ChevronDown, Coins, Gift, Loader2, Sparkles } from 'lucide-react';
+import { type CSSProperties, useEffect, useMemo, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
 interface DrawResp {
   win: boolean;
@@ -26,30 +27,70 @@ interface Item {
   ImageURL: string;
 }
 
-// 根据权重百分比映射稀有度
-function rarityOf(weight: number, total: number): {
+function rarityOf(
+  weight: number,
+  total: number,
+): {
   tier: 'legendary' | 'epic' | 'rare' | 'common';
   label: string;
   color: string;
 } {
   const pct = (weight / Math.max(total, 1)) * 100;
-  if (pct < 5) return { tier: 'legendary', label: '传说', color: '#fbbf24' };
-  if (pct < 15) return { tier: 'epic', label: '史诗', color: '#a855f7' };
-  if (pct < 35) return { tier: 'rare', label: '稀有', color: '#0ea5e9' };
+  if (pct < 5) return { tier: 'legendary', label: '传说', color: '#d97706' };
+  if (pct < 15) return { tier: 'epic', label: '史诗', color: '#7c3aed' };
+  if (pct < 35) return { tier: 'rare', label: '稀有', color: '#0891b2' };
   return { tier: 'common', label: '普通', color: '#10b981' };
 }
 
-const tintByCost: Record<string, string> = {
-  // 不同盲盒主题色（按 cost 区间）
-  low: '#a78bfa',
-  mid: '#f9a8d4',
-  high: '#fbbf24',
+const tintByCost = {
+  standard: '#6a5cff',
+  premium: '#22d3ee',
 };
+
+const pageStyle: CSSProperties = {
+  minHeight: '100%',
+  position: 'relative',
+  overflow: 'hidden',
+  background: 'linear-gradient(180deg, var(--cpm-app-bg) 0%, var(--cpm-bg-0) 100%)',
+  fontFamily: 'var(--cpm-font-sans)',
+};
+
+function contentStyle(isDesktop: boolean): CSSProperties {
+  return {
+    width: '100%',
+    maxWidth: isDesktop ? 1080 : 560,
+    boxSizing: 'border-box',
+    margin: '0 auto',
+    padding: isDesktop ? '22px 28px 34px' : '14px 16px 22px',
+    position: 'relative',
+    zIndex: 1,
+  };
+}
+
+function drawGridStyle(isDesktop: boolean): CSSProperties {
+  return {
+    display: 'grid',
+    gridTemplateColumns: isDesktop ? 'minmax(320px, 0.85fr) minmax(420px, 1.15fr)' : '1fr',
+    alignItems: isDesktop ? 'start' : 'stretch',
+    gap: isDesktop ? 18 : 14,
+  };
+}
+
+function cardStyle(isDesktop: boolean): CSSProperties {
+  return {
+    width: '100%',
+    boxSizing: 'border-box',
+    background: 'rgba(255,255,255,0.94)',
+    borderRadius: isDesktop ? 24 : 22,
+    border: '1px solid var(--cpm-border-subtle)',
+    boxShadow: 'var(--cpm-elev-soft)',
+  };
+}
 
 export function BlindboxDrawPage() {
   const { id } = useParams();
   const boxId = Number(id);
-  const navigate = useNavigate();
+  const { isDesktop, width } = useBreakpoint();
 
   const [box, setBox] = useState<Item | null>(null);
   const [prizes, setPrizes] = useState<Prize[]>([]);
@@ -78,10 +119,8 @@ export function BlindboxDrawPage() {
 
   const totalWeight = prizes.reduce((s, p) => s + p.weight, 0);
   const tint = useMemo(() => {
-    if (!box) return tintByCost.low;
-    if (box.Cost >= 200) return tintByCost.high;
-    if (box.Cost >= 80) return tintByCost.mid;
-    return tintByCost.low;
+    if (!box) return tintByCost.standard;
+    return box.Cost >= 10 ? tintByCost.premium : tintByCost.standard;
   }, [box]);
 
   const winPct = useMemo(() => {
@@ -91,8 +130,11 @@ export function BlindboxDrawPage() {
     return (p.weight / Math.max(totalWeight, 1)) * 100;
   }, [result, prizes, totalWeight]);
 
-  const draw = async () => {
-    if (boxState !== 'idle') return;
+  const boxSize = isDesktop ? 300 : Math.max(220, Math.min(270, width - 92));
+  const disabled = loading || !box || boxState !== 'idle';
+
+  const draw = async (force = false) => {
+    if ((!force && disabled) || loading || !box) return;
     setErr(null);
     setResult(null);
     setBoxState('spinning');
@@ -103,10 +145,9 @@ export function BlindboxDrawPage() {
         { boxId },
         { headers: { Authorization: `Bearer ${token}` } },
       );
-      // 至少转 1.6s 让动画过瘾
       await new Promise((r) => setTimeout(r, 1600));
       setResult(data);
-      setBoxState('opening'); // 触发减速 + 开盒
+      setBoxState('opening');
     } catch (e) {
       const er = e as { response?: { data?: { error?: string } } };
       setErr(er?.response?.data?.error ?? String(e));
@@ -114,7 +155,6 @@ export function BlindboxDrawPage() {
     }
   };
 
-  // 当 box 动画完成（onAnimationDone 由 BlindboxBox3D 回调），显示奖品
   const onBoxAnimationDone = () => {
     setShowReveal(true);
   };
@@ -127,483 +167,423 @@ export function BlindboxDrawPage() {
   const drawAgain = () => {
     setShowReveal(false);
     setBoxState('idle');
-    // 留一点点过渡时间避免 modal 退场动画与新一轮抽奖冲突
-    setTimeout(() => draw(), 350);
+    setTimeout(() => draw(true), 350);
   };
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        background: 'var(--cpm-bg-0)',
-        position: 'relative',
-        overflow: 'hidden',
-        fontFamily: 'var(--cpm-font-sans)',
-      }}
-    >
-      {/* 主题色 mesh 光斑 */}
-      <div
-        aria-hidden
-        style={{
-          position: 'absolute',
-          left: '-15%',
-          top: '-10%',
-          width: 480,
-          height: 480,
-          borderRadius: '50%',
-          background: `radial-gradient(circle, ${tint}40, transparent 65%)`,
-          filter: 'blur(80px)',
-          pointerEvents: 'none',
-          transition: 'background 0.6s ease',
-        }}
-      />
-      <div
-        aria-hidden
-        style={{
-          position: 'absolute',
-          right: '-15%',
-          bottom: '5%',
-          width: 400,
-          height: 400,
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(253,164,175,0.32), transparent 65%)',
-          filter: 'blur(80px)',
-          pointerEvents: 'none',
-        }}
-      />
-
-      <main
-        style={{
-          position: 'relative',
-          zIndex: 1,
-          maxWidth: 460,
-          margin: '0 auto',
-          padding: '20px 16px 60px',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}
-      >
-        {/* 顶部导航 */}
-        <div
-          style={{
-            width: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: 18,
-          }}
-        >
-          <motion.button
-            onClick={() => navigate(-1)}
-            whileTap={{ scale: 0.88 }}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              padding: '6px 12px',
-              borderRadius: 10,
-              background: '#fff',
-              border: '1px solid var(--cpm-card-border)',
-              boxShadow: 'var(--cpm-shadow-soft)',
-              cursor: 'pointer',
-              fontSize: 13,
-              fontWeight: 500,
-              color: 'var(--cpm-text-primary)',
-            }}
+    <div style={pageStyle}>
+      <main data-testid="blindbox-draw-content" style={contentStyle(isDesktop)}>
+        <div style={drawGridStyle(isDesktop)}>
+          <motion.section
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35 }}
+            style={{ ...cardStyle(isDesktop), padding: isDesktop ? '20px 22px' : '16px 18px' }}
           >
-            ← 返回
-          </motion.button>
-          <span
-            style={{
-              fontSize: 15,
-              fontWeight: 600,
-              color: 'var(--cpm-text-primary)',
-              letterSpacing: '-0.01em',
-            }}
-          >
-            盲盒抽奖
-          </span>
-          <div style={{ width: 60 }} />
-        </div>
-
-        {/* 盲盒信息卡 */}
-        <motion.section
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45 }}
-          style={{
-            width: '100%',
-            background: '#fff',
-            borderRadius: 22,
-            border: '1px solid var(--cpm-card-border)',
-            boxShadow: 'var(--cpm-shadow-pop)',
-            padding: '16px 18px 14px',
-            marginBottom: 18,
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginBottom: showPrizePool ? 12 : 4,
-            }}
-          >
-            <div style={{ minWidth: 0, flex: 1 }}>
-              <div
-                style={{
-                  fontSize: 10,
-                  fontWeight: 600,
-                  letterSpacing: '0.18em',
-                  color: tint,
-                  marginBottom: 4,
-                }}
-              >
-                BLIND BOX
-              </div>
-              <div
-                style={{
-                  fontSize: 18,
-                  fontWeight: 700,
-                  color: 'var(--cpm-text-primary)',
-                  letterSpacing: '-0.01em',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {box?.Name ?? `文化盲盒 · #${boxId}`}
-              </div>
-            </div>
-            {box && (
-              <span
-                style={{
-                  padding: '5px 12px',
-                  borderRadius: 999,
-                  background: `${tint}22`,
-                  color: tint,
-                  fontSize: 13,
-                  fontWeight: 700,
-                  fontFeatureSettings: '"tnum"',
-                  flexShrink: 0,
-                }}
-              >
-                {box.Cost} 分 / 次
-              </span>
-            )}
-          </div>
-
-          {/* 折叠 - 奖品概率 */}
-          <motion.button
-            onClick={() => setShowPrizePool((v) => !v)}
-            whileTap={{ scale: 0.97 }}
-            style={{
-              width: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '10px 0 6px',
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              borderTop: '1px solid var(--cpm-card-border)',
-              marginTop: 8,
-              fontSize: 13,
-              fontWeight: 600,
-              color: 'var(--cpm-text-secondary)',
-            }}
-          >
-            <span>查看奖品池 · {prizes.length} 种</span>
-            <motion.span
-              animate={{ rotate: showPrizePool ? 180 : 0 }}
-              transition={{ duration: 0.2 }}
-              style={{ display: 'inline-block', fontSize: 12 }}
-            >
-              ▾
-            </motion.span>
-          </motion.button>
-
-          <AnimatePresence>
-            {showPrizePool && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                style={{ overflow: 'hidden' }}
-              >
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingTop: 6 }}>
-                  {prizes.map((p) => {
-                    const r = rarityOf(p.weight, totalWeight);
-                    const pct = (p.weight / Math.max(totalWeight, 1)) * 100;
-                    return (
-                      <motion.div
-                        key={p.id}
-                        initial={{ opacity: 0, x: -8 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 12,
-                          padding: '8px 10px',
-                          borderRadius: 12,
-                          background: `${r.color}10`,
-                          border: `1px solid ${r.color}25`,
-                        }}
-                      >
-                        {p.prizeImage ? (
-                          <img
-                            src={p.prizeImage}
-                            alt={p.prizeName}
-                            style={{
-                              width: 36,
-                              height: 36,
-                              borderRadius: 9,
-                              objectFit: 'cover',
-                              background: '#fff',
-                              flexShrink: 0,
-                            }}
-                          />
-                        ) : (
-                          <div
-                            style={{
-                              width: 36,
-                              height: 36,
-                              borderRadius: 9,
-                              background: `${r.color}25`,
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              fontSize: 18,
-                              flexShrink: 0,
-                            }}
-                          >
-                            🎁
-                          </div>
-                        )}
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 6,
-                              marginBottom: 4,
-                            }}
-                          >
-                            <span
-                              style={{
-                                fontSize: 13.5,
-                                fontWeight: 600,
-                                color: 'var(--cpm-text-primary)',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap',
-                              }}
-                            >
-                              {p.prizeName}
-                            </span>
-                            <span
-                              style={{
-                                fontSize: 9,
-                                fontWeight: 700,
-                                letterSpacing: '0.08em',
-                                padding: '1px 6px',
-                                borderRadius: 4,
-                                background: r.color,
-                                color: '#fff',
-                                flexShrink: 0,
-                              }}
-                            >
-                              {r.label}
-                            </span>
-                          </div>
-                          {/* 概率条 */}
-                          <div
-                            style={{
-                              position: 'relative',
-                              height: 4,
-                              background: 'rgba(15,23,42,0.05)',
-                              borderRadius: 2,
-                              overflow: 'hidden',
-                            }}
-                          >
-                            <motion.div
-                              initial={{ width: 0 }}
-                              animate={{ width: `${pct}%` }}
-                              transition={{ duration: 0.6, delay: 0.1 }}
-                              style={{
-                                position: 'absolute',
-                                inset: 0,
-                                background: r.color,
-                                borderRadius: 2,
-                              }}
-                            />
-                          </div>
-                        </div>
-                        <span
-                          style={{
-                            fontSize: 13,
-                            fontWeight: 700,
-                            color: r.color,
-                            fontFeatureSettings: '"tnum"',
-                            flexShrink: 0,
-                          }}
-                        >
-                          {pct < 1 ? pct.toFixed(1) : Math.round(pct)}%
-                        </span>
-                      </motion.div>
-                    );
-                  })}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.section>
-
-        {/* 3D 盒子展示卡 */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.92 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          style={{
-            width: '100%',
-            background: 'linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.85) 100%)',
-            borderRadius: 28,
-            border: '1px solid var(--cpm-card-border)',
-            boxShadow:
-              boxState === 'spinning'
-                ? `0 30px 60px -16px ${tint}55, var(--cpm-shadow-soft)`
-                : 'var(--cpm-shadow-soft)',
-            padding: '18px 16px 12px',
-            marginBottom: 22,
-            position: 'relative',
-            overflow: 'hidden',
-            transition: 'box-shadow 0.6s ease',
-          }}
-        >
-          {/* 旋转底盘装饰 */}
-          {boxState === 'spinning' && (
-            <motion.div
-              aria-hidden
-              animate={{ rotate: 360 }}
-              transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
-              style={{
-                position: 'absolute',
-                left: '50%',
-                top: '50%',
-                width: 220,
-                height: 220,
-                marginLeft: -110,
-                marginTop: -110,
-                borderRadius: '50%',
-                background: `conic-gradient(from 0deg, transparent, ${tint}60, transparent 40%, ${tint}60, transparent 80%)`,
-                filter: 'blur(8px)',
-                opacity: 0.7,
-                pointerEvents: 'none',
-              }}
-            />
-          )}
-
-          {loading ? (
             <div
               style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                justifyContent: 'space-between',
+                gap: 14,
+                flexWrap: 'wrap',
+              }}
+            >
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <div
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    padding: '5px 9px',
+                    borderRadius: 999,
+                    background: `${tint}18`,
+                    color: tint,
+                    fontSize: 12,
+                    fontWeight: 800,
+                  }}
+                >
+                  <Sparkles size={14} aria-hidden />
+                  盲盒抽奖
+                </div>
+                <h1
+                  style={{
+                    margin: '12px 0 0',
+                    fontSize: isDesktop ? 24 : 22,
+                    lineHeight: 1.2,
+                    fontWeight: 800,
+                    color: 'var(--cpm-ink-1)',
+                  }}
+                >
+                  {box?.Name ?? `文化盲盒 · #${boxId}`}
+                </h1>
+                <p
+                  style={{
+                    margin: '8px 0 0',
+                    fontSize: 13,
+                    lineHeight: 1.55,
+                    color: 'var(--cpm-ink-2)',
+                  }}
+                >
+                  开盒仅在中奖时扣积分，未中奖会自动退回冻结分。
+                </p>
+              </div>
+              {box && (
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 5,
+                    padding: '8px 12px',
+                    borderRadius: 999,
+                    background: 'var(--cpm-gold-soft)',
+                    color: 'var(--cpm-gold-ink)',
+                    fontFamily: 'var(--cpm-font-num)',
+                    fontSize: 16,
+                    fontWeight: 800,
+                    flexShrink: 0,
+                  }}
+                >
+                  <Coins size={15} style={{ color: 'var(--cpm-gold)' }} aria-hidden />
+                  {box.Cost} 分 / 次
+                </span>
+              )}
+            </div>
+
+            <motion.button
+              type="button"
+              onClick={() => setShowPrizePool((v) => !v)}
+              whileTap={{ scale: 0.98 }}
+              style={{
                 width: '100%',
-                height: 280,
+                minHeight: 48,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 12,
+                padding: '13px 0 0',
+                marginTop: 14,
+                background: 'transparent',
+                border: 'none',
+                borderTop: '1px solid var(--cpm-border-subtle)',
+                cursor: 'pointer',
+                fontSize: 14,
+                fontWeight: 800,
+                color: 'var(--cpm-ink-2)',
+                fontFamily: 'var(--cpm-font-sans)',
+              }}
+            >
+              <span>查看奖品池 · {prizes.length} 种</span>
+              <motion.span
+                animate={{ rotate: showPrizePool ? 180 : 0 }}
+                transition={{ duration: 0.2 }}
+                style={{ display: 'inline-flex', color: 'var(--cpm-ink-2)' }}
+              >
+                <ChevronDown size={18} aria-hidden />
+              </motion.span>
+            </motion.button>
+
+            <AnimatePresence initial={false}>
+              {showPrizePool && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.22 }}
+                  style={{ overflow: 'hidden' }}
+                >
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingTop: 10 }}>
+                    {prizes.map((p) => {
+                      const r = rarityOf(p.weight, totalWeight);
+                      const pct = (p.weight / Math.max(totalWeight, 1)) * 100;
+                      return (
+                        <motion.div
+                          key={p.id}
+                          initial={{ opacity: 0, x: -6 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 10,
+                            padding: '9px 10px',
+                            borderRadius: 14,
+                            background: `${r.color}10`,
+                            border: `1px solid ${r.color}24`,
+                          }}
+                        >
+                          {p.prizeImage ? (
+                            <img
+                              src={p.prizeImage}
+                              alt={p.prizeName}
+                              style={{
+                                width: 38,
+                                height: 38,
+                                borderRadius: 10,
+                                objectFit: 'cover',
+                                background: '#fff',
+                                flexShrink: 0,
+                              }}
+                            />
+                          ) : (
+                            <div
+                              style={{
+                                width: 38,
+                                height: 38,
+                                borderRadius: 10,
+                                background: `${r.color}18`,
+                                display: 'grid',
+                                placeItems: 'center',
+                                flexShrink: 0,
+                                color: r.color,
+                              }}
+                            >
+                              <Gift size={19} aria-hidden />
+                            </div>
+                          )}
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 6,
+                                marginBottom: 5,
+                              }}
+                            >
+                              <span
+                                style={{
+                                  fontSize: 13,
+                                  fontWeight: 800,
+                                  color: 'var(--cpm-ink-1)',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  whiteSpace: 'nowrap',
+                                }}
+                              >
+                                {p.prizeName}
+                              </span>
+                              <span
+                                style={{
+                                  fontSize: 10,
+                                  fontWeight: 800,
+                                  padding: '2px 6px',
+                                  borderRadius: 999,
+                                  background: r.color,
+                                  color: '#fff',
+                                  flexShrink: 0,
+                                }}
+                              >
+                                {r.label}
+                              </span>
+                            </div>
+                            <div
+                              style={{
+                                position: 'relative',
+                                height: 5,
+                                background: 'rgba(15,23,42,0.06)',
+                                borderRadius: 999,
+                                overflow: 'hidden',
+                              }}
+                            >
+                              <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: `${pct}%` }}
+                                transition={{ duration: 0.45, delay: 0.08 }}
+                                style={{
+                                  position: 'absolute',
+                                  inset: 0,
+                                  background: r.color,
+                                  borderRadius: 999,
+                                }}
+                              />
+                            </div>
+                          </div>
+                          <span
+                            style={{
+                              fontSize: 13,
+                              fontWeight: 800,
+                              color: r.color,
+                              fontFamily: 'var(--cpm-font-num)',
+                              flexShrink: 0,
+                            }}
+                          >
+                            {pct < 1 ? pct.toFixed(1) : Math.round(pct)}%
+                          </span>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.section>
+
+          <motion.section
+            initial={{ opacity: 0, y: 12, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.38, delay: 0.05 }}
+            style={{
+              ...cardStyle(isDesktop),
+              padding: isDesktop ? '20px 20px 18px' : '16px 14px 14px',
+              boxShadow:
+                boxState === 'spinning' ? `0 26px 54px -20px ${tint}66, var(--cpm-elev-soft)` : 'var(--cpm-elev-soft)',
+              transition: 'box-shadow 300ms ease',
+            }}
+          >
+            <div
+              style={{
+                minHeight: isDesktop ? 318 : 250,
+                display: 'grid',
+                placeItems: 'center',
+                position: 'relative',
+                overflow: 'hidden',
+                borderRadius: isDesktop ? 22 : 20,
+                background: 'linear-gradient(180deg, #fff 0%, rgba(245,246,251,0.72) 100%)',
+                border: '1px solid var(--cpm-border-subtle)',
+              }}
+            >
+              {boxState === 'spinning' && (
+                <motion.div
+                  aria-hidden
+                  animate={{ scale: [0.92, 1.04, 0.96], opacity: [0.35, 0.72, 0.38] }}
+                  transition={{ duration: 1.6, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
+                  style={{
+                    position: 'absolute',
+                    width: isDesktop ? 250 : 210,
+                    height: isDesktop ? 250 : 210,
+                    borderRadius: '50%',
+                    border: `1px solid ${tint}55`,
+                    boxShadow: `0 0 34px ${tint}26, inset 0 0 28px ${tint}18`,
+                    pointerEvents: 'none',
+                  }}
+                />
+              )}
+
+              {loading ? (
+                <div
+                  style={{
+                    minHeight: boxSize,
+                    display: 'grid',
+                    placeItems: 'center',
+                    color: 'var(--cpm-ink-2)',
+                    fontSize: 13,
+                  }}
+                >
+                  加载盲盒中…
+                </div>
+              ) : (
+                <BlindboxBox3D state={boxState} tint={tint} size={boxSize} onAnimationDone={onBoxAnimationDone} />
+              )}
+            </div>
+
+            <div
+              style={{
+                minHeight: 34,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: 'var(--cpm-text-muted)',
-                fontSize: 13,
+                gap: 7,
+                textAlign: 'center',
+                fontSize: 12,
+                fontWeight: 800,
+                color: 'var(--cpm-ink-2)',
+                marginTop: 10,
               }}
             >
-              加载盲盒中…
+              {boxState === 'spinning' && (
+                <>
+                  <Loader2 size={15} aria-hidden />
+                  抽奖中
+                </>
+              )}
+              {boxState === 'opening' && (
+                <>
+                  <Sparkles size={15} aria-hidden />
+                  开盒中
+                </>
+              )}
+              {boxState === 'idle' && (
+                <>
+                  <Gift size={15} aria-hidden />
+                  点击按钮开启盲盒
+                </>
+              )}
             </div>
-          ) : (
-            <div style={{ display: 'flex', justifyContent: 'center', position: 'relative' }}>
-              <BlindboxBox3D
-                state={boxState}
-                tint={tint}
-                size={280}
-                onAnimationDone={onBoxAnimationDone}
-              />
-            </div>
-          )}
 
-          {/* 状态标签 */}
-          <div
-            style={{
-              textAlign: 'center',
-              fontSize: 11,
-              fontWeight: 600,
-              letterSpacing: '0.15em',
-              color: 'var(--cpm-text-tertiary)',
-              marginTop: 2,
-            }}
-          >
-            {boxState === 'spinning' && '✦ SPINNING…'}
-            {boxState === 'opening' && '◆ OPENING…'}
-            {boxState === 'idle' && '◐ TAP TO REVEAL'}
-          </div>
-        </motion.div>
+            <motion.button
+              type="button"
+              onClick={() => draw()}
+              disabled={disabled}
+              whileHover={!disabled ? { y: -1 } : undefined}
+              whileTap={!disabled ? { scale: 0.98 } : undefined}
+              transition={{ type: 'spring', stiffness: 350, damping: 22 }}
+              style={{
+                width: '100%',
+                minHeight: 54,
+                padding: '14px 18px',
+                borderRadius: 18,
+                border: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 9,
+                fontSize: isDesktop ? 17 : 16,
+                fontWeight: 800,
+                fontFamily: 'var(--cpm-font-sans)',
+                background: disabled
+                  ? 'linear-gradient(135deg, rgba(106,92,255,0.62), rgba(34,211,238,0.62))'
+                  : `linear-gradient(135deg, ${tint} 0%, var(--cpm-brand-cyan) 100%)`,
+                color: '#fff',
+                cursor: disabled ? 'not-allowed' : 'pointer',
+                boxShadow: disabled ? `0 8px 20px -8px ${tint}55` : `0 16px 36px -12px ${tint}80`,
+                opacity: disabled ? 0.86 : 1,
+                transition: 'background 200ms ease, box-shadow 200ms ease, opacity 200ms ease',
+              }}
+            >
+              {boxState === 'spinning' && (
+                <>
+                  <Loader2 size={18} aria-hidden />
+                  抽奖中…
+                </>
+              )}
+              {boxState === 'opening' && (
+                <>
+                  <Sparkles size={18} aria-hidden />
+                  开盒中…
+                </>
+              )}
+              {boxState === 'idle' && (
+                <>
+                  <Sparkles size={18} aria-hidden />
+                  开启盲盒 · {box?.Cost ?? ''} 分
+                </>
+              )}
+            </motion.button>
 
-        {/* 抽奖大按钮 */}
-        <motion.button
-          onClick={draw}
-          disabled={boxState !== 'idle'}
-          whileHover={boxState === 'idle' ? { scale: 1.02 } : undefined}
-          whileTap={boxState === 'idle' ? { scale: 0.97 } : undefined}
-          transition={{ type: 'spring', stiffness: 350, damping: 22 }}
-          style={{
-            width: '100%',
-            padding: '17px 0',
-            borderRadius: 18,
-            fontSize: 17,
-            fontWeight: 700,
-            fontFamily: 'var(--cpm-font-sans)',
-            letterSpacing: '0.05em',
-            border: 'none',
-            background:
-              boxState !== 'idle'
-                ? `linear-gradient(135deg, ${tint}aa 0%, ${tint}88 100%)`
-                : `linear-gradient(135deg, ${tint} 0%, var(--cpm-brand-cyan) 100%)`,
-            color: '#fff',
-            cursor: boxState !== 'idle' ? 'not-allowed' : 'pointer',
-            boxShadow: boxState === 'idle'
-              ? `0 16px 40px -10px ${tint}80`
-              : `0 8px 22px -6px ${tint}55`,
-            transition: 'background 0.3s ease, box-shadow 0.3s ease',
-            opacity: boxState !== 'idle' ? 0.92 : 1,
-          }}
-        >
-          {boxState === 'spinning' && '抽奖中…'}
-          {boxState === 'opening' && '开盒中…'}
-          {boxState === 'idle' && `✦ 开启盲盒 · ${box?.Cost ?? ''} 分`}
-        </motion.button>
-
-        {err && (
-          <motion.div
-            initial={{ opacity: 0, y: -4 }}
-            animate={{ opacity: 1, y: 0 }}
-            style={{
-              width: '100%',
-              marginTop: 14,
-              padding: '10px 14px',
-              borderRadius: 12,
-              background: 'rgba(239,68,68,0.08)',
-              border: '1px solid rgba(239,68,68,0.2)',
-              color: 'var(--cpm-danger)',
-              fontSize: 13,
-              fontWeight: 500,
-              textAlign: 'center',
-            }}
-          >
-            {err}
-          </motion.div>
-        )}
+            {err && (
+              <motion.div
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                style={{
+                  width: '100%',
+                  boxSizing: 'border-box',
+                  marginTop: 12,
+                  padding: '10px 14px',
+                  borderRadius: 14,
+                  background: 'rgba(239,68,68,0.08)',
+                  border: '1px solid rgba(239,68,68,0.2)',
+                  color: 'var(--cpm-danger)',
+                  fontSize: 13,
+                  fontWeight: 700,
+                  textAlign: 'center',
+                }}
+              >
+                {err}
+              </motion.div>
+            )}
+          </motion.section>
+        </div>
       </main>
 
-      {/* 中奖弹窗 */}
       <PrizeRevealModal
         open={showReveal}
         win={result?.win ?? false}

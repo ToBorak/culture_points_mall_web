@@ -109,10 +109,7 @@ export function LeaderboardMobile(s: LeaderboardState) {
             <div
               style={{ fontFamily: 'var(--cpm-font-sans)', fontWeight: 700, fontSize: 14, color: 'var(--cpm-ink-1)' }}
             >
-              第 {myEntry.rank} 名 · {myEntry.name}
-            </div>
-            <div style={{ fontFamily: 'var(--cpm-font-sans)', fontSize: 11, color: 'var(--cpm-ink-2)' }}>
-              我的文化分
+              {myEntry.rank} · {myEntry.name}
             </div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>

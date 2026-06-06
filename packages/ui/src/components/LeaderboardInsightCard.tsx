@@ -15,9 +15,9 @@ interface Props {
 }
 
 const toneColors: Record<string, { from: string; to: string; text: string }> = {
-  proud:       { from: '#fef3c7', to: '#fed7aa', text: '#92400e' },
+  proud: { from: '#fef3c7', to: '#fed7aa', text: '#92400e' },
   encouraging: { from: '#ede9fe', to: '#dbeafe', text: '#5b21b6' },
-  steady:      { from: '#f0fdf4', to: '#dcfce7', text: '#166534' },
+  steady: { from: '#f0fdf4', to: '#dcfce7', text: '#166534' },
 };
 
 export function LeaderboardInsightCard({ data, loading }: Props) {
@@ -25,6 +25,7 @@ export function LeaderboardInsightCard({ data, loading }: Props) {
     return (
       <div
         style={{
+          flexShrink: 0,
           padding: '14px 16px',
           borderRadius: 16,
           background: 'rgba(124,58,237,0.06)',
@@ -45,6 +46,7 @@ export function LeaderboardInsightCard({ data, loading }: Props) {
       transition={{ duration: 0.35 }}
       style={{
         position: 'relative',
+        flexShrink: 0,
         padding: '14px 16px',
         borderRadius: 18,
         background: `linear-gradient(135deg, ${theme.from} 0%, ${theme.to} 100%)`,

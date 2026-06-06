@@ -16,7 +16,8 @@ export interface MeState {
 }
 
 export function useMeState(): MeState {
-  const me = useMe();
+  const authUserId = useAuth((s) => s.userId);
+  const me = useMe(authUserId);
   const p = usePassport();
   const b = useMyBadges();
   const txQ = useMyTransactions(20);

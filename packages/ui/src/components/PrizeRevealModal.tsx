@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
+import { Gem, Gift, Sparkles, Star, Trophy } from 'lucide-react';
 import { useEffect, useMemo } from 'react';
 
 export type RarityTier = 'common' | 'rare' | 'epic' | 'legendary' | 'miss';
@@ -15,16 +16,18 @@ export interface PrizeRevealModalProps {
   onAgain?: () => void;
 }
 
-const rarityTheme: Record<RarityTier, {
-  label: string;
-  primary: string;
-  ring: string;
-  glow: string;
-  bgFrom: string;
-  bgTo: string;
-  text: string;
-  emoji: string;
-}> = {
+const rarityTheme: Record<
+  RarityTier,
+  {
+    label: string;
+    primary: string;
+    ring: string;
+    glow: string;
+    bgFrom: string;
+    bgTo: string;
+    text: string;
+  }
+> = {
   legendary: {
     label: '传说级',
     primary: '#fbbf24',
@@ -33,7 +36,6 @@ const rarityTheme: Record<RarityTier, {
     bgFrom: '#fff7ed',
     bgTo: '#fef3c7',
     text: '#92400e',
-    emoji: '👑',
   },
   epic: {
     label: '史诗级',
@@ -43,7 +45,6 @@ const rarityTheme: Record<RarityTier, {
     bgFrom: '#faf5ff',
     bgTo: '#ede9fe',
     text: '#6d28d9',
-    emoji: '💎',
   },
   rare: {
     label: '稀有',
@@ -53,7 +54,6 @@ const rarityTheme: Record<RarityTier, {
     bgFrom: '#ecfeff',
     bgTo: '#dbeafe',
     text: '#0c4a6e',
-    emoji: '✨',
   },
   common: {
     label: '普通',
@@ -63,7 +63,6 @@ const rarityTheme: Record<RarityTier, {
     bgFrom: '#f0fdf4',
     bgTo: '#dcfce7',
     text: '#065f46',
-    emoji: '🎁',
   },
   miss: {
     label: '鼓励',
@@ -73,7 +72,6 @@ const rarityTheme: Record<RarityTier, {
     bgFrom: '#f8fafc',
     bgTo: '#e2e8f0',
     text: '#334155',
-    emoji: '🌟',
   },
 };
 
@@ -83,6 +81,14 @@ function tierOf(win: boolean, pct: number): RarityTier {
   if (pct < 15) return 'epic';
   if (pct < 35) return 'rare';
   return 'common';
+}
+
+function TierIcon({ tier, size = 20 }: { tier: RarityTier; size?: number }) {
+  if (tier === 'legendary') return <Trophy size={size} aria-hidden />;
+  if (tier === 'epic') return <Gem size={size} aria-hidden />;
+  if (tier === 'rare') return <Sparkles size={size} aria-hidden />;
+  if (tier === 'common') return <Gift size={size} aria-hidden />;
+  return <Star size={size} aria-hidden />;
 }
 
 export function PrizeRevealModal({
@@ -107,9 +113,7 @@ export function PrizeRevealModal({
         delay: Math.random() * 0.6,
         rotation: Math.random() * 360,
         size: 6 + Math.random() * 10,
-        color: ['#fbbf24', '#f97316', '#ec4899', '#a855f7', '#06b6d4', '#10b981'][
-          i % 6
-        ],
+        color: ['#fbbf24', '#f97316', '#ec4899', '#a855f7', '#06b6d4', '#10b981'][i % 6],
       })),
     [],
   );
@@ -152,8 +156,7 @@ export function PrizeRevealModal({
             style={{
               position: 'absolute',
               inset: 0,
-              background:
-                'radial-gradient(ellipse at center, rgba(15,23,42,0.55) 0%, rgba(15,23,42,0.78) 100%)',
+              background: 'radial-gradient(ellipse at center, rgba(15,23,42,0.55) 0%, rgba(15,23,42,0.78) 100%)',
               backdropFilter: 'blur(10px)',
               WebkitBackdropFilter: 'blur(10px)',
             }}
@@ -242,12 +245,12 @@ export function PrizeRevealModal({
                 color: '#fff',
                 fontSize: 11,
                 fontWeight: 700,
-                letterSpacing: '0.15em',
+                letterSpacing: 0,
                 marginBottom: 16,
                 boxShadow: `0 6px 16px -4px ${t.glow}`,
               }}
             >
-              <span>{t.emoji}</span>
+              <TierIcon tier={tier} size={13} />
               <span>{t.label.toUpperCase()}</span>
             </motion.div>
 
@@ -265,7 +268,7 @@ export function PrizeRevealModal({
                 <motion.div
                   aria-hidden
                   animate={{ rotate: 360 }}
-                  transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
+                  transition={{ duration: 6, repeat: Number.POSITIVE_INFINITY, ease: 'linear' }}
                   style={{
                     position: 'absolute',
                     inset: -16,
@@ -307,7 +310,9 @@ export function PrizeRevealModal({
                     }}
                   />
                 ) : (
-                  <span style={{ fontSize: 64 }}>{t.emoji}</span>
+                  <span style={{ color: t.primary, display: 'grid', placeItems: 'center' }}>
+                    <TierIcon tier={tier} size={64} />
+                  </span>
                 )}
               </motion.div>
             </div>
@@ -320,7 +325,7 @@ export function PrizeRevealModal({
               style={{
                 fontSize: 13,
                 fontWeight: 600,
-                letterSpacing: '0.2em',
+                letterSpacing: 0,
                 color: t.text,
                 opacity: 0.6,
                 marginBottom: 4,
@@ -337,7 +342,7 @@ export function PrizeRevealModal({
               style={{
                 fontSize: 24,
                 fontWeight: 800,
-                letterSpacing: '-0.02em',
+                letterSpacing: 0,
                 color: 'var(--cpm-text-primary)',
                 marginBottom: 8,
                 lineHeight: 1.25,
@@ -359,9 +364,13 @@ export function PrizeRevealModal({
               }}
             >
               {win ? (
-                <>已扣除 <strong style={{ color: t.text }}>{amount}</strong> 积分</>
+                <>
+                  已扣除 <strong style={{ color: t.text }}>{amount}</strong> 积分
+                </>
               ) : (
-                <>本次未中奖，<strong style={{ color: 'var(--cpm-success)' }}>不扣分</strong>，鼓励再接再厉</>
+                <>
+                  本次未中奖，<strong style={{ color: 'var(--cpm-success)' }}>不扣分</strong>，鼓励再接再厉
+                </>
               )}
             </motion.div>
 

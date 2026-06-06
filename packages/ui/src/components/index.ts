@@ -40,3 +40,4 @@ export * from './LeaderboardRow.tsx';
 // 重设计 · 我的组件 (2026-06)
 export * from './PointLedgerRow.tsx';
 export * from './BadgeCard.tsx';
+export * from './BadgeMedal.tsx';
