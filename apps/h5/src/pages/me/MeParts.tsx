@@ -14,12 +14,14 @@ function Stat({ n, label }: { n: number; label: string }) {
 
 export function MeHero({
   name,
+  avatarUrl,
   total,
   badgeCount,
   dimCount,
   loading,
 }: {
   name: string;
+  avatarUrl?: string;
   total: number;
   badgeCount: number;
   dimCount: number;
@@ -37,7 +39,7 @@ export function MeHero({
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-        <Avatar name={name} size={56} ringColor="rgba(255,255,255,0.6)" />
+        <Avatar name={name} avatarUrl={avatarUrl || undefined} size={56} ringColor="rgba(255,255,255,0.6)" />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
             <span style={{ fontFamily: 'var(--cpm-font-sans)', fontSize: 17, fontWeight: 800 }}>{name}</span>
