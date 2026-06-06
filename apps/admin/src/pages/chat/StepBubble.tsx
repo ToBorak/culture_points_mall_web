@@ -1,5 +1,5 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { useState, type CSSProperties } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { type CSSProperties, useState } from 'react';
 import type { Step } from './types';
 
 interface Props {
@@ -34,7 +34,9 @@ function CollapseBtn({
         fontFamily: 'var(--cpm-font-sans)',
       }}
     >
-      <span style={{ transition: 'transform 0.2s', display: 'inline-block', transform: open ? 'rotate(90deg)' : 'none' }}>
+      <span
+        style={{ transition: 'transform 0.2s', display: 'inline-block', transform: open ? 'rotate(90deg)' : 'none' }}
+      >
         ›
       </span>
       {label ?? (open ? '折叠' : '展开')}
@@ -221,7 +223,14 @@ export function StepBubble({ step }: Props) {
           {!isErr && <CollapseBtn open={open} onToggle={() => setOpen((p) => !p)} label="输出" />}
         </div>
         {isErr && (
-          <div style={{ padding: '0 14px 12px', fontSize: 12, color: 'var(--cpm-danger)', fontFamily: 'var(--cpm-font-sans)' }}>
+          <div
+            style={{
+              padding: '0 14px 12px',
+              fontSize: 12,
+              color: 'var(--cpm-danger)',
+              fontFamily: 'var(--cpm-font-sans)',
+            }}
+          >
             {step.error}
           </div>
         )}
@@ -256,9 +265,7 @@ export function StepBubble({ step }: Props) {
 
   if (step.kind === 'error') {
     const raw = step.error ?? '';
-    const isAuthErr =
-      /x-api-key|authentication_error|401|api[_-]?key/i.test(raw) ||
-      /未配置.*api/i.test(raw);
+    const isAuthErr = /x-api-key|authentication_error|401|api[_-]?key/i.test(raw) || /未配置.*api/i.test(raw);
     if (isAuthErr) {
       return (
         <motion.div
@@ -296,13 +303,12 @@ export function StepBubble({ step }: Props) {
             ⚡
           </span>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 14, fontWeight: 600, color: '#9a3412', marginBottom: 4 }}>
-              LLM 尚未配置
-            </div>
+            <div style={{ fontSize: 14, fontWeight: 600, color: '#9a3412', marginBottom: 4 }}>LLM 尚未配置</div>
             <div style={{ fontSize: 12.5, color: '#7c2d12', lineHeight: 1.6 }}>
               HR-Agent 依赖大模型推理，需要在后端 <code style={codeStyle}>configs/config.yaml</code> 配置{' '}
               <code style={codeStyle}>llm.claude.api_key</code>，或导出环境变量{' '}
-              <code style={codeStyle}>ANTHROPIC_API_KEY</code> 后重启服务。除此之外的功能（活动、商城、签到、积分、徽章、排行榜、维度、钉钉推送）均已就绪。
+              <code style={codeStyle}>ANTHROPIC_API_KEY</code>{' '}
+              后重启服务。除此之外的功能（活动、商城、签到、积分、徽章、排行榜、维度、钉钉推送）均已就绪。
             </div>
           </div>
         </motion.div>

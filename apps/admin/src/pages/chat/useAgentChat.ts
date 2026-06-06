@@ -1,17 +1,27 @@
 import { useCallback, useState } from 'react';
+import type { PublishPayload } from './ActivityScheduleForm';
 import type { ChatTurn, Step } from './types';
 
 export function useAgentChat() {
   const [turns, setTurns] = useState<ChatTurn[]>([]);
   const [sessionId, setSessionId] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
+  const [formPrefill, setFormPrefill] = useState<Record<string, unknown>>({});
 
-  const send = useCallback(
-    async (text: string) => {
+  const openForm = useCallback((prefill?: Record<string, unknown>) => {
+    setFormPrefill(prefill ?? {});
+    setFormOpen(true);
+  }, []);
+  const closeForm = useCallback(() => setFormOpen(false), []);
+
+  // runStream 读取 SSE（/admin/agent/chat 与 /admin/activities/publish 同款协议），把 step 追加到新建的一轮。
+  const runStream = useCallback(
+    async (url: string, body: unknown, userText: string) => {
       const turn: ChatTurn = {
         id: `${Date.now()}-${Math.random()}`,
         sessionId,
-        userText: text,
+        userText,
         steps: [],
         done: false,
       };
@@ -19,10 +29,10 @@ export function useAgentChat() {
       setBusy(true);
 
       const token = localStorage.getItem('cpm_admin_jwt');
-      const resp = await fetch('/admin/agent/chat', {
+      const resp = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ sessionId, text }),
+        body: JSON.stringify(body),
       });
       if (!resp.ok || !resp.body) {
         setBusy(false);
@@ -51,14 +61,19 @@ export function useAgentChat() {
             setSessionId(obj.sessionId);
           } else if (event === 'step') {
             const step = JSON.parse(data) as Step;
+            // agent 通过 open_activity_form 工具发出"渲染日程表单"的信号
+            const out = step.output as { form?: string; prefill?: Record<string, unknown> } | undefined;
+            if (step.kind === 'tool_result' && out?.form === 'activity_schedule') {
+              setFormPrefill(out.prefill ?? {});
+              setFormOpen(true);
+            }
             setTurns((prev) => {
               if (prev.length === 0) return prev;
               const last = prev[prev.length - 1];
               const updated: ChatTurn = {
                 ...last,
                 steps: [...last.steps, step],
-                done:
-                  step.kind === 'done' || step.kind === 'error' ? true : last.done,
+                done: step.kind === 'done' || step.kind === 'error' ? true : last.done,
               };
               return [...prev.slice(0, -1), updated];
             });
@@ -70,5 +85,18 @@ export function useAgentChat() {
     [sessionId],
   );
 
-  return { turns, busy, send };
+  const send = useCallback(
+    (text: string) => runStream('/admin/agent/chat', { sessionId, text }, text),
+    [runStream, sessionId],
+  );
+
+  const publishActivity = useCallback(
+    (payload: PublishPayload) => {
+      setFormOpen(false);
+      return runStream('/admin/activities/publish', payload, `发布活动：${payload.title}`);
+    },
+    [runStream],
+  );
+
+  return { turns, busy, send, publishActivity, formOpen, formPrefill, openForm, closeForm };
 }

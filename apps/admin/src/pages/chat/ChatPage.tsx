@@ -1,12 +1,13 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { useEffect, useRef, useState } from 'react';
 import { Button } from '@cpm/ui';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
+import { ActivityScheduleForm } from './ActivityScheduleForm';
 import { SessionsSidebar } from './SessionsSidebar';
 import { StepBubble } from './StepBubble';
 import { useAgentChat } from './useAgentChat';
 
 export function ChatPage() {
-  const { turns, busy, send } = useAgentChat();
+  const { turns, busy, send, publishActivity, formOpen, formPrefill, openForm, closeForm } = useAgentChat();
   const [text, setText] = useState('');
   const [activeSessionId, setActiveSessionId] = useState<number | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -100,6 +101,26 @@ export function ChatPage() {
             </div>
           </div>
           <div style={{ flex: 1 }} />
+          <motion.button
+            type="button"
+            onClick={() => openForm({})}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.94 }}
+            transition={{ type: 'spring', stiffness: 350, damping: 22 }}
+            style={{
+              padding: '5px 12px',
+              borderRadius: 8,
+              border: '1px solid rgba(124,58,237,0.3)',
+              background: 'rgba(124,58,237,0.08)',
+              color: 'var(--cpm-brand-violet)',
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: 'pointer',
+              fontFamily: 'var(--cpm-font-sans)',
+            }}
+          >
+            + 发布活动
+          </motion.button>
           <motion.button
             type="button"
             onClick={clearChat}
@@ -242,7 +263,7 @@ export function ChatPage() {
                   <motion.div
                     key={i}
                     animate={{ y: [0, -4, 0] }}
-                    transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.12 }}
+                    transition={{ duration: 0.6, repeat: Number.POSITIVE_INFINITY, delay: i * 0.12 }}
                     style={{
                       width: 6,
                       height: 6,
@@ -256,6 +277,19 @@ export function ChatPage() {
             </motion.div>
           )}
         </div>
+
+        {/* 发布活动日程表单：停靠在输入框正上方，常驻可见，不随消息区滚动 */}
+        {formOpen && (
+          <div style={{ padding: '12px 20px 0', flexShrink: 0, background: 'var(--cpm-bg-0)' }}>
+            <ActivityScheduleForm
+              prefill={formPrefill}
+              onSubmit={(payload) => {
+                void publishActivity(payload);
+              }}
+              onCancel={closeForm}
+            />
+          </div>
+        )}
 
         {/* 底部输入区 */}
         <div
@@ -324,13 +358,7 @@ export function ChatPage() {
               Enter 发送 · Shift+Enter 换行
             </div>
           </div>
-          <Button
-            tone="primary"
-            size="md"
-            onClick={submit}
-            disabled={busy || !text.trim()}
-            style={{ flexShrink: 0 }}
-          >
+          <Button tone="primary" size="md" onClick={submit} disabled={busy || !text.trim()} style={{ flexShrink: 0 }}>
             {busy ? '思考中…' : '发送'}
           </Button>
         </div>

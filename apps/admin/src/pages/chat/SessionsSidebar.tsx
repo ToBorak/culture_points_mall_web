@@ -81,9 +81,7 @@ export function SessionsSidebar({ onPick, activeId }: Props) {
       {/* 会话列表 */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '0 8px 12px' }}>
         {rows.length === 0 && (
-          <div style={{ padding: '12px 8px', fontSize: 12, color: 'var(--cpm-text-muted)' }}>
-            暂无会话记录
-          </div>
+          <div style={{ padding: '12px 8px', fontSize: 12, color: 'var(--cpm-text-muted)' }}>暂无会话记录</div>
         )}
         <motion.ul
           initial="hidden"
@@ -94,10 +92,7 @@ export function SessionsSidebar({ onPick, activeId }: Props) {
           {rows.map((s) => {
             const isActive = s.ID === activeId;
             return (
-              <motion.li
-                key={s.ID}
-                variants={{ hidden: { opacity: 0, x: -6 }, visible: { opacity: 1, x: 0 } }}
-              >
+              <motion.li key={s.ID} variants={{ hidden: { opacity: 0, x: -6 }, visible: { opacity: 1, x: 0 } }}>
                 <button
                   type="button"
                   onClick={() => onPick(s.ID)}
