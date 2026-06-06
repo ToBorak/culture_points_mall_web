@@ -1,23 +1,28 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { HomePage } from './pages/home/HomePage';
-import { LeaderboardPage } from './pages/leaderboard/LeaderboardPage';
-import { PassportPage } from './pages/passport/PassportPage';
-import { SigninPage } from './pages/signin/SigninPage';
-import { MallPage } from './pages/mall/MallPage';
-import { BlindboxDrawPage } from './pages/mall/BlindboxDrawPage';
+import { AppShell } from './layout/AppShell';
+import { ActivitiesPage } from './pages/activities/ActivitiesPage';
 import { DNAReportPage } from './pages/dna/DNAReportPage';
+import { LeaderboardPage } from './pages/leaderboard/LeaderboardPage';
+import { BlindboxDrawPage } from './pages/mall/BlindboxDrawPage';
+import { MallPage } from './pages/mall/MallPage';
+import { MePage } from './pages/me/MePage';
+import { SigninPage } from './pages/signin/SigninPage';
 
 export function AppRouter() {
   return (
     <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/passport" element={<PassportPage />} />
-      <Route path="/leaderboard" element={<LeaderboardPage />} />
-      <Route path="/activities" element={<div>activities · 占位 · Phase 3 实现</div>} />
-      <Route path="/signin" element={<SigninPage />} />
-      <Route path="/mall" element={<MallPage />} />
+      {/* 4 个核心 Tab 套响应式外壳（移动底部 Tab / 桌面侧边栏） */}
+      <Route element={<AppShell />}>
+        <Route path="/" element={<Navigate to="/leaderboard" replace />} />
+        <Route path="/leaderboard" element={<LeaderboardPage />} />
+        <Route path="/activities" element={<ActivitiesPage />} />
+        <Route path="/mall" element={<MallPage />} />
+        <Route path="/me" element={<MePage />} />
+      </Route>
+      {/* 全屏路由（不带外壳） */}
       <Route path="/mall/blindbox/:id" element={<BlindboxDrawPage />} />
       <Route path="/dna" element={<DNAReportPage />} />
+      <Route path="/signin" element={<SigninPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

@@ -94,6 +94,31 @@
   /* === 玻璃旧 shadow 兼容 === */
   --cpm-shadow-glass: var(--cpm-shadow-soft);
   --cpm-shadow-glass-hover: var(--cpm-shadow-pop);
+
+  /* === 重设计 · 元气紫蓝 canonical tokens (2026-06) === */
+  --cpm-primary: #6a5cff;
+  --cpm-primary-strong: #5646e0;
+  --cpm-primary-soft: #ecebff;
+  --cpm-accent: #22d3ee;
+  --cpm-gold: #ffb020;
+  --cpm-gold-soft: #fff4da;
+  --cpm-gold-ink: #9a6800;
+  --cpm-app-bg: #f5f6fb;
+  --cpm-surface: #ffffff;
+  --cpm-sunken: #edeff6;
+  --cpm-ink-1: #191a2c;
+  --cpm-ink-2: #6b6f86;
+  --cpm-on-primary: #ffffff;
+  --cpm-border-subtle: #eceef4;
+  --cpm-up: #22c55e;
+  --cpm-down: #ff5470;
+  --cpm-medal-gold: #ffc23d;
+  --cpm-medal-silver: #cbd3e1;
+  --cpm-medal-bronze: #e29b6b;
+  --cpm-grad-brand: linear-gradient(135deg, #6a5cff 0%, #7c6cff 45%, #22d3ee 120%);
+  /* 旧品牌色对齐到新紫蓝，保持全局一致 */
+  --cpm-brand-violet: #6a5cff;
+  --cpm-brand-cyan: #22d3ee;
 }
 
 html, body {

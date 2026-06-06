@@ -1,0 +1,20 @@
+/* 基础 a11y 增强（UI/UX Pro Max 复核增量 · 2026-06） */
+
+/* 键盘焦点可见：统一焦点环 */
+:where(button, a, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--cpm-primary);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* 尊重「减少动效」系统偏好 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

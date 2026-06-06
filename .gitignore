@@ -8,3 +8,5 @@ storybook-static/
 
 # Vite cache 残留
 **/vite.config.ts.timestamp-*
+
+e2e/test-results/
