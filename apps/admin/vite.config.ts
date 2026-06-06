@@ -6,6 +6,8 @@ import { cpmUnoConfig } from '@cpm/ui/uno';
 export default defineConfig({
   plugins: [react(), unocss(cpmUnoConfig)],
   server: {
+    host: true,
+    allowedHosts: true,
     port: 5174,
     proxy: {
       '/api': { target: 'http://localhost:8080', changeOrigin: true },
