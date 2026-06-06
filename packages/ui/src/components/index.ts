@@ -29,3 +29,10 @@ export * from './BadgeWall.tsx';
 export * from './PointsPill.tsx';
 export * from './BottomTabBar.tsx';
 export * from './SideNav.tsx';
+
+// 重设计 · 排行榜组件 (2026-06)
+export * from './Avatar.tsx';
+export * from './TrendIndicator.tsx';
+export * from './SegmentedControl.tsx';
+export * from './PodiumTop3.tsx';
+export * from './LeaderboardRow.tsx';
