@@ -11,6 +11,7 @@ const items = [
   { to: '/mall', label: '商城/盲盒', icon: '◈', end: false },
   { to: '/insights', label: '数据洞察', icon: '⌬', end: false },
   { to: '/dingtalk/mock-outbox', label: '钉钉推送', icon: '⊕', end: false },
+  { to: '/schedules', label: '日程发布', icon: '📅', end: false },
 ];
 
 export function Sidebar() {
