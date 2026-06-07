@@ -262,16 +262,11 @@ function StarsJudgingPanel({
       <h3>
         评审台 · {sel.name}（{statusLabel(sel.status)}）
       </h3>
-      {/* AI 摘要 */}
+      {/* AI 摘要 + 定榜操作区 */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
         <Button size="sm" onClick={runDigest} disabled={disabled}>
           🧮 AI 评审摘要
         </Button>
-        {!disabled && (
-          <Button tone="primary" size="sm" onClick={confirmSelect} disabled={disabled}>
-            确认定榜
-          </Button>
-        )}
       </div>
       {digest && (
         <div
