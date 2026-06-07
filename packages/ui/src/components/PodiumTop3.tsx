@@ -30,7 +30,7 @@ function Column({ entry, place }: { entry: LeaderboardEntry | undefined; place: 
         {entry.name}
       </div>
       <div style={{ fontFamily: 'var(--cpm-font-num)', fontWeight: 800, fontSize: 15, color: 'var(--cpm-on-primary)' }}>
-        {entry.score.toLocaleString('en-US')}
+        {(entry.earned ?? 0).toLocaleString('en-US')}
       </div>
       <div
         style={{

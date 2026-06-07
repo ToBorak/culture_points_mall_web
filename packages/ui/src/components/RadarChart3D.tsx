@@ -1,5 +1,5 @@
-import { Canvas, useFrame } from '@react-three/fiber';
 import { MeshReflectorMaterial, OrbitControls } from '@react-three/drei';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
 import type { Group, Mesh, Points } from 'three';
 import { Color } from 'three';
@@ -25,10 +25,7 @@ export interface RadarChart3DProps {
  * - 顶部 HTML 浮标显示具体分数与维度名
  */
 export function RadarChart3D({ data, size = 320 }: RadarChart3DProps) {
-  const maxInData = useMemo(
-    () => Math.max(1, ...data.map((d) => d.score)),
-    [data],
-  );
+  const maxInData = useMemo(() => Math.max(1, ...data.map((d) => d.score)), [data]);
 
   return (
     <div style={{ width: size, height: size, position: 'relative' }}>
@@ -45,11 +42,7 @@ export function RadarChart3D({ data, size = 320 }: RadarChart3DProps) {
           borderRadius: 18,
         }}
       />
-      <Canvas
-        dpr={[1, 2]}
-        camera={{ position: [0, 2.4, 5.2], fov: 36 }}
-        style={{ position: 'relative', zIndex: 1 }}
-      >
+      <Canvas dpr={[1, 2]} camera={{ position: [0, 2.4, 5.2], fov: 36 }} style={{ position: 'relative', zIndex: 1 }}>
         {/* 三点光照：主光 + 补光 + 背光（轮廓光） */}
         <ambientLight intensity={0.45} />
         <directionalLight position={[5, 8, 4]} intensity={2.4} color="#ffffff" castShadow />
@@ -126,7 +119,7 @@ function CrystalTower({
 
   // 归一化：让最高分顶到 2.4，其它按比例
   const ratio = dim.score / Math.max(maxScore, 1);
-  const targetHeight = 0.18 + Math.pow(ratio, 0.55) * 2.22;
+  const targetHeight = 0.18 + ratio ** 0.55 * 2.22;
   const tipHeight = 0.4;
   const fade = Math.min(1, ratio * 4);
   const isDominant = ratio > 0.6;
@@ -237,19 +230,9 @@ function ParticleDust({ count }: { count: number }) {
   return (
     <points ref={ref}>
       <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          args={[positions, 3]}
-        />
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
       </bufferGeometry>
-      <pointsMaterial
-        color="#a78bfa"
-        size={0.035}
-        sizeAttenuation
-        transparent
-        opacity={0.6}
-        depthWrite={false}
-      />
+      <pointsMaterial color="#a78bfa" size={0.035} sizeAttenuation transparent opacity={0.6} depthWrite={false} />
     </points>
   );
 }

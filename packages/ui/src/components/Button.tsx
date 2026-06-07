@@ -17,21 +17,12 @@ const sizeMap: Record<ButtonSize, { px: number; py: number; fs: number; radius: 
   lg: { px: 28, py: 16, fs: 16, radius: 14 },
 };
 
-export function Button({
-  tone = 'primary',
-  size = 'md',
-  children,
-  icon,
-  style,
-  disabled,
-  ...rest
-}: ButtonProps) {
+export function Button({ tone = 'primary', size = 'md', children, icon, style, disabled, ...rest }: ButtonProps) {
   const sz = sizeMap[size];
 
   const styles: Record<ButtonTone, React.CSSProperties> = {
     primary: {
-      background:
-        'linear-gradient(135deg, var(--cpm-brand-violet) 0%, var(--cpm-brand-cyan) 100%)',
+      background: 'linear-gradient(135deg, var(--cpm-brand-violet) 0%, var(--cpm-brand-cyan) 100%)',
       color: '#fff',
       border: '1px solid rgba(255,255,255,0.18)',
       boxShadow: 'var(--cpm-shadow-glow-violet)',

@@ -115,7 +115,7 @@ export function AiCoachCard({ data, loading }: Props) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 12 }}>
           {data.actionItems.map((it, idx) => (
             <motion.div
-              key={idx}
+              key={it}
               initial={{ opacity: 0, x: -8 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.05 * idx + 0.1 }}
@@ -166,9 +166,7 @@ export function AiCoachCard({ data, loading }: Props) {
           }}
         >
           <span style={{ color: 'var(--cpm-text-tertiary)' }}>预期收益</span>
-          <span style={{ fontWeight: 700, color: tint, fontFeatureSettings: '"tnum"' }}>
-            {data.expectedGain}
-          </span>
+          <span style={{ fontWeight: 700, color: tint, fontFeatureSettings: '"tnum"' }}>{data.expectedGain}</span>
         </div>
       </div>
     </motion.div>

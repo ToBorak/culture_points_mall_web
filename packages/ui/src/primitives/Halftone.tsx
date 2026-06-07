@@ -21,5 +21,9 @@ export function Halftone({ className, style, children, intensity = 'normal' }: H
     backgroundSize: '18px 18px, 26px 26px',
     ...style,
   };
-  return <div className={className} style={bg}>{children}</div>;
+  return (
+    <div className={className} style={bg}>
+      {children}
+    </div>
+  );
 }

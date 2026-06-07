@@ -28,9 +28,7 @@ export function DimensionTag({ code, name, active = false, size = 'md', onClick 
     borderRadius: 999,
     border: '1px solid',
     borderColor: active ? color : 'var(--cpm-glass-border)',
-    background: active
-      ? `color-mix(in oklab, ${color} 18%, transparent)`
-      : 'var(--cpm-glass-bg)',
+    background: active ? `color-mix(in oklab, ${color} 18%, transparent)` : 'var(--cpm-glass-bg)',
     color: active ? color : 'var(--cpm-text-secondary)',
     cursor: onClick ? 'pointer' : 'default',
     transition: 'all 0.2s ease',
@@ -38,8 +36,8 @@ export function DimensionTag({ code, name, active = false, size = 'md', onClick 
     WebkitBackdropFilter: 'blur(8px)',
   };
 
-  return (
-    <span style={style} onClick={onClick}>
+  const content = (
+    <>
       <span
         style={{
           width: sz.dot,
@@ -50,6 +48,16 @@ export function DimensionTag({ code, name, active = false, size = 'md', onClick 
         }}
       />
       {name}
-    </span>
+    </>
   );
+
+  if (onClick) {
+    return (
+      <button type="button" style={{ ...style, font: 'inherit' }} onClick={onClick}>
+        {content}
+      </button>
+    );
+  }
+
+  return <span style={style}>{content}</span>;
 }

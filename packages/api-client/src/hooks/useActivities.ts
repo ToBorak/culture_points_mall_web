@@ -9,7 +9,7 @@ function normalize(a: Partial<Activity>): Activity {
     enrolledCount: a.enrolledCount ?? 0,
     dimensionCode: a.dimensionCode ?? '',
     dimensionName: a.dimensionName ?? '',
-    mine: a.mine ?? { enrolled: false, status: '', checkedIn: false },
+    mine: a.mine ?? { enrolled: false, status: '', checkedIn: false, inCalendar: false },
   };
 }
 

@@ -6,6 +6,8 @@ export interface ActivityMine {
   enrolled: boolean;
   status: EnrollStatus;
   checkedIn: boolean;
+  /** 报名是否已自动加入该用户的钉钉日历 */
+  inCalendar: boolean;
 }
 
 /**
@@ -21,9 +23,6 @@ export interface Activity {
   Capacity: number | null;
   StartAt: string | null;
   EndAt: string | null;
-  LocationLat: number | null;
-  LocationLng: number | null;
-  RadiusM: number | null;
   PointsReward: number;
   CreatedAt: string;
   dimensionCode: string;

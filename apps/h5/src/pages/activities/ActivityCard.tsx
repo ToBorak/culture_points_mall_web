@@ -1,9 +1,9 @@
 import type { Activity } from '@cpm/types';
 import { DimensionTag } from '@cpm/ui';
 import { motion } from 'framer-motion';
-import { CalendarDays, CheckCircle2, Coins, MapPin, Ticket, Users } from 'lucide-react';
+import { CalendarDays, CheckCircle2, Coins, Ticket, Users } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { countdownText, fmtTimeRange, phaseOf, STATUS_META } from './lib';
+import { STATUS_META, countdownText, fmtTimeRange, phaseOf } from './lib';
 
 interface ActivityCardProps {
   activity: Activity;
@@ -91,17 +91,20 @@ export function ActivityCard({ activity: a, onClick }: ActivityCardProps) {
 
       {/* 元信息 */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-        <Meta icon={<CalendarDays size={15} />} text={countdown ?? fmtTimeRange(a.StartAt, a.EndAt)} accent={!!countdown} />
-        {a.LocationLat != null && a.LocationLng != null && (
-          <Meta icon={<MapPin size={15} />} text={a.RadiusM ? `线下活动 · 签到范围 ${a.RadiusM}m` : '线下活动'} />
-        )}
+        <Meta
+          icon={<CalendarDays size={15} />}
+          text={countdown ?? fmtTimeRange(a.StartAt, a.EndAt)}
+          accent={!!countdown}
+        />
       </div>
 
       {/* 名额进度 */}
       {hasCap && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, color: 'var(--cpm-ink-2)' }}>
+            <span
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, color: 'var(--cpm-ink-2)' }}
+            >
               <Users size={14} /> 已报名 {a.enrolledCount}/{a.Capacity}
             </span>
             <span style={{ fontSize: 12, color: pct >= 100 ? 'var(--cpm-down)' : 'var(--cpm-ink-2)', fontWeight: 600 }}>
@@ -147,14 +150,21 @@ export function ActivityCard({ activity: a, onClick }: ActivityCardProps) {
           签到 +{a.PointsReward || 10}
         </span>
         {!hasCap && (
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, color: 'var(--cpm-ink-2)' }}>
+          <span
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, color: 'var(--cpm-ink-2)' }}
+          >
             <Users size={14} /> {a.enrolledCount} 人已报名
           </span>
         )}
         {a.mine.checkedIn ? (
           <MineChip color="var(--cpm-up)" bg="rgba(34,197,94,0.12)" icon={<CheckCircle2 size={14} />} label="已签到" />
         ) : a.mine.enrolled ? (
-          <MineChip color="var(--cpm-primary)" bg="var(--cpm-primary-soft)" icon={<Ticket size={14} />} label="已报名" />
+          <MineChip
+            color="var(--cpm-primary)"
+            bg="var(--cpm-primary-soft)"
+            icon={<Ticket size={14} />}
+            label="已报名"
+          />
         ) : null}
       </div>
     </motion.button>

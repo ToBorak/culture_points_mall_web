@@ -1,4 +1,4 @@
-# 文化积分商城 · 前端 Monorepo
+# 文化官 · 前端 Monorepo
 
 > pnpm workspace + Turborepo · React 19 + Vite + UnoCSS + @react-three/fiber + GSAP + Lottie
 
@@ -58,4 +58,4 @@ pnpm test:e2e
 pnpm -r build
 ```
 
-详见后端仓库的 `docs/superpowers/specs/2026-05-22-文化积分商城-动漫风钉钉应用-design.md`。
+详见后端仓库的 `docs/superpowers/specs/2026-05-22-文化官-动漫风钉钉应用-design.md`。

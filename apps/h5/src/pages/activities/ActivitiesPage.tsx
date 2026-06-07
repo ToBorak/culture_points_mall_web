@@ -39,11 +39,13 @@ export function ActivitiesPage() {
   const shown = useMemo(() => applyFilter(data ?? [], filter), [data, filter]);
 
   return (
-    <div style={{ height: '100%', overflowY: 'auto', overscrollBehavior: 'contain' }}>
+    <div style={{ width: '100%', height: '100%', overflowY: 'auto', overscrollBehavior: 'contain' }}>
       <div
         style={{
+          width: '100%',
           maxWidth: isDesktop ? 1040 : '100%',
           margin: '0 auto',
+          boxSizing: 'border-box',
           display: 'flex',
           flexDirection: 'column',
           gap: 14,
@@ -54,7 +56,9 @@ export function ActivitiesPage() {
         {/* 标题栏 */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
-            <h1 style={{ fontSize: isDesktop ? 28 : 22, fontWeight: 800, color: 'var(--cpm-ink-1)', margin: 0 }}>活动</h1>
+            <h1 style={{ fontSize: isDesktop ? 28 : 22, fontWeight: 800, color: 'var(--cpm-ink-1)', margin: 0 }}>
+              活动
+            </h1>
             <p style={{ fontSize: 13, color: 'var(--cpm-ink-2)', margin: '4px 0 0' }}>报名参加 · 现场扫码签到领积分</p>
           </div>
           <PointsPill value={points} />
@@ -80,6 +84,7 @@ export function ActivitiesPage() {
           <div
             style={{
               display: 'grid',
+              width: '100%',
               gridTemplateColumns: isDesktop ? 'repeat(2, minmax(0, 1fr))' : '1fr',
               gap: 12,
             }}

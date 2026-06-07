@@ -1,31 +1,20 @@
 import { useActivity, useEnroll, useUnenroll } from '@cpm/api-client';
 import { Button, DimensionTag, useBreakpoint } from '@cpm/ui';
 import { AnimatePresence, motion } from 'framer-motion';
-import {
-  CalendarDays,
-  CalendarPlus,
-  CheckCircle2,
-  ChevronRight,
-  Coins,
-  MapPin,
-  QrCode,
-  Ticket,
-  Users,
-} from 'lucide-react';
+import { CalendarDays, CalendarPlus, CheckCircle2, Coins, QrCode, Ticket, Users } from 'lucide-react';
 import { type ReactNode, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { isInDingTalk } from '../../auth/dingtalkLogin';
 import { ScannerOverlay } from './ScannerOverlay';
 import {
+  STATUS_META,
   countdownText,
   downloadIcs,
   fmtTimeRange,
   hasBarcodeDetector,
-  mapLink,
   parseSigninTarget,
   phaseOf,
   scanViaDingTalk,
-  STATUS_META,
 } from './lib';
 
 export function ActivityDetailPage() {
@@ -83,7 +72,13 @@ export function ActivityDetailPage() {
   const doEnroll = () => {
     setMsg(null);
     enroll.mutate(activityId, {
-      onSuccess: () => setMsg({ text: '报名成功，记得到现场扫码签到', tone: 'ok' }),
+      onSuccess: (data) =>
+        setMsg({
+          text: data.mine?.inCalendar
+            ? '报名成功，已加入你的钉钉日历，记得到现场扫码签到'
+            : '报名成功，记得到现场扫码签到',
+          tone: 'ok',
+        }),
       onError: (e: unknown) => setMsg({ text: errText(e, '报名失败，请重试'), tone: 'err' }),
     });
   };
@@ -133,7 +128,15 @@ export function ActivityDetailPage() {
           fontFamily: 'var(--cpm-font-sans)',
         }}
       >
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14, padding: isDesktop ? '20px 24px 24px' : '16px 16px 20px' }}>
+        <div
+          style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 14,
+            padding: isDesktop ? '20px 24px 24px' : '16px 16px 20px',
+          }}
+        >
           {/* 英雄区 */}
           <motion.section
             initial={{ opacity: 0, y: 12 }}
@@ -174,11 +177,30 @@ export function ActivityDetailPage() {
                 {phase === 'live' ? '进行中' : status.label}
               </span>
             </div>
-            <h1 style={{ fontSize: isDesktop ? 28 : 23, fontWeight: 800, color: 'var(--cpm-ink-1)', lineHeight: 1.3, margin: 0, letterSpacing: '-0.01em' }}>
+            <h1
+              style={{
+                fontSize: isDesktop ? 28 : 23,
+                fontWeight: 800,
+                color: 'var(--cpm-ink-1)',
+                lineHeight: 1.3,
+                margin: 0,
+                letterSpacing: '-0.01em',
+              }}
+            >
               {a.Title}
             </h1>
             {countdown && (
-              <div style={{ marginTop: 12, display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14, fontWeight: 700, color: 'var(--cpm-primary)' }}>
+              <div
+                style={{
+                  marginTop: 12,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: 'var(--cpm-primary)',
+                }}
+              >
                 <CalendarDays size={16} /> {countdown}
               </div>
             )}
@@ -217,23 +239,6 @@ export function ActivityDetailPage() {
             }}
           >
             <InfoRow icon={<CalendarDays size={18} />} label="活动时间" value={fmtTimeRange(a.StartAt, a.EndAt)} />
-            {a.LocationLat != null && a.LocationLng != null && (
-              <InfoRow
-                icon={<MapPin size={18} />}
-                label="活动地点"
-                value={a.RadiusM ? `线下定位签到 · 范围 ${a.RadiusM}m` : '线下定位签到'}
-                action={
-                  <a
-                    href={mapLink(a.LocationLat, a.LocationLng, a.Title)}
-                    target="_blank"
-                    rel="noreferrer"
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: 2, color: 'var(--cpm-primary)', fontWeight: 700, fontSize: 13, textDecoration: 'none' }}
-                  >
-                    导航 <ChevronRight size={15} />
-                  </a>
-                }
-              />
-            )}
             <InfoRow
               icon={<Coins size={18} />}
               label="签到奖励"
@@ -250,15 +255,49 @@ export function ActivityDetailPage() {
               last
             >
               {hasCap && (
-                <div style={{ marginTop: 8, height: 6, borderRadius: 3, background: 'var(--cpm-sunken)', overflow: 'hidden' }}>
-                  <div style={{ height: '100%', width: `${pct}%`, borderRadius: 3, background: pct >= 100 ? 'var(--cpm-down)' : 'var(--cpm-grad-brand)' }} />
+                <div
+                  style={{
+                    marginTop: 8,
+                    height: 6,
+                    borderRadius: 3,
+                    background: 'var(--cpm-sunken)',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <div
+                    style={{
+                      height: '100%',
+                      width: `${pct}%`,
+                      borderRadius: 3,
+                      background: pct >= 100 ? 'var(--cpm-down)' : 'var(--cpm-grad-brand)',
+                    }}
+                  />
                 </div>
               )}
             </InfoRow>
           </section>
 
-          {/* 加入日历 */}
-          {a.StartAt && (
+          {/* 日历：移动端（钉钉）报名后由后端自动写入钉钉日历，这里只展示「已加入」状态；
+              桌面端（浏览器）钉钉日历无意义，改提供 .ics 下载到本地日历作为兜底。 */}
+          {a.mine.enrolled && a.mine.inCalendar && (
+            <div
+              style={{
+                display: 'inline-flex',
+                alignSelf: 'flex-start',
+                alignItems: 'center',
+                gap: 6,
+                padding: '8px 12px',
+                borderRadius: 12,
+                background: 'rgba(16,185,129,0.1)',
+                color: '#065f46',
+                fontSize: 13,
+                fontWeight: 600,
+              }}
+            >
+              <CalendarDays size={16} /> 已加入钉钉日历
+            </div>
+          )}
+          {isDesktop && a.StartAt && (
             <button
               type="button"
               onClick={() => downloadIcs(a)}
@@ -278,7 +317,7 @@ export function ActivityDetailPage() {
                 touchAction: 'manipulation',
               }}
             >
-              <CalendarPlus size={16} /> 加入日历
+              <CalendarPlus size={16} /> 下载到本地日历(.ics)
             </button>
           )}
 
@@ -356,7 +395,9 @@ export function ActivityDetailPage() {
       </div>
 
       {/* 摄像头扫码浮层 */}
-      <AnimatePresence>{scanOpen && <ScannerOverlay onResult={onScanResult} onClose={() => setScanOpen(false)} />}</AnimatePresence>
+      <AnimatePresence>
+        {scanOpen && <ScannerOverlay onResult={onScanResult} onClose={() => setScanOpen(false)} />}
+      </AnimatePresence>
 
       {/* 手动输入签到码 */}
       <AnimatePresence>
@@ -383,7 +424,17 @@ function errText(e: unknown, fallback: string): string {
 
 function Centered({ children }: { children: ReactNode }) {
   return (
-    <div style={{ height: '100%', display: 'grid', placeItems: 'center', color: 'var(--cpm-ink-2)', fontFamily: 'var(--cpm-font-sans)', fontSize: 15, padding: 24 }}>
+    <div
+      style={{
+        height: '100%',
+        display: 'grid',
+        placeItems: 'center',
+        color: 'var(--cpm-ink-2)',
+        fontFamily: 'var(--cpm-font-sans)',
+        fontSize: 15,
+        padding: 24,
+      }}
+    >
       {children}
     </div>
   );
@@ -434,7 +485,15 @@ function ManualSheet({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       onClick={onClose}
-      style={{ position: 'fixed', inset: 0, zIndex: 120, background: 'rgba(15,23,42,0.45)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 120,
+        background: 'rgba(15,23,42,0.45)',
+        display: 'flex',
+        alignItems: 'flex-end',
+        justifyContent: 'center',
+      }}
     >
       <motion.div
         initial={{ y: 40 }}
@@ -455,7 +514,9 @@ function ManualSheet({
       >
         <div>
           <div style={{ fontSize: 17, fontWeight: 800, color: 'var(--cpm-ink-1)' }}>输入签到码</div>
-          <div style={{ fontSize: 13, color: 'var(--cpm-ink-2)', marginTop: 4 }}>请输入活动现场签到大屏二维码下方的 6 位签到码</div>
+          <div style={{ fontSize: 13, color: 'var(--cpm-ink-2)', marginTop: 4 }}>
+            请输入活动现场签到大屏二维码下方的 6 位签到码
+          </div>
         </div>
         <input
           value={code}

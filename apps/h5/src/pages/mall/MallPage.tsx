@@ -568,9 +568,7 @@ export function MallPage() {
   const [view, setView] = useState<'shop' | 'orders'>('shop');
   const [redeemItem, setRedeemItem] = useState<MallItem | null>(null);
   const [redeemError, setRedeemError] = useState<string | null>(null);
-  const [redeemSuccess, setRedeemSuccess] = useState<{ name: string; cost: number; image: string } | null>(
-    null,
-  );
+  const [redeemSuccess, setRedeemSuccess] = useState<{ name: string; cost: number; image: string } | null>(null);
   const itemsQ = useMallItems();
   const points = usePassport().data?.totalScore ?? 0;
   const redeem = useRedeemItem();

@@ -1,7 +1,7 @@
+import { PageHeader, StatTile } from '@cpm/ui';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
-import { PageHeader, StatTile } from '@cpm/ui';
 
 interface Entry {
   rank: number;
@@ -59,12 +59,15 @@ export function InsightsPage() {
     const headers = { Authorization: `Bearer ${token}` };
 
     // 总榜
-    axios.get<LbResp>('/api/v1/leaderboard?scope=total', { headers }).then((r) => {
-      setTotalEntries(r.data.total);
-      const entries = r.data.entries ?? [];
-      setTopEntries(entries.slice(0, 5));
-      setTotalSum(entries.reduce((s, e) => s + e.score, 0));
-    }).catch(() => {});
+    axios
+      .get<LbResp>('/api/v1/leaderboard?scope=total', { headers })
+      .then((r) => {
+        setTotalEntries(r.data.total);
+        const entries = r.data.entries ?? [];
+        setTopEntries(entries.slice(0, 5));
+        setTotalSum(entries.reduce((s, e) => s + e.score, 0));
+      })
+      .catch(() => {});
 
     // 维度分榜
     axios
@@ -74,10 +77,7 @@ export function InsightsPage() {
         const totals: Record<number, number> = {};
         for (const d of r.data.items) {
           try {
-            const lb = await axios.get<LbResp>(
-              `/api/v1/leaderboard?scope=dim&dimension_id=${d.id}`,
-              { headers },
-            );
+            const lb = await axios.get<LbResp>(`/api/v1/leaderboard?scope=dim&dimension_id=${d.id}`, { headers });
             totals[d.id] = (lb.data.entries ?? []).reduce((s, e) => s + e.score, 0);
           } catch {
             totals[d.id] = 0;
@@ -139,23 +139,32 @@ export function InsightsPage() {
         }}
       >
         {[
-          { label: '参与人数', value: totalEntries, icon: '✦', tint: 'var(--cpm-brand-violet)', bg: 'var(--cpm-brand-violet-bg)' },
-          { label: '积分总量', value: totalSum, icon: '⌬', tint: 'var(--cpm-brand-cyan)', bg: 'var(--cpm-brand-cyan-bg)' },
+          {
+            label: '参与人数',
+            value: totalEntries,
+            icon: '✦',
+            tint: 'var(--cpm-brand-violet)',
+            bg: 'var(--cpm-brand-violet-bg)',
+          },
+          {
+            label: '积分总量',
+            value: totalSum,
+            icon: '⌬',
+            tint: 'var(--cpm-brand-cyan)',
+            bg: 'var(--cpm-brand-cyan-bg)',
+          },
           { label: '人均积分', value: avg, icon: '◐', tint: 'var(--cpm-dim-innovation)', bg: 'rgba(236,72,153,0.1)' },
-          { label: '活跃维度', value: dims.filter((d) => (dimTotals[d.id] ?? 0) > 0).length, icon: '✧', tint: 'var(--cpm-dim-growth)', bg: 'rgba(234,179,8,0.1)', suffix: `/ ${dims.length}` },
+          {
+            label: '活跃维度',
+            value: dims.filter((d) => (dimTotals[d.id] ?? 0) > 0).length,
+            icon: '✧',
+            tint: 'var(--cpm-dim-growth)',
+            bg: 'rgba(234,179,8,0.1)',
+            suffix: `/ ${dims.length}`,
+          },
         ].map((s) => (
-          <motion.div
-            key={s.label}
-            variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}
-          >
-            <StatTile
-              label={s.label}
-              value={s.value}
-              icon={s.icon}
-              tint={s.tint}
-              bg={s.bg}
-              suffix={s.suffix}
-            />
+          <motion.div key={s.label} variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}>
+            <StatTile label={s.label} value={s.value} icon={s.icon} tint={s.tint} bg={s.bg} suffix={s.suffix} />
           </motion.div>
         ))}
       </motion.div>
@@ -221,9 +230,7 @@ export function InsightsPage() {
                         {d.name}
                       </span>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <span style={{ fontSize: 11, color, fontWeight: 600 }}>
-                          {sharePct}%
-                        </span>
+                        <span style={{ fontSize: 11, color, fontWeight: 600 }}>{sharePct}%</span>
                         <span style={{ fontSize: 12, fontWeight: 700, color, fontFeatureSettings: '"tnum"' }}>
                           {v.toLocaleString()}
                         </span>
@@ -285,9 +292,7 @@ export function InsightsPage() {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {topEntries.length === 0 && (
-              <div style={{ fontSize: 13, color: 'var(--cpm-text-muted)', padding: '12px 0' }}>
-                暂无排行数据
-              </div>
+              <div style={{ fontSize: 13, color: 'var(--cpm-text-muted)', padding: '12px 0' }}>暂无排行数据</div>
             )}
             {topEntries.map((e, i) => {
               const rankColors = ['#f59e0b', '#94a3b8', '#b45309', '#7c3aed', '#0891b2'];
@@ -364,9 +369,7 @@ export function InsightsPage() {
                     >
                       {e.name}
                     </div>
-                    {e.deptName && (
-                      <div style={{ fontSize: 11, color: 'var(--cpm-text-muted)' }}>{e.deptName}</div>
-                    )}
+                    {e.deptName && <div style={{ fontSize: 11, color: 'var(--cpm-text-muted)' }}>{e.deptName}</div>}
                   </div>
 
                   {/* 分数 */}

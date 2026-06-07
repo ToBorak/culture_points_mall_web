@@ -20,13 +20,7 @@ export function AuroraBg({ children, className = '', variant = 'page' }: AuroraB
     isolation: 'isolate',
   };
 
-  const orbStyle = (
-    color: string,
-    size: number,
-    x: string,
-    y: string,
-    delay: number,
-  ): CSSProperties => ({
+  const orbStyle = (color: string, size: number, x: string, y: string, delay: number): CSSProperties => ({
     position: 'absolute',
     width: size,
     height: size,

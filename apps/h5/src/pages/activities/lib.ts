@@ -42,8 +42,7 @@ export function fmtTimeRange(start: string | null, end: string | null): string {
   if (!end) return base;
   const e = new Date(end);
   if (Number.isNaN(e.getTime())) return base;
-  const sameDay =
-    s.getFullYear() === e.getFullYear() && s.getMonth() === e.getMonth() && s.getDate() === e.getDate();
+  const sameDay = s.getFullYear() === e.getFullYear() && s.getMonth() === e.getMonth() && s.getDate() === e.getDate();
   const endStr = sameDay
     ? `${pad(e.getHours())}:${pad(e.getMinutes())}`
     : `${e.getMonth() + 1}月${e.getDate()}日 ${pad(e.getHours())}:${pad(e.getMinutes())}`;
@@ -65,12 +64,7 @@ export function countdownText(start: string | null, now = Date.now()): string | 
   return `${Math.max(mins, 1)} 分钟后开始`;
 }
 
-// ---- 地图 / 日历 ----
-
-/** 高德地图标记链接（坐标系 gcj02），移动端可唤起 App。 */
-export function mapLink(lat: number, lng: number, name: string): string {
-  return `https://uri.amap.com/marker?position=${lng},${lat}&name=${encodeURIComponent(name)}&src=cpm&coordinate=gcj02&callnative=1`;
-}
+// ---- 日历 ----
 
 function toIcsDate(iso: string | null): string | null {
   if (!iso) return null;
@@ -94,7 +88,6 @@ export function downloadIcs(a: Activity): void {
     dtStart ? `DTSTART:${dtStart}` : '',
     dtEnd ? `DTEND:${dtEnd}` : '',
     `SUMMARY:${icsEscape(a.Title)}`,
-    a.LocationLat != null && a.LocationLng != null ? `GEO:${a.LocationLat};${a.LocationLng}` : '',
     'END:VEVENT',
     'END:VCALENDAR',
   ].filter(Boolean);
@@ -122,7 +115,7 @@ export function parseSigninTarget(text: string): { a: number; c: string } | null
   } catch {
     // 非合法 URL，退化为正则匹配 a=…&c=…
   }
-  const m = text.match(/a=(\d+)[^]*?c=([^&\s]+)/);
+  const m = text.match(/a=(\d+)[\s\S]*?c=([^&\s]+)/);
   if (m) return { a: Number(m[1]), c: m[2] };
   return null;
 }

@@ -82,7 +82,13 @@ function Emblem({ code, deep, center }: { code: string; deep: string; center: st
     case 'bag': // 满载而归 · 满袋
       return (
         <>
-          <path d="M31 39 Q31 32 36 32 Q41 32 41 39" stroke={deep} strokeWidth={2.4} fill="none" strokeLinecap="round" />
+          <path
+            d="M31 39 Q31 32 36 32 Q41 32 41 39"
+            stroke={deep}
+            strokeWidth={2.4}
+            fill="none"
+            strokeLinecap="round"
+          />
           <path d="M27 39 L45 39 L46.5 53 Q46.6 54 45.6 54 L26.4 54 Q25.4 54 25.5 53 Z" fill={deep} />
           <circle cx={32} cy={38} r={2.4} fill={center} />
           <circle cx={40} cy={38} r={2.4} fill={center} />
@@ -99,6 +105,37 @@ function Emblem({ code, deep, center }: { code: string; deep: string; center: st
           <circle cx={43} cy={37} r={3.7} fill="none" stroke={center} strokeWidth={1.2} />
           <circle cx={44} cy={49} r={4.5} fill={deep} />
           <circle cx={44} cy={49} r={2.3} fill="none" stroke={center} strokeWidth={1} />
+        </>
+      );
+    case 'calendar_check': // 渐入佳境 · 日历打卡（完成 5 次签到）
+      return (
+        <>
+          <rect x={30.5} y={27} width={2.6} height={6} rx={1.3} fill={deep} />
+          <rect x={38.9} y={27} width={2.6} height={6} rx={1.3} fill={deep} />
+          <rect x={25} y={30} width={22} height={20} rx={3} fill={deep} />
+          <rect x={27} y={33} width={18} height={2.4} rx={1.2} fill={center} opacity={0.55} />
+          <path
+            d="M30.5 42 L34.5 46 L42 38"
+            fill="none"
+            stroke={center}
+            strokeWidth={2.8}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </>
+      );
+    case 'flame': // 持之以恒 · 不灭之焰（完成 10 次签到）
+      return (
+        <>
+          <path
+            d="M36 27 C 41 33 44 37 44 42.5 C 44 47.7 40.4 51 36 51 C 31.6 51 28 47.7 28 42.5 C 28 39 29.8 36.6 31.6 34.4 C 31.8 37.6 33.2 39 34.4 39.4 C 34 34.6 34.2 30.6 36 27 Z"
+            fill={deep}
+          />
+          <path
+            d="M36 39 C 38.4 41.6 39.4 43.4 39.4 45.6 C 39.4 47.9 38 49.4 36 49.4 C 34 49.4 32.8 47.9 32.8 46 C 32.8 44 34.2 43 35 41.4 C 35.2 42.3 35.6 42.5 36 42.3 Z"
+            fill={center}
+            opacity={0.6}
+          />
         </>
       );
     default:

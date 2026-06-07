@@ -21,7 +21,12 @@ export const Demo: Story = {
     return (
       <div className="flex flex-col items-center gap-3 p-6">
         <BlindboxWheel segments={segs} spinning={spin} resultIndex={idx} onSpinEnd={() => setSpin(false)} />
-        <ComicButton onClick={() => { setSpin(true); setIdx(Math.floor(Math.random() * segs.length)); }}>
+        <ComicButton
+          onClick={() => {
+            setSpin(true);
+            setIdx(Math.floor(Math.random() * segs.length));
+          }}
+        >
           抽！
         </ComicButton>
       </div>

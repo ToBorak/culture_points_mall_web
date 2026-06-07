@@ -72,9 +72,7 @@ export function ChallengeCard({ data, loading, onSubmit }: Props) {
         position: 'relative',
         padding: '16px 18px 14px',
         borderRadius: 22,
-        background: done
-          ? `linear-gradient(135deg, ${tint}15 0%, ${tint}10 100%)`
-          : '#fff',
+        background: done ? `linear-gradient(135deg, ${tint}15 0%, ${tint}10 100%)` : '#fff',
         border: `1.5px solid ${tint}30`,
         boxShadow: `0 14px 32px -12px ${tint}40`,
         fontFamily: 'var(--cpm-font-sans)',
@@ -284,9 +282,7 @@ export function ChallengeCard({ data, loading, onSubmit }: Props) {
                   padding: '11px 0',
                   borderRadius: 11,
                   border: 'none',
-                  background: proof.trim()
-                    ? `linear-gradient(135deg, ${tint} 0%, ${tint}dd 100%)`
-                    : 'var(--cpm-bg-2)',
+                  background: proof.trim() ? `linear-gradient(135deg, ${tint} 0%, ${tint}dd 100%)` : 'var(--cpm-bg-2)',
                   color: proof.trim() ? '#fff' : 'var(--cpm-text-muted)',
                   fontSize: 14,
                   fontWeight: 700,

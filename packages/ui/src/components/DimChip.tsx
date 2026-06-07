@@ -22,5 +22,13 @@ export function DimChip({ code, name, active = false, onClick }: DimChipProps) {
     boxShadow: active ? '3px 3px 0 var(--cpm-ink)' : 'none',
     transition: 'all .15s ease',
   };
-  return <span style={style} onClick={onClick}>{name}</span>;
+  if (onClick) {
+    return (
+      <button type="button" style={{ ...style, font: 'inherit' }} onClick={onClick}>
+        {name}
+      </button>
+    );
+  }
+
+  return <span style={style}>{name}</span>;
 }

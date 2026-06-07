@@ -86,11 +86,7 @@ export function StatTile({
         >
           {display}
         </motion.span>
-        {suffix && (
-          <span style={{ fontSize: 14, color: 'var(--cpm-text-tertiary)', fontWeight: 500 }}>
-            {suffix}
-          </span>
-        )}
+        {suffix && <span style={{ fontSize: 14, color: 'var(--cpm-text-tertiary)', fontWeight: 500 }}>{suffix}</span>}
       </div>
       {delta !== undefined && (
         <span

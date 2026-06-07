@@ -1,8 +1,8 @@
+import { Button, PageHeader, StatTile } from '@cpm/ui';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PageHeader, StatTile, Button } from '@cpm/ui';
 import { useAuth } from '../../store/auth';
 
 interface LbEntry {
@@ -121,10 +121,7 @@ export function AdminHomePage() {
         const totals: Record<number, number> = {};
         for (const d of r.data.items) {
           try {
-            const lb = await axios.get<LbResp>(
-              `/api/v1/leaderboard?scope=dim&dimension_id=${d.id}`,
-              { headers: h },
-            );
+            const lb = await axios.get<LbResp>(`/api/v1/leaderboard?scope=dim&dimension_id=${d.id}`, { headers: h });
             totals[d.id] = (lb.data.entries ?? []).reduce((s, e) => s + e.score, 0);
           } catch {
             totals[d.id] = 0;
@@ -139,10 +136,7 @@ export function AdminHomePage() {
 
   return (
     <div>
-      <PageHeader
-        title={`欢迎回来，${name ?? '管理员'}`}
-        subtitle="CPM 运营数据概览"
-      />
+      <PageHeader title={`欢迎回来，${name ?? '管理员'}`} subtitle="CPM 运营数据概览" />
 
       {/* StatTile 横排 */}
       <motion.div
@@ -230,9 +224,7 @@ export function AdminHomePage() {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {recentActivities.length === 0 && (
-              <div style={{ fontSize: 13, color: 'var(--cpm-text-muted)', padding: '12px 0' }}>
-                暂无活动记录
-              </div>
+              <div style={{ fontSize: 13, color: 'var(--cpm-text-muted)', padding: '12px 0' }}>暂无活动记录</div>
             )}
             {recentActivities.map((a) => (
               <motion.div
@@ -255,7 +247,8 @@ export function AdminHomePage() {
                     width: 4,
                     height: 36,
                     borderRadius: 2,
-                    background: colorByCode[dims.find((d) => d.id === a.DimensionID)?.code ?? ''] ?? 'var(--cpm-brand-violet)',
+                    background:
+                      colorByCode[dims.find((d) => d.id === a.DimensionID)?.code ?? ''] ?? 'var(--cpm-brand-violet)',
                     flexShrink: 0,
                   }}
                 />
@@ -478,9 +471,7 @@ export function AdminHomePage() {
               >
                 {it.label}
               </div>
-              <div style={{ fontSize: 12, color: 'var(--cpm-text-tertiary)', lineHeight: 1.5 }}>
-                {it.desc}
-              </div>
+              <div style={{ fontSize: 12, color: 'var(--cpm-text-tertiary)', lineHeight: 1.5 }}>{it.desc}</div>
             </div>
             <div style={{ marginTop: 'auto' }}>
               <Button tone="ghost" size="sm" style={{ padding: '4px 0', color: it.tint, fontSize: 12 }}>

@@ -1,7 +1,7 @@
-import axios from 'axios';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useEffect, useState } from 'react';
 import { PageHeader } from '@cpm/ui';
+import axios from 'axios';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 
 interface Outbox {
   id: number;
@@ -62,7 +62,7 @@ function LiveBadge() {
     >
       <motion.span
         animate={{ scale: [1, 1.5, 1], opacity: [1, 0.4, 1] }}
-        transition={{ duration: 2, repeat: Infinity }}
+        transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
         style={{
           display: 'inline-block',
           width: 6,
@@ -110,10 +110,7 @@ export function MockOutboxPage() {
 
   return (
     <div>
-      <PageHeader
-        title="钉钉推送"
-        badge={<LiveBadge />}
-      />
+      <PageHeader title="钉钉推送" badge={<LiveBadge />} />
 
       {/* Filter chips */}
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 20 }}>
@@ -127,15 +124,9 @@ export function MockOutboxPage() {
               padding: '6px 14px',
               borderRadius: 999,
               border: '1px solid',
-              borderColor: filter === f.key
-                ? (apiColor[f.key] ?? 'var(--cpm-brand-violet)')
-                : 'var(--cpm-card-border)',
-              background: filter === f.key
-                ? (apiBg[f.key] ?? 'var(--cpm-brand-violet-bg)')
-                : 'transparent',
-              color: filter === f.key
-                ? (apiColor[f.key] ?? 'var(--cpm-brand-violet)')
-                : 'var(--cpm-text-tertiary)',
+              borderColor: filter === f.key ? (apiColor[f.key] ?? 'var(--cpm-brand-violet)') : 'var(--cpm-card-border)',
+              background: filter === f.key ? (apiBg[f.key] ?? 'var(--cpm-brand-violet-bg)') : 'transparent',
+              color: filter === f.key ? (apiColor[f.key] ?? 'var(--cpm-brand-violet)') : 'var(--cpm-text-tertiary)',
               fontSize: 12,
               fontWeight: filter === f.key ? 600 : 500,
               cursor: 'pointer',

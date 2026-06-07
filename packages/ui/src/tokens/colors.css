@@ -9,7 +9,7 @@
   --cpm-card-bg: rgba(255, 255, 255, 0.85);
   --cpm-card-bg-solid: #ffffff;
   --cpm-card-border: rgba(15, 23, 42, 0.06);
-  --cpm-card-border-strong: rgba(15, 23, 42, 0.10);
+  --cpm-card-border-strong: rgba(15, 23, 42, 0.1);
   --cpm-card-shine: rgba(255, 255, 255, 0.8);
 
   /* === 文本层级（深色文字，浅底反差强） === */
@@ -43,10 +43,10 @@
   --cpm-dim-growth: #eab308;
 
   /* === Mesh gradient 渲染色 === */
-  --cpm-mesh-1: rgba(167, 139, 250, 0.35);   /* violet */
-  --cpm-mesh-2: rgba(125, 211, 252, 0.30);   /* cyan */
-  --cpm-mesh-3: rgba(253, 164, 175, 0.35);   /* rose */
-  --cpm-mesh-4: rgba(254, 215, 170, 0.32);   /* amber */
+  --cpm-mesh-1: rgba(167, 139, 250, 0.35); /* violet */
+  --cpm-mesh-2: rgba(125, 211, 252, 0.3); /* cyan */
+  --cpm-mesh-3: rgba(253, 164, 175, 0.35); /* rose */
+  --cpm-mesh-4: rgba(254, 215, 170, 0.32); /* amber */
 
   /* === 状态色 === */
   --cpm-success: #10b981;
@@ -81,17 +81,13 @@
   --cpm-aurora-4: var(--cpm-mesh-4);
 
   /* === Bento 阴影 === */
-  --cpm-shadow-soft:
-    0 1px 0 rgba(255, 255, 255, 0.6) inset,
-    0 1px 2px rgba(15, 23, 42, 0.04),
-    0 8px 24px -8px rgba(15, 23, 42, 0.08);
-  --cpm-shadow-pop:
-    0 1px 0 rgba(255, 255, 255, 0.8) inset,
-    0 4px 12px -4px rgba(15, 23, 42, 0.10),
-    0 20px 40px -16px rgba(124, 58, 237, 0.20);
+  --cpm-shadow-soft: 0 1px 0 rgba(255, 255, 255, 0.6) inset, 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px -8px
+    rgba(15, 23, 42, 0.08);
+  --cpm-shadow-pop: 0 1px 0 rgba(255, 255, 255, 0.8) inset, 0 4px 12px -4px rgba(15, 23, 42, 0.1), 0 20px 40px -16px
+    rgba(124, 58, 237, 0.2);
   --cpm-shadow-glow-violet: 0 12px 32px -8px rgba(124, 58, 237, 0.35);
   --cpm-shadow-glow-cyan: 0 12px 32px -8px rgba(8, 145, 178, 0.32);
-  --cpm-shadow-glow-rose: 0 12px 32px -8px rgba(225, 29, 72, 0.30);
+  --cpm-shadow-glow-rose: 0 12px 32px -8px rgba(225, 29, 72, 0.3);
   --cpm-shadow-glow-amber: 0 12px 32px -8px rgba(217, 119, 6, 0.32);
 
   /* === 玻璃旧 shadow 兼容 === */
@@ -124,7 +120,8 @@
   --cpm-brand-cyan: #22d3ee;
 }
 
-html, body {
+html,
+body {
   background: var(--cpm-bg-0);
   color: var(--cpm-text-primary);
 }

@@ -1,8 +1,8 @@
+import { Button, EmptyState, PageHeader } from '@cpm/ui';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { PageHeader, Button, EmptyState } from '@cpm/ui';
 
 interface Activity {
   ID: number;
@@ -92,16 +92,9 @@ export function ActivitiesPage() {
 
   return (
     <div>
-      <PageHeader
-        title="活动管理"
-        badge="通过 HR-Agent /chat 创建"
-      />
+      <PageHeader title="活动管理" badge="通过 HR-Agent /chat 创建" />
 
-      {loading && (
-        <div style={{ color: 'var(--cpm-text-tertiary)', fontSize: 14, padding: '16px 0' }}>
-          加载中...
-        </div>
-      )}
+      {loading && <div style={{ color: 'var(--cpm-text-tertiary)', fontSize: 14, padding: '16px 0' }}>加载中...</div>}
 
       {!loading && rows.length === 0 && (
         <EmptyState
@@ -211,24 +204,20 @@ export function ActivitiesPage() {
                         {dim.name}
                       </span>
                     )}
-                    <span style={{ fontSize: 12, color: 'var(--cpm-text-tertiary)' }}>
-                      奖励 {a.PointsReward} 分
-                    </span>
+                    <span style={{ fontSize: 12, color: 'var(--cpm-text-tertiary)' }}>奖励 {a.PointsReward} 分</span>
                     {a.Capacity != null && (
-                      <span style={{ fontSize: 12, color: 'var(--cpm-text-tertiary)' }}>
-                        上限 {a.Capacity} 人
-                      </span>
+                      <span style={{ fontSize: 12, color: 'var(--cpm-text-tertiary)' }}>上限 {a.Capacity} 人</span>
                     )}
-                    <span style={{ fontSize: 12, color: 'var(--cpm-text-muted)' }}>
-                      {relTime(a.CreatedAt)}
-                    </span>
+                    <span style={{ fontSize: 12, color: 'var(--cpm-text-muted)' }}>{relTime(a.CreatedAt)}</span>
                   </div>
                 </div>
 
                 {/* 右侧操作 */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
                   <Link to={`/activities/${a.ID}/code`} style={{ textDecoration: 'none' }}>
-                    <Button tone="primary" size="sm">签到二维码</Button>
+                    <Button tone="primary" size="sm">
+                      签到二维码
+                    </Button>
                   </Link>
                   <button
                     type="button"

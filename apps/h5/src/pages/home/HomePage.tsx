@@ -223,9 +223,9 @@ export function HomePage() {
           }}
         >
           {dims.length === 0 &&
-            Array.from({ length: 6 }).map((_, i) => (
+            Array.from({ length: 6 }, (_, i) => `empty-dim-${i}`).map((key) => (
               <div
-                key={i}
+                key={key}
                 style={{
                   height: 4,
                   borderRadius: 2,
