@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { AppShell } from './layout/AppShell';
 import { ActivitiesPage } from './pages/activities/ActivitiesPage';
+import { ActivityDetailPage } from './pages/activities/ActivityDetailPage';
 import { DNAReportPage } from './pages/dna/DNAReportPage';
 import { LeaderboardPage } from './pages/leaderboard/LeaderboardPage';
 import { BlindboxDrawPage } from './pages/mall/BlindboxDrawPage';
@@ -16,6 +17,7 @@ export function AppRouter() {
         <Route path="/" element={<Navigate to="/leaderboard" replace />} />
         <Route path="/leaderboard" element={<LeaderboardPage />} />
         <Route path="/activities" element={<ActivitiesPage />} />
+        <Route path="/activities/:id" element={<ActivityDetailPage />} />
         <Route path="/mall" element={<MallPage />} />
         <Route path="/mall/blindbox/:id" element={<BlindboxDrawPage />} />
         <Route path="/me" element={<MePage />} />

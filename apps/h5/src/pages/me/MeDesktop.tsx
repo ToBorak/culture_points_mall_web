@@ -1,5 +1,5 @@
 import { BadgeCard, PointLedgerRow } from '@cpm/ui';
-import { DnaEntry, MeEmpty, MeHero, MePanel, loadMoreStyle } from './MeParts';
+import { AdminEntry, DnaEntry, MeEmpty, MeHero, MePanel, loadMoreStyle } from './MeParts';
 import type { MeState } from './useMeState';
 
 export function MeDesktop(s: MeState) {
@@ -50,6 +50,7 @@ export function MeDesktop(s: MeState) {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
           <DnaEntry />
+          <AdminEntry />
           <MePanel title="积分流水">
             {s.txItems.length === 0 && !s.txQ.isLoading ? (
               <MeEmpty text="还没有积分流水" />

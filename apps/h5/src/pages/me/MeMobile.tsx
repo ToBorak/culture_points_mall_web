@@ -1,6 +1,6 @@
 import { BadgeCard, PointLedgerRow, SegmentedControl } from '@cpm/ui';
 import { useState } from 'react';
-import { DnaEntry, MeEmpty, MeHero, loadMoreStyle } from './MeParts';
+import { AdminEntry, DnaEntry, MeEmpty, MeHero, loadMoreStyle } from './MeParts';
 import type { MeState } from './useMeState';
 
 type View = 'badges' | 'tx';
@@ -23,6 +23,7 @@ export function MeMobile(s: MeState) {
         loading={s.p.isLoading}
       />
       <DnaEntry />
+      <AdminEntry />
       <SegmentedControl items={VIEWS} value={view} onChange={setView} />
 
       {view === 'badges' &&
