@@ -11,6 +11,8 @@ import { InsightsPage } from './pages/insights/InsightsPage';
 import { MallAdminPage } from './pages/mall/MallAdminPage';
 import { SchedulePage } from './pages/schedules/SchedulePage';
 import { ValuesPage } from './pages/values/ValuesPage';
+import { StarsPage } from './pages/stars/StarsPage';
+import { PublicationsPage } from './pages/publications/PublicationsPage';
 
 const wrap = (el: ReactNode) => <AdminLayout>{el}</AdminLayout>;
 
@@ -27,6 +29,8 @@ export function AdminRouter() {
       <Route path="/insights" element={wrap(<InsightsPage />)} />
       <Route path="/dingtalk/mock-outbox" element={wrap(<MockOutboxPage />)} />
       <Route path="/schedules" element={wrap(<SchedulePage />)} />
+      <Route path="/stars" element={wrap(<StarsPage />)} />
+      <Route path="/publications" element={wrap(<PublicationsPage />)} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

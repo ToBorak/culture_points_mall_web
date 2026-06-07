@@ -11,6 +11,8 @@ const items = [
   { to: '/insights', label: '数据洞察', icon: '⌬', end: false },
   { to: '/dingtalk/mock-outbox', label: '钉钉推送', icon: '⊕', end: false },
   { to: '/schedules', label: '日程发布', icon: '📅', end: false },
+  { to: '/stars', label: '文化星标', icon: '⭐', end: false },
+  { to: '/publications', label: '文化刊', icon: '📰', end: false },
 ];
 
 export function Sidebar() {
