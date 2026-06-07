@@ -26,7 +26,15 @@ export function PointLedgerRow({ tx }: PointLedgerRowProps) {
         boxShadow: 'var(--cpm-elev-soft)',
       }}
     >
-      <div style={{ width: 4, height: 44, borderRadius: 2, background: DIM_COLOR[tx.dimensionCode] ?? 'var(--cpm-primary)', flexShrink: 0 }} />
+      <div
+        style={{
+          width: 4,
+          height: 44,
+          borderRadius: 2,
+          background: DIM_COLOR[tx.dimensionCode] ?? 'var(--cpm-primary)',
+          flexShrink: 0,
+        }}
+      />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div
           style={{
@@ -41,7 +49,9 @@ export function PointLedgerRow({ tx }: PointLedgerRowProps) {
         >
           {tx.reason || '加分'}
         </div>
-        <div style={{ fontFamily: 'var(--cpm-font-sans)', fontSize: 11, color: 'var(--cpm-ink-2)', marginTop: 2 }}>{tx.createdAt}</div>
+        <div style={{ fontFamily: 'var(--cpm-font-sans)', fontSize: 11, color: 'var(--cpm-ink-2)', marginTop: 2 }}>
+          {tx.createdAt}
+        </div>
       </div>
       <div
         style={{

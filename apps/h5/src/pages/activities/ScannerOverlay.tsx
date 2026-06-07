@@ -15,7 +15,6 @@ export function ScannerOverlay({ onResult, onClose }: ScannerOverlayProps) {
   onResultRef.current = onResult;
   const [error, setError] = useState<string | null>(null);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: 摄像头仅在挂载时开启一次，回调用 ref 透传
   useEffect(() => {
     let stream: MediaStream | null = null;
     let raf = 0;
@@ -160,7 +159,14 @@ export function ScannerOverlay({ onResult, onClose }: ScannerOverlayProps) {
       </div>
 
       {/* 底部说明 / 错误 */}
-      <div style={{ marginTop: 'auto', position: 'relative', zIndex: 1, padding: '0 24px max(28px, env(safe-area-inset-bottom))' }}>
+      <div
+        style={{
+          marginTop: 'auto',
+          position: 'relative',
+          zIndex: 1,
+          padding: '0 24px max(28px, env(safe-area-inset-bottom))',
+        }}
+      >
         <AnimatePresence mode="wait">
           {error ? (
             <motion.div

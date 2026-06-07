@@ -938,7 +938,7 @@ export function AppShell() {
                 🎴
               </div>
               <div style={{ fontFamily: 'var(--cpm-font-sans)' }}>
-                <b style={{ color: 'var(--cpm-ink-1)' }}>文化积分</b>
+                <b style={{ color: 'var(--cpm-ink-1)' }}>文化官</b>
                 <small style={{ display: 'block', color: 'var(--cpm-ink-2)', fontSize: 11 }}>员工成长中心</small>
               </div>
             </div>

@@ -1,4 +1,4 @@
-import { checkNewBadges, usePassport } from '@cpm/api-client';
+import { ackCelebratedBadges, checkNewBadges, usePassport } from '@cpm/api-client';
 import type { Badge } from '@cpm/types';
 import { BadgeMedal } from '@cpm/ui';
 import { useQueryClient } from '@tanstack/react-query';
@@ -19,15 +19,20 @@ export function BadgeCelebration() {
   const qc = useQueryClient();
   const [queue, setQueue] = useState<Badge[]>([]);
   const checking = useRef(false);
+  const seen = useRef<Set<number>>(new Set()); // 本会话已入队的勋章 id，避免重复结算时重复入队
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: totalScore intentionally retriggers badge settlement after point changes.
   useEffect(() => {
     if (checking.current) return;
     checking.current = true;
-    let alive = true;
+    // checkNewBadges 返回所有「尚未庆祝」的已得勋章（授予与庆祝已解耦）。结果必须无条件入队，
+    // 展示后再回执 ackCelebratedBadges 落定；未展示的下次仍会返回，确保竞态/刷新/崩溃下零丢失。
     checkNewBadges()
       .then((items) => {
-        if (alive && items.length > 0) {
-          setQueue((q) => [...q, ...items]);
+        const fresh = items.filter((b) => !seen.current.has(b.id));
+        if (fresh.length > 0) {
+          for (const b of fresh) seen.current.add(b.id);
+          setQueue((q) => [...q, ...fresh]);
           qc.invalidateQueries({ queryKey: ['me', 'badges'] }); // 让勋章墙同步刷新
         }
       })
@@ -35,20 +40,25 @@ export function BadgeCelebration() {
       .finally(() => {
         checking.current = false;
       });
-    return () => {
-      alive = false;
-    };
   }, [totalScore, qc]);
 
   const current = queue[0];
 
+  // 展示一枚：4 秒后自动切下一枚；切走时才回执「已庆祝」（确保真正展示过才落定）。
   useEffect(() => {
     if (!current) return;
-    const t = setTimeout(() => setQueue((q) => q.slice(1)), 4000);
+    const t = setTimeout(() => {
+      ackCelebratedBadges([current.id]).catch(() => {});
+      setQueue((q) => q.slice(1));
+    }, 4000);
     return () => clearTimeout(t);
   }, [current]);
 
-  const dismiss = () => setQueue((q) => q.slice(1));
+  const dismiss = () => {
+    if (!current) return;
+    ackCelebratedBadges([current.id]).catch(() => {});
+    setQueue((q) => q.slice(1));
+  };
 
   return (
     <AnimatePresence>
@@ -101,7 +111,9 @@ export function BadgeCelebration() {
               }}
             />
             <div style={{ position: 'relative' }}>
-              <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: '0.22em', color: 'var(--cpm-primary-strong)' }}>
+              <div
+                style={{ fontSize: 12, fontWeight: 800, letterSpacing: '0.22em', color: 'var(--cpm-primary-strong)' }}
+              >
                 成就解锁
               </div>
               <motion.div

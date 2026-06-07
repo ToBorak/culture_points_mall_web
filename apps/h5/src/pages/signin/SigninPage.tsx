@@ -1,24 +1,11 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import axios from 'axios';
-import { motion, AnimatePresence } from 'framer-motion';
 import { AuroraBg, useBreakpoint } from '@cpm/ui';
+import { useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
-interface Quiz {
-  question: string;
-  expect: string;
-}
-
-type Step = 'gps' | 'quiz' | 'submit' | 'ok' | 'fail';
-
-const QUIZ_OPTIONS = ['客户第一', '坦诚沟通', '一号位', '敢于创新'];
-
-const QUIZ_COLORS = [
-  { bg: 'rgba(249,115,22,0.10)', color: '#f97316' },
-  { bg: 'rgba(14,165,233,0.10)', color: '#0ea5e9' },
-  { bg: 'rgba(16,185,129,0.10)', color: '#10b981' },
-  { bg: 'rgba(236,72,153,0.10)', color: '#ec4899' },
-];
+type Step = 'submit' | 'ok' | 'fail';
 
 // animated counting number
 function CountUp({ to, duration = 1.2 }: { to: number; duration?: number }) {
@@ -41,32 +28,12 @@ export function SigninPage() {
   const code = params.get('c') ?? '';
   const navigate = useNavigate();
   const { isDesktop } = useBreakpoint();
+  const qc = useQueryClient();
 
-  const [step, setStep] = useState<Step>('gps');
-  const [gps, setGps] = useState<{ lat: number; lng: number } | null>(null);
-  const [answer, setAnswer] = useState('');
+  const [step, setStep] = useState<Step>('submit');
   const [reason, setReason] = useState<string | null>(null);
   const [earnedPoints, setEarnedPoints] = useState(0);
-  const [quiz] = useState<Quiz>({
-    question: '今天活动主题中哪个价值观最重要？',
-    expect: '客户第一',
-  });
-
-  useEffect(() => {
-    if (step !== 'gps') return;
-    if (!navigator.geolocation) {
-      setStep('quiz');
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setGps({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-        setStep('quiz');
-      },
-      () => setStep('quiz'),
-      { timeout: 6000 },
-    );
-  }, [step]);
+  const fired = useRef(false);
 
   const submit = async () => {
     setStep('submit');
@@ -74,18 +41,18 @@ export function SigninPage() {
     try {
       const res = await axios.post<{ points?: number }>(
         '/api/v1/signin/check',
-        {
-          activityId,
-          code,
-          gpsLat: gps?.lat,
-          gpsLng: gps?.lng,
-          quizExpect: quiz.expect,
-          quizAnswer: answer,
-        },
+        { activityId, code },
         { headers: { Authorization: `Bearer ${token}` } },
       );
       setEarnedPoints(res.data?.points ?? 10);
       setStep('ok');
+      // 与积分商城一致：失效积分/勋章墙/活动等缓存。totalScore 变化会驱动全局
+      // BadgeCelebration 结算并弹出本次新解锁的勋章（如首次签到）。
+      qc.invalidateQueries({ queryKey: ['me', 'passport'] });
+      qc.invalidateQueries({ queryKey: ['me', 'badges'] });
+      qc.invalidateQueries({ queryKey: ['me', 'transactions'] });
+      qc.invalidateQueries({ queryKey: ['activities'] });
+      qc.invalidateQueries({ queryKey: ['activity', activityId] });
     } catch (e: unknown) {
       const err = e as { response?: { data?: { error?: string; reason?: string } } };
       setReason(err?.response?.data?.error ?? err?.response?.data?.reason ?? '签到失败，请重试');
@@ -93,10 +60,14 @@ export function SigninPage() {
     }
   };
 
-  // 步骤编号 0-based for progress
-  const stepIndex: Record<Step, number> = { gps: 0, quiz: 1, submit: 1, ok: 2, fail: 1 };
-  const currentStepIdx = stepIndex[step];
-  const steps = ['定位', '答题', '完成'];
+  // 扫码进入即自动核销签到（无需定位、无需答题）；ref 守卫保证含 StrictMode 双调用/重渲染下
+  // 只提交一次，避免并发重复请求把签到记录与积分重复计入。
+  // biome-ignore lint/correctness/useExhaustiveDependencies: 仅在首次进入时自动提交一次
+  useEffect(() => {
+    if (fired.current) return;
+    fired.current = true;
+    submit();
+  }, []);
 
   return (
     <AuroraBg>
@@ -148,257 +119,8 @@ export function SigninPage() {
           <div style={{ width: 60 }} />
         </div>
 
-        {/* Stepper */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 0,
-            marginBottom: 28,
-          }}
-        >
-          {steps.map((label, idx) => {
-            const done = currentStepIdx > idx;
-            const active = currentStepIdx === idx;
-            return (
-              <div key={label} style={{ display: 'flex', alignItems: 'center' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
-                  <motion.div
-                    animate={{
-                      background: done
-                        ? 'var(--cpm-success)'
-                        : active
-                        ? 'linear-gradient(135deg,var(--cpm-brand-violet),var(--cpm-brand-cyan))'
-                        : '#fff',
-                      boxShadow: active ? 'var(--cpm-shadow-glow-violet)' : 'none',
-                    }}
-                    transition={{ duration: 0.3 }}
-                    style={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: '50%',
-                      border: done || active
-                        ? 'none'
-                        : '1.5px solid var(--cpm-card-border-strong)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: 13,
-                      fontWeight: 700,
-                      color: done || active ? '#fff' : 'var(--cpm-text-muted)',
-                    }}
-                  >
-                    {done ? '✓' : idx + 1}
-                  </motion.div>
-                  <span
-                    style={{
-                      fontSize: 11,
-                      fontWeight: active ? 600 : 400,
-                      color: active
-                        ? 'var(--cpm-brand-violet)'
-                        : done
-                        ? 'var(--cpm-success)'
-                        : 'var(--cpm-text-muted)',
-                    }}
-                  >
-                    {label}
-                  </span>
-                </div>
-                {idx < steps.length - 1 && (
-                  <div
-                    style={{
-                      width: 48,
-                      height: 2,
-                      background: done
-                        ? 'var(--cpm-success)'
-                        : 'var(--cpm-card-border)',
-                      borderRadius: 1,
-                      margin: '0 4px',
-                      marginBottom: 18,
-                      transition: 'background 0.4s ease',
-                    }}
-                  />
-                )}
-              </div>
-            );
-          })}
-        </motion.div>
-
         {/* 步骤内容 */}
         <AnimatePresence mode="wait">
-          {/* 步骤 1：GPS 定位 */}
-          {step === 'gps' && (
-            <motion.div
-              key="gps"
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -30 }}
-              transition={{ duration: 0.3 }}
-              style={{
-                background: '#fff',
-                borderRadius: 24,
-                border: '1px solid var(--cpm-card-border)',
-                boxShadow: 'var(--cpm-shadow-soft)',
-                padding: '36px 24px',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: 16,
-                textAlign: 'center',
-              }}
-            >
-              <motion.div
-                animate={{ scale: [1, 1.1, 1], opacity: [1, 0.7, 1] }}
-                transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
-                style={{
-                  width: 72,
-                  height: 72,
-                  borderRadius: '50%',
-                  background: 'linear-gradient(135deg,rgba(124,58,237,0.12),rgba(8,145,178,0.08))',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 34,
-                }}
-              >
-                ⊕
-              </motion.div>
-              <div style={{ fontSize: 17, fontWeight: 600, color: 'var(--cpm-text-primary)' }}>
-                正在获取定位...
-              </div>
-              <div
-                style={{
-                  fontSize: 13,
-                  color: 'var(--cpm-text-tertiary)',
-                  lineHeight: 1.6,
-                  maxWidth: 260,
-                }}
-              >
-                我们需要验证您在活动现场，请允许浏览器获取您的位置信息。
-              </div>
-            </motion.div>
-          )}
-
-          {/* 步骤 2：答题 */}
-          {step === 'quiz' && (
-            <motion.div
-              key="quiz"
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -30 }}
-              transition={{ duration: 0.3 }}
-              style={{
-                background: '#fff',
-                borderRadius: 24,
-                border: '1px solid var(--cpm-card-border)',
-                boxShadow: 'var(--cpm-shadow-soft)',
-                padding: '24px 20px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 16,
-              }}
-            >
-              <div
-                style={{
-                  fontSize: 11,
-                  fontWeight: 600,
-                  letterSpacing: '0.12em',
-                  color: 'var(--cpm-text-tertiary)',
-                }}
-              >
-                QUIZ · 活动 #{activityId}
-              </div>
-              <div
-                style={{
-                  fontSize: 16,
-                  fontWeight: 600,
-                  color: 'var(--cpm-text-primary)',
-                  lineHeight: 1.5,
-                }}
-              >
-                {quiz.question}
-              </div>
-
-              {/* 选项 chips */}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                {QUIZ_OPTIONS.map((opt, idx) => {
-                  const c = QUIZ_COLORS[idx % QUIZ_COLORS.length];
-                  const selected = answer === opt;
-                  return (
-                    <motion.button
-                      key={opt}
-                      onClick={() => setAnswer(opt)}
-                      whileTap={{ scale: 0.92 }}
-                      style={{
-                        padding: '8px 16px',
-                        borderRadius: 999,
-                        fontSize: 13,
-                        fontWeight: 600,
-                        fontFamily: 'var(--cpm-font-sans)',
-                        cursor: 'pointer',
-                        border: selected ? 'none' : `1px solid ${c.color}40`,
-                        background: selected ? c.color : c.bg,
-                        color: selected ? '#fff' : c.color,
-                        boxShadow: selected ? `0 4px 12px -4px ${c.color}50` : 'none',
-                        transition: 'all 0.18s ease',
-                      }}
-                    >
-                      {opt}
-                    </motion.button>
-                  );
-                })}
-              </div>
-
-              {/* 或者手输 */}
-              <input
-                value={answer}
-                onChange={(e) => setAnswer(e.target.value)}
-                placeholder="或直接输入答案..."
-                style={{
-                  width: '100%',
-                  padding: '12px 14px',
-                  borderRadius: 12,
-                  border: '1px solid var(--cpm-card-border-strong)',
-                  background: 'var(--cpm-bg-0)',
-                  fontSize: 14,
-                  color: 'var(--cpm-text-primary)',
-                  fontFamily: 'var(--cpm-font-sans)',
-                  outline: 'none',
-                  boxSizing: 'border-box',
-                }}
-              />
-
-              <motion.button
-                onClick={submit}
-                disabled={!answer.trim()}
-                whileHover={answer.trim() ? { scale: 1.02 } : undefined}
-                whileTap={answer.trim() ? { scale: 0.97 } : undefined}
-                style={{
-                  width: '100%',
-                  padding: '14px 0',
-                  borderRadius: 14,
-                  fontSize: 15,
-                  fontWeight: 700,
-                  fontFamily: 'var(--cpm-font-sans)',
-                  border: 'none',
-                  background: answer.trim()
-                    ? 'linear-gradient(135deg,var(--cpm-brand-violet),var(--cpm-brand-cyan))'
-                    : 'rgba(15,23,42,0.08)',
-                  color: answer.trim() ? '#fff' : 'var(--cpm-text-muted)',
-                  cursor: answer.trim() ? 'pointer' : 'not-allowed',
-                  boxShadow: answer.trim() ? 'var(--cpm-shadow-glow-violet)' : 'none',
-                  transition: 'all 0.2s ease',
-                }}
-              >
-                提交签到
-              </motion.button>
-            </motion.div>
-          )}
-
           {/* 提交中 */}
           {step === 'submit' && (
             <motion.div
@@ -421,7 +143,7 @@ export function SigninPage() {
             >
               <motion.div
                 animate={{ rotate: 360 }}
-                transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+                transition={{ repeat: Number.POSITIVE_INFINITY, duration: 1, ease: 'linear' }}
                 style={{
                   width: 48,
                   height: 48,
@@ -430,9 +152,7 @@ export function SigninPage() {
                   borderTopColor: 'var(--cpm-brand-violet)',
                 }}
               />
-              <div style={{ fontSize: 15, fontWeight: 500, color: 'var(--cpm-text-secondary)' }}>
-                验证中，请稍候...
-              </div>
+              <div style={{ fontSize: 15, fontWeight: 500, color: 'var(--cpm-text-secondary)' }}>验证中，请稍候...</div>
             </motion.div>
           )}
 
@@ -500,9 +220,7 @@ export function SigninPage() {
               >
                 <CountUp to={earnedPoints} />
               </motion.div>
-              <div style={{ fontSize: 14, color: '#064e3b', fontWeight: 500 }}>
-                积分已入账 🎊
-              </div>
+              <div style={{ fontSize: 14, color: '#064e3b', fontWeight: 500 }}>积分已入账 🎊</div>
               <motion.button
                 onClick={() => navigate('/')}
                 whileTap={{ scale: 0.96 }}
@@ -580,10 +298,10 @@ export function SigninPage() {
                   maxWidth: 280,
                 }}
               >
-                {reason ?? '请检查位置和答案后重试'}
+                {reason ?? '签到失败，请重试'}
               </div>
               <motion.button
-                onClick={() => setStep('quiz')}
+                onClick={() => submit()}
                 whileTap={{ scale: 0.96 }}
                 style={{
                   padding: '12px 28px',

@@ -66,11 +66,11 @@ export function LeaderboardRow({ entry, highlight = false }: LeaderboardRowProps
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
         <div style={{ fontFamily: 'var(--cpm-font-num)', fontWeight: 800, fontSize: 15, color: 'var(--cpm-gold-ink)' }}>
-          {entry.score.toLocaleString('en-US')}
+          {(entry.earned ?? 0).toLocaleString('en-US')}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <span style={{ fontFamily: 'var(--cpm-font-sans)', fontSize: 10.5, color: 'var(--cpm-ink-2)' }}>
-            累计 {(entry.earned ?? 0).toLocaleString('en-US')}
+            当前积分 {entry.score.toLocaleString('en-US')}
           </span>
           <TrendIndicator value={entry.trend} />
         </div>

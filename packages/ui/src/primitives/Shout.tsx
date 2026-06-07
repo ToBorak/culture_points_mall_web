@@ -33,5 +33,9 @@ export function Shout({ children, tone = 'yellow', rotation = -3, className }: S
     boxShadow: '3px 3px 0 var(--cpm-ink)',
     letterSpacing: 1,
   };
-  return <span className={className} style={style}>{children}</span>;
+  return (
+    <span className={className} style={style}>
+      {children}
+    </span>
+  );
 }

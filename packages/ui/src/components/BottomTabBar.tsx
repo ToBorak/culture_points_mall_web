@@ -45,6 +45,12 @@ export function BottomTabBar({ items, activeKey, onSelect }: BottomTabBarProps) 
               background: 'none',
               border: 'none',
               cursor: 'pointer',
+              outline: 'none',
+              // 去掉移动端 WebKit 点击时的灰色高亮闪烁
+              WebkitTapHighlightColor: 'transparent',
+              WebkitUserSelect: 'none',
+              userSelect: 'none',
+              touchAction: 'manipulation',
               fontFamily: 'var(--cpm-font-sans)',
               fontSize: 11,
               fontWeight: 600,

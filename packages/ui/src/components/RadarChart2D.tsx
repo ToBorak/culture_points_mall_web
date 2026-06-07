@@ -11,7 +11,7 @@ export function RadarChart2D({ data, size = 320 }: RadarChart2DProps) {
   const r = size * 0.4;
   const n = data.length;
   const points = data.map((d, i) => {
-    const angle = (-Math.PI / 2) + (i / n) * Math.PI * 2;
+    const angle = -Math.PI / 2 + (i / n) * Math.PI * 2;
     const ratio = Math.min(d.score / d.max, 1);
     return {
       x: cx + Math.cos(angle) * r * ratio,
@@ -22,10 +22,10 @@ export function RadarChart2D({ data, size = 320 }: RadarChart2DProps) {
       name: d.name,
     };
   });
-  const path = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x},${p.y}`).join(' ') + ' Z';
+  const path = `${points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x},${p.y}`).join(' ')} Z`;
 
   return (
-    <svg width={size} height={size}>
+    <svg width={size} height={size} role="img" aria-label="文化维度雷达图">
       {[0.25, 0.5, 0.75, 1].map((ratio) => (
         <polygon
           key={ratio}

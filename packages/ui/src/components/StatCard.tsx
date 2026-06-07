@@ -1,5 +1,5 @@
 import { motion, useSpring, useTransform } from 'framer-motion';
-import { useEffect, type ReactNode } from 'react';
+import { type ReactNode, useEffect } from 'react';
 import { GlassCard } from '../primitives/GlassCard';
 import type { GlassTone } from '../primitives/GlassCard';
 
@@ -77,15 +77,9 @@ export function StatCard({ label, value, suffix, icon, tone = 'violet', hint }: 
           >
             {display}
           </motion.span>
-          {suffix && (
-            <span style={{ fontSize: 16, color: 'var(--cpm-text-tertiary)', fontWeight: 500 }}>
-              {suffix}
-            </span>
-          )}
+          {suffix && <span style={{ fontSize: 16, color: 'var(--cpm-text-tertiary)', fontWeight: 500 }}>{suffix}</span>}
         </div>
-        {hint && (
-          <span style={{ fontSize: 12, color: 'var(--cpm-text-tertiary)' }}>{hint}</span>
-        )}
+        {hint && <span style={{ fontSize: 12, color: 'var(--cpm-text-tertiary)' }}>{hint}</span>}
       </div>
     </GlassCard>
   );

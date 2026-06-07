@@ -1,8 +1,8 @@
+import type { BlindboxConfig } from '@cpm/types';
+import { Button, EmptyState, PageHeader } from '@cpm/ui';
 import axios from 'axios';
 import { AnimatePresence, motion } from 'framer-motion';
 import { type ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, PageHeader, EmptyState } from '@cpm/ui';
-import type { BlindboxConfig } from '@cpm/types';
 
 interface Item {
   ID: number;
@@ -77,6 +77,7 @@ export function MallAdminPage() {
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [editItem, setEditItem] = useState<Item | null>(null);
   const [configBox, setConfigBox] = useState<Item | null>(null);
 
   const loadItems = useCallback(async () => {
@@ -123,10 +124,20 @@ export function MallAdminPage() {
 
       <AnimatePresence>
         {showModal && (
-          <CreateItemModal
+          <ItemFormModal
             onClose={() => setShowModal(false)}
-            onCreated={() => {
+            onSaved={() => {
               setShowModal(false);
+              void loadItems();
+            }}
+          />
+        )}
+        {editItem && (
+          <ItemFormModal
+            editing={editItem}
+            onClose={() => setEditItem(null)}
+            onSaved={() => {
+              setEditItem(null);
               void loadItems();
             }}
           />
@@ -143,18 +154,10 @@ export function MallAdminPage() {
         )}
       </AnimatePresence>
 
-      {loading && (
-        <div style={{ color: 'var(--cpm-text-tertiary)', fontSize: 14, padding: '16px 0' }}>
-          加载中...
-        </div>
-      )}
+      {loading && <div style={{ color: 'var(--cpm-text-tertiary)', fontSize: 14, padding: '16px 0' }}>加载中...</div>}
 
       {!loading && items.length === 0 && (
-        <EmptyState
-          icon="◈"
-          title="商城暂无商品"
-          description="完整商城管理功能在后续 Phase 上线"
-        />
+        <EmptyState icon="◈" title="商城暂无商品" description="完整商城管理功能在后续 Phase 上线" />
       )}
 
       {!loading && boxes.length > 0 && (
@@ -387,17 +390,18 @@ export function MallAdminPage() {
                         <span style={{ fontSize: 11, color: 'var(--cpm-text-tertiary)' }}>分</span>
                       </div>
                     ) : (
-                      <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--cpm-brand-violet)' }}>
-                        实时上新
-                      </span>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--cpm-brand-violet)' }}>实时上新</span>
                     )}
-                    <span style={{ fontSize: 11, color: 'var(--cpm-text-muted)' }}>
-                      库存 {g.Stock ?? '∞'}
-                    </span>
+                    <span style={{ fontSize: 11, color: 'var(--cpm-text-muted)' }}>库存 {g.Stock ?? '∞'}</span>
                   </div>
-                  <Button tone="danger" size="sm" onClick={() => deleteItem(g)} style={{ width: '100%' }}>
-                    删除
-                  </Button>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <Button tone="secondary" size="sm" onClick={() => setEditItem(g)} style={{ flex: 1 }}>
+                      编辑
+                    </Button>
+                    <Button tone="danger" size="sm" onClick={() => deleteItem(g)} style={{ flex: 1 }}>
+                      删除
+                    </Button>
+                  </div>
                 </div>
               </motion.div>
             ))}
@@ -408,18 +412,20 @@ export function MallAdminPage() {
   );
 }
 
-function CreateItemModal({
+function ItemFormModal({
+  editing,
   onClose,
-  onCreated,
+  onSaved,
 }: {
+  editing?: Item;
   onClose: () => void;
-  onCreated: () => void;
+  onSaved: () => void;
 }) {
-  const [type, setType] = useState<'item' | 'blindbox'>('item');
-  const [name, setName] = useState('');
-  const [cost, setCost] = useState('');
-  const [stock, setStock] = useState('');
-  const [imageURL, setImageURL] = useState('');
+  const [type, setType] = useState<'item' | 'blindbox'>(editing?.Type === 'blindbox' ? 'blindbox' : 'item');
+  const [name, setName] = useState(editing?.Name ?? '');
+  const [cost, setCost] = useState(editing ? String(editing.Cost) : '');
+  const [stock, setStock] = useState(editing?.Stock != null ? String(editing.Stock) : '');
+  const [imageURL, setImageURL] = useState(editing?.ImageURL ?? '');
   const [submitting, setSubmitting] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
@@ -428,17 +434,25 @@ function CreateItemModal({
     const costN = Number(cost);
     if (!name.trim()) return setErr('请填写商品名');
     if (!Number.isFinite(costN) || costN <= 0) return setErr('cost 必须 > 0');
-    const body: Record<string, unknown> = { type, name: name.trim(), cost: costN };
-    if (stock.trim() !== '') body.stock = Number(stock);
-    if (imageURL.trim() !== '') body.image_url = imageURL.trim();
+    // 全量提交：stock 留空=不限量(null)，image 留空=清除；后端据此整体设置。
+    const body: Record<string, unknown> = {
+      type,
+      name: name.trim(),
+      cost: costN,
+      stock: stock.trim() === '' ? null : Number(stock),
+      image_url: imageURL.trim(),
+    };
 
     setSubmitting(true);
     try {
       const token = localStorage.getItem('cpm_admin_jwt');
-      await axios.post('/api/v1/admin/mall/items', body, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      onCreated();
+      const headers = { Authorization: `Bearer ${token}` };
+      if (editing) {
+        await axios.put(`/api/v1/admin/mall/items/${editing.ID}`, body, { headers });
+      } else {
+        await axios.post('/api/v1/admin/mall/items', body, { headers });
+      }
+      onSaved();
     } catch (e) {
       const er = e as { response?: { data?: { error?: string } } };
       setErr(er?.response?.data?.error ?? String(e));
@@ -485,10 +499,10 @@ function CreateItemModal({
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 22 }}>
           <div>
             <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--cpm-text-primary)', letterSpacing: '-0.01em' }}>
-              新增商品
+              {editing ? '编辑商品' : '新增商品'}
             </div>
             <div style={{ fontSize: 13, color: 'var(--cpm-text-tertiary)', marginTop: 4 }}>
-              支持普通商品 / 盲盒两种类型
+              {editing ? '修改商品基础信息' : '支持普通商品 / 盲盒两种类型'}
             </div>
           </div>
           <button
@@ -510,37 +524,41 @@ function CreateItemModal({
           </button>
         </div>
 
-        {/* 类型切换 */}
-        <FieldLabel>类型</FieldLabel>
-        <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-          {(['item', 'blindbox'] as const).map((t) => {
-            const active = type === t;
-            return (
-              <button
-                key={t}
-                type="button"
-                onClick={() => setType(t)}
-                style={{
-                  flex: 1,
-                  padding: '10px 14px',
-                  borderRadius: 11,
-                  border: active
-                    ? '1.5px solid var(--cpm-brand-violet)'
-                    : '1.5px solid var(--cpm-card-border-strong)',
-                  background: active ? 'var(--cpm-brand-violet-bg)' : 'transparent',
-                  color: active ? 'var(--cpm-brand-violet)' : 'var(--cpm-text-secondary)',
-                  fontWeight: 600,
-                  fontSize: 13,
-                  cursor: 'pointer',
-                  fontFamily: 'var(--cpm-font-sans)',
-                  transition: 'all 0.15s',
-                }}
-              >
-                {t === 'item' ? '✦ 普通商品' : '◈ 盲盒'}
-              </button>
-            );
-          })}
-        </div>
+        {/* 类型切换：仅新增时可选，编辑不改类型 */}
+        {!editing && (
+          <>
+            <FieldLabel>类型</FieldLabel>
+            <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+              {(['item', 'blindbox'] as const).map((t) => {
+                const active = type === t;
+                return (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => setType(t)}
+                    style={{
+                      flex: 1,
+                      padding: '10px 14px',
+                      borderRadius: 11,
+                      border: active
+                        ? '1.5px solid var(--cpm-brand-violet)'
+                        : '1.5px solid var(--cpm-card-border-strong)',
+                      background: active ? 'var(--cpm-brand-violet-bg)' : 'transparent',
+                      color: active ? 'var(--cpm-brand-violet)' : 'var(--cpm-text-secondary)',
+                      fontWeight: 600,
+                      fontSize: 13,
+                      cursor: 'pointer',
+                      fontFamily: 'var(--cpm-font-sans)',
+                      transition: 'all 0.15s',
+                    }}
+                  >
+                    {t === 'item' ? '✦ 普通商品' : '◈ 盲盒'}
+                  </button>
+                );
+              })}
+            </div>
+          </>
+        )}
 
         <FieldLabel>名称</FieldLabel>
         <Input value={name} onChange={setName} placeholder="例如：咖啡券" />
@@ -582,7 +600,7 @@ function CreateItemModal({
             取消
           </Button>
           <Button tone="primary" size="md" onClick={submit} disabled={submitting} style={{ flex: 1 }}>
-            {submitting ? '提交中…' : '提交'}
+            {submitting ? '保存中…' : editing ? '保存' : '提交'}
           </Button>
         </div>
       </motion.div>
@@ -592,7 +610,7 @@ function CreateItemModal({
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return (
-    <label
+    <div
       style={{
         display: 'block',
         fontSize: 12,
@@ -603,7 +621,7 @@ function FieldLabel({ children }: { children: React.ReactNode }) {
       }}
     >
       {children}
-    </label>
+    </div>
   );
 }
 
@@ -983,7 +1001,15 @@ function BlindboxConfigModal({
                   style={numInputStyle}
                 />
               </div>
-              <div style={{ width: 52, textAlign: 'right', fontSize: 13, fontWeight: 700, color: 'var(--cpm-text-secondary)' }}>
+              <div
+                style={{
+                  width: 52,
+                  textAlign: 'right',
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: 'var(--cpm-text-secondary)',
+                }}
+              >
                 {fmtPct(Number(noPrizeWeight) || 0)}
               </div>
             </div>

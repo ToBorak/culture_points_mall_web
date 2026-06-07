@@ -1,15 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Serif+Display&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Serif+Display&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&display=swap");
 
 :root {
   /* 中文优先阿里巴巴普惠体（本机有则用；自托管子集字体为后续任务）→ 回退 Inter/系统 */
-  --cpm-font-sans:
-    'Alibaba PuHuiTi 3.0', 'Alibaba PuHuiTi', 'Inter', 'HarmonyOS Sans SC', 'PingFang SC',
-    -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
+  --cpm-font-sans: "Alibaba PuHuiTi 3.0", "Alibaba PuHuiTi", "Inter", "HarmonyOS Sans SC", "PingFang SC", -apple-system,
+    BlinkMacSystemFont, "Helvetica Neue", "Microsoft YaHei", sans-serif;
   /* 数字/积分/排名 · 圆体厚重 */
-  --cpm-font-num: 'Baloo 2', var(--cpm-font-sans);
-  --cpm-font-serif: 'DM Serif Display', 'Source Han Serif SC', 'Noto Serif SC', serif;
-  --cpm-font-mono: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
+  --cpm-font-num: "Baloo 2", var(--cpm-font-sans);
+  --cpm-font-serif: "DM Serif Display", "Source Han Serif SC", "Noto Serif SC", serif;
+  --cpm-font-mono: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
 
   --cpm-text-display: 56px;
   --cpm-text-h1: 36px;
@@ -28,9 +27,10 @@
   --cpm-tracking-wide: 0.04em;
 }
 
-html, body {
+html,
+body {
   font-family: var(--cpm-font-sans);
-  font-feature-settings: 'ss01', 'cv11';
+  font-feature-settings: "ss01", "cv11";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
+import { QRCodeCanvas } from 'qrcode.react';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { QRCodeCanvas } from 'qrcode.react';
 
 export function ActivityCodePage() {
   const { id } = useParams();
@@ -127,13 +127,7 @@ export function ActivityCodePage() {
       >
         {code ? (
           <>
-            <QRCodeCanvas
-              value={url}
-              size={380}
-              bgColor="#ffffff"
-              fgColor="#0f172a"
-              level="M"
-            />
+            <QRCodeCanvas value={url} size={380} bgColor="#ffffff" fgColor="#0f172a" level="M" />
             <div
               style={{
                 fontFamily: 'monospace',
@@ -160,9 +154,7 @@ export function ActivityCodePage() {
                   marginBottom: 6,
                 }}
               >
-                <span style={{ fontSize: 11, color: 'var(--cpm-text-muted)', fontWeight: 500 }}>
-                  自动刷新
-                </span>
+                <span style={{ fontSize: 11, color: 'var(--cpm-text-muted)', fontWeight: 500 }}>自动刷新</span>
                 <span
                   style={{
                     fontSize: 12,
@@ -187,9 +179,10 @@ export function ActivityCodePage() {
                   transition={{ duration: 1, ease: 'linear' }}
                   style={{
                     height: '100%',
-                    background: countdown <= 5
-                      ? 'var(--cpm-danger)'
-                      : 'linear-gradient(90deg, var(--cpm-brand-violet), var(--cpm-brand-cyan))',
+                    background:
+                      countdown <= 5
+                        ? 'var(--cpm-danger)'
+                        : 'linear-gradient(90deg, var(--cpm-brand-violet), var(--cpm-brand-cyan))',
                     borderRadius: 2,
                   }}
                 />
@@ -213,7 +206,7 @@ export function ActivityCodePage() {
                 <motion.div
                   key={i}
                   animate={{ scale: [1, 1.3, 1], opacity: [0.4, 1, 0.4] }}
-                  transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
+                  transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, delay: i * 0.2 }}
                   style={{
                     width: 8,
                     height: 8,
@@ -249,7 +242,7 @@ export function ActivityCodePage() {
       >
         <motion.div
           animate={connected ? { scale: [1, 1.5, 1], opacity: [1, 0.4, 1] } : {}}
-          transition={connected ? { duration: 2, repeat: Infinity } : {}}
+          transition={connected ? { duration: 2, repeat: Number.POSITIVE_INFINITY } : {}}
           style={{
             width: 8,
             height: 8,

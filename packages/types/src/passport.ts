@@ -40,8 +40,10 @@ export interface Badge {
   iconUrl: string;
   earned: boolean;
   earnedAt: string | null;
-  /** 进度（仅累计赚取/消费类勋章）：当前累计值 */
+  /** 进度（累计赚取/消费/签到类勋章）：当前累计值 */
   progressCurrent?: number;
   /** 进度目标阈值；0 或缺省表示无进度条 */
   progressTarget?: number;
+  /** 进度单位：积分类为"分"，签到类为"次"。缺省按"分"。 */
+  progressUnit?: string;
 }

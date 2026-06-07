@@ -9,8 +9,7 @@
   --cpm-radius-card: 12px;
   --cpm-radius-button: 8px;
 
-  --cpm-halftone-bg:
-    radial-gradient(circle at 20% 30%, var(--cpm-halftone) 1px, transparent 1.6px) 0 0 / 18px 18px,
+  --cpm-halftone-bg: radial-gradient(circle at 20% 30%, var(--cpm-halftone) 1px, transparent 1.6px) 0 0 / 18px 18px,
     radial-gradient(circle at 70% 70%, var(--cpm-halftone) 1px, transparent 1.6px) 0 0 / 26px 26px;
 
   /* === 重设计 · 圆角与立体阴影 (2026-06) === */

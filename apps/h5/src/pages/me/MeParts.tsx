@@ -1,6 +1,6 @@
 import { Avatar, levelOf } from '@cpm/ui';
 import { LayoutDashboard, Sparkles } from 'lucide-react';
-import { useState, type ReactNode } from 'react';
+import { type ReactNode, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../store/auth';
 

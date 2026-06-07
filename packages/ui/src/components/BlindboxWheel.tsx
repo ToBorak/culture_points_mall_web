@@ -1,7 +1,7 @@
+import { MeshTransmissionMaterial } from '@react-three/drei';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { useEffect, useRef, useState } from 'react';
 import type { Mesh } from 'three';
-import { MeshTransmissionMaterial } from '@react-three/drei';
 
 export interface BlindboxWheelProps {
   segments: { label: string; color: string }[];
@@ -24,7 +24,10 @@ export function BlindboxWheel({ segments, spinning, resultIndex, onSpinEnd, size
 }
 
 function WheelMesh({
-  segments, spinning, resultIndex, onEnd,
+  segments,
+  spinning,
+  resultIndex,
+  onEnd,
 }: {
   segments: BlindboxWheelProps['segments'];
   spinning: boolean;

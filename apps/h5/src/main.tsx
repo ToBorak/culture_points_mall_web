@@ -37,6 +37,20 @@ const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchOnWindowFocus: false } },
 });
 
+// 钉钉 H5 是固定布局应用，禁止缩放：viewport meta 的 user-scalable=no 覆盖 Android WebView，
+// iOS WKWebView 会忽略该 meta，需再拦截 gesture 手势事件与多指 touchmove。
+const preventZoom = (e: Event) => e.preventDefault();
+document.addEventListener('gesturestart', preventZoom);
+document.addEventListener('gesturechange', preventZoom);
+document.addEventListener('gestureend', preventZoom);
+document.addEventListener(
+  'touchmove',
+  (e) => {
+    if (e.touches.length > 1) e.preventDefault();
+  },
+  { passive: false },
+);
+
 const rootEl = document.getElementById('root');
 if (!rootEl) throw new Error('root element not found');
 createRoot(rootEl).render(

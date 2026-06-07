@@ -14,6 +14,8 @@ const RARITY_LABEL: Record<string, { label: string; color: string; bg: string }>
 // 与后端 seed 的 description 一致；后端返回 description 时优先用后端的。
 const EMBLEM_CONDITION: Record<string, string> = {
   sprout: '完成第一次活动签到',
+  calendar_check: '完成 5 次活动签到',
+  flame: '完成 10 次活动签到',
   flag: '赚到第一笔积分',
   coin_stack: '累计赚取满 5 分',
   pagoda: '累计赚取满 10 分',
@@ -79,6 +81,7 @@ function BadgeDetailModal({ badge, onClose }: { badge: Badge; onClose: () => voi
   const condition = badge.description || EMBLEM_CONDITION[badge.iconUrl] || '—';
   const target = badge.progressTarget ?? 0;
   const current = badge.progressCurrent ?? 0;
+  const unit = badge.progressUnit || '分';
   const remain = !badge.earned && target > 0 ? Math.max(0, target - current) : 0;
   const pct = target > 0 ? Math.min(100, Math.round((current / target) * 100)) : 0;
 
@@ -99,17 +102,27 @@ function BadgeDetailModal({ badge, onClose }: { badge: Badge; onClose: () => voi
         type="button"
         aria-label="关闭"
         onClick={onClose}
-        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', padding: 0, border: 'none', background: 'transparent', cursor: 'default' }}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          padding: 0,
+          border: 'none',
+          background: 'transparent',
+          cursor: 'default',
+        }}
       />
-      <div
-        role="dialog"
-        aria-modal="true"
+      <dialog
+        open
         aria-label={`勋章 ${badge.name}`}
         style={{
           position: 'relative',
           zIndex: 1,
           width: '100%',
           maxWidth: 300,
+          margin: 0,
+          border: 'none',
           borderRadius: 20,
           background: 'var(--cpm-surface, #ffffff)',
           boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
@@ -122,10 +135,26 @@ function BadgeDetailModal({ badge, onClose }: { badge: Badge; onClose: () => voi
         }}
       >
         <BadgeMedal emblem={badge.iconUrl} rarity={badge.rarity} size={88} earned={badge.earned} />
-        <div style={{ fontFamily: 'var(--cpm-font-sans)', fontSize: 19, fontWeight: 800, color: 'var(--cpm-ink-1, #1f2733)' }}>
+        <div
+          style={{
+            fontFamily: 'var(--cpm-font-sans)',
+            fontSize: 19,
+            fontWeight: 800,
+            color: 'var(--cpm-ink-1, #1f2733)',
+          }}
+        >
           {badge.name}
         </div>
-        <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 999, background: rc.bg, color: rc.color }}>
+        <span
+          style={{
+            fontSize: 11,
+            fontWeight: 600,
+            padding: '3px 10px',
+            borderRadius: 999,
+            background: rc.bg,
+            color: rc.color,
+          }}
+        >
           {rc.label}
         </span>
         <div style={{ fontSize: 13, color: 'var(--cpm-ink-2, #64748b)', lineHeight: 1.5 }}>
@@ -138,7 +167,7 @@ function BadgeDetailModal({ badge, onClose }: { badge: Badge; onClose: () => voi
               <div style={{ width: `${pct}%`, height: '100%', borderRadius: 999, background: rc.color }} />
             </div>
             <div style={{ fontSize: 11, color: 'var(--cpm-ink-3, #94a3b8)', marginTop: 4 }}>
-              累计 {current} / {target} 分
+              累计 {current} / {target} {unit}
             </div>
           </div>
         )}
@@ -149,7 +178,7 @@ function BadgeDetailModal({ badge, onClose }: { badge: Badge; onClose: () => voi
             color: badge.earned ? '#16a34a' : remain > 0 ? rc.color : 'var(--cpm-ink-3, #94a3b8)',
           }}
         >
-          {badge.earned ? '✓ 已获得' : remain > 0 ? `还差 ${remain} 分解锁` : '尚未获得'}
+          {badge.earned ? '✓ 已获得' : remain > 0 ? `还差 ${remain} ${unit}解锁` : '尚未获得'}
         </div>
         <button
           type="button"
@@ -168,7 +197,7 @@ function BadgeDetailModal({ badge, onClose }: { badge: Badge; onClose: () => voi
         >
           知道了
         </button>
-      </div>
+      </dialog>
     </div>
   );
 }

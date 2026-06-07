@@ -1,5 +1,5 @@
-import type { PassportSummary, PointTransaction, Badge } from '@cpm/types';
-import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
+import type { Badge, PassportSummary, PointTransaction } from '@cpm/types';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { http } from '../http';
 
 export function usePassport() {
@@ -30,9 +30,16 @@ export function useMyBadges() {
   });
 }
 
-// checkNewBadges 结算并返回本次「新解锁」的勋章（后端只返回首次达成的，已拥有不再返回）。
-// 供全局庆祝弹窗在积分变化后调用。
+// checkNewBadges 结算授予并返回所有「尚未庆祝」(celebrated=0) 的已得勋章。
+// 授予与庆祝解耦：返回的勋章需经 ackCelebratedBadges 回执才落定，否则下次仍会返回（零丢失）。
+// 供全局庆祝弹窗在加载 / 积分变化后调用。
 export async function checkNewBadges(): Promise<Badge[]> {
   const { data } = await http().post<{ items: Badge[] }>('/api/v1/me/badges/check');
   return data.items ?? [];
+}
+
+// ackCelebratedBadges 勋章弹窗展示后回执，落定「已庆祝」，之后后端不再返回这些勋章。
+export async function ackCelebratedBadges(badgeIds: number[]): Promise<void> {
+  if (badgeIds.length === 0) return;
+  await http().post('/api/v1/me/badges/celebrated', { badgeIds });
 }

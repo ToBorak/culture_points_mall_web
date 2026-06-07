@@ -27,5 +27,9 @@ export function Stamp({ text, color = 'red', rotation = -12, className }: StampP
     borderRadius: 6,
     display: 'inline-block',
   };
-  return <span className={className} style={style}>{text}</span>;
+  return (
+    <span className={className} style={style}>
+      {text}
+    </span>
+  );
 }

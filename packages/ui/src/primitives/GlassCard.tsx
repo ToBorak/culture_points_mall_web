@@ -116,8 +116,12 @@ export function GlassCard({
             transition: 'opacity 0.4s ease',
             pointerEvents: 'none',
           }}
-          onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.opacity = '0.6')}
-          onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.opacity = '0')}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLElement).style.opacity = '0.6';
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLElement).style.opacity = '0';
+          }}
         />
       )}
       <div style={{ position: 'relative' }}>{children}</div>

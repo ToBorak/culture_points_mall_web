@@ -9,6 +9,8 @@ body {
   margin: 0;
   overflow: hidden;
   overscroll-behavior: none;
+  /* 钉钉 H5 是固定布局应用：禁用双击缩放（双指缩放另在 viewport meta + main.tsx 拦截） */
+  touch-action: manipulation;
 }
 
 /* 登录中 loading 的旋转指示器 */

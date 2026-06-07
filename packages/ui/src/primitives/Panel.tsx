@@ -31,5 +31,9 @@ export function Panel({ className, shadow = 'ink', children, style }: PanelProps
     position: 'relative',
     ...style,
   };
-  return <div className={className} style={css}>{children}</div>;
+  return (
+    <div className={className} style={css}>
+      {children}
+    </div>
+  );
 }

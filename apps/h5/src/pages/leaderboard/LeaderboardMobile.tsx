@@ -15,6 +15,12 @@ const SCOPES: { key: LeaderboardScope; label: string }[] = [
   { key: 'dept', label: '部门榜' },
 ];
 
+const MEDAL_BG: Record<number, string> = {
+  1: 'var(--cpm-medal-gold)',
+  2: 'var(--cpm-medal-silver)',
+  3: 'var(--cpm-medal-bronze)',
+};
+
 export function LeaderboardMobile(s: LeaderboardState) {
   const { entries, myEntry } = s;
   return (
@@ -92,36 +98,40 @@ export function LeaderboardMobile(s: LeaderboardState) {
             boxShadow: '0 -2px 16px rgba(25,26,44,0.10)',
           }}
         >
-          <span
+          <div
             style={{
-              fontFamily: 'var(--cpm-font-sans)',
-              fontSize: 11,
+              width: 28,
+              minWidth: 28,
+              height: 28,
+              display: 'grid',
+              placeItems: 'center',
+              borderRadius: MEDAL_BG[myEntry.rank] ? 8 : 0,
+              background: MEDAL_BG[myEntry.rank] ?? 'transparent',
+              color: MEDAL_BG[myEntry.rank] ? '#fff' : 'var(--cpm-ink-2)',
+              fontFamily: 'var(--cpm-font-num)',
               fontWeight: 800,
-              color: 'var(--cpm-primary-strong)',
-              background: 'var(--cpm-surface)',
-              borderRadius: 8,
-              padding: '2px 7px',
+              fontSize: MEDAL_BG[myEntry.rank] ? 13 : 16,
             }}
           >
-            你
-          </span>
+            {myEntry.rank}
+          </div>
           <Avatar name={myEntry.name} avatarUrl={myEntry.avatarUrl || undefined} size={38} />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div
               style={{ fontFamily: 'var(--cpm-font-sans)', fontWeight: 700, fontSize: 14, color: 'var(--cpm-ink-1)' }}
             >
-              {myEntry.rank} · {myEntry.name}
+              {myEntry.name}（你）
             </div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
             <span
               style={{ fontFamily: 'var(--cpm-font-num)', fontWeight: 800, fontSize: 16, color: 'var(--cpm-gold-ink)' }}
             >
-              {myEntry.score.toLocaleString('en-US')}
+              {(myEntry.earned ?? 0).toLocaleString('en-US')}
             </span>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <span style={{ fontFamily: 'var(--cpm-font-sans)', fontSize: 10.5, color: 'var(--cpm-ink-2)' }}>
-                累计 {(myEntry.earned ?? 0).toLocaleString('en-US')}
+                当前积分 {myEntry.score.toLocaleString('en-US')}
               </span>
               <TrendIndicator value={myEntry.trend} />
             </div>
