@@ -12,8 +12,8 @@ interface ShellTab extends TabItem {
 const TABS: ShellTab[] = [
   { key: 'leaderboard', label: '排行榜', icon: <Trophy size={22} />, path: '/leaderboard' },
   { key: 'activities', label: '活动', icon: <Target size={22} />, path: '/activities' },
-  { key: 'mall', label: '商城', icon: <Gift size={22} />, path: '/mall' },
   { key: 'publications', label: '文化刊', icon: <BookOpen size={22} />, path: '/publications' },
+  { key: 'mall', label: '商城', icon: <Gift size={22} />, path: '/mall' },
   { key: 'me', label: '我的', icon: <User size={22} />, path: '/me' },
 ];
 
