@@ -1,6 +1,6 @@
 import { usePassport } from '@cpm/api-client';
 import { BottomTabBar, PointsPill, SideNav, type TabItem, useBreakpoint } from '@cpm/ui';
-import { ArrowLeft, Gift, Sparkles, Target, Trophy, User } from 'lucide-react';
+import { ArrowLeft, BookOpen, Gift, Sparkles, Target, Trophy, User } from 'lucide-react';
 import { useMemo } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { BadgeCelebration } from './BadgeCelebration';
@@ -13,6 +13,7 @@ const TABS: ShellTab[] = [
   { key: 'leaderboard', label: '排行榜', icon: <Trophy size={22} />, path: '/leaderboard' },
   { key: 'activities', label: '活动', icon: <Target size={22} />, path: '/activities' },
   { key: 'mall', label: '商城', icon: <Gift size={22} />, path: '/mall' },
+  { key: 'publications', label: '文化刊', icon: <BookOpen size={22} />, path: '/publications' },
   { key: 'me', label: '我的', icon: <User size={22} />, path: '/me' },
 ];
 
