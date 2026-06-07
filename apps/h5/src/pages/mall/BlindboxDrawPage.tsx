@@ -25,6 +25,7 @@ interface Item {
   Name: string;
   Cost: number;
   ImageURL: string;
+  ChargeOnMiss?: boolean;
 }
 
 function rarityOf(
@@ -225,7 +226,9 @@ export function BlindboxDrawPage() {
                     color: 'var(--cpm-ink-2)',
                   }}
                 >
-                  开盒仅在中奖时扣积分，未中奖会自动退回冻结分。
+                  {box?.ChargeOnMiss
+                    ? `每次抽奖消耗 ${box?.Cost ?? ''} 分，可能抽中好物，也可能谢谢参与（未中奖也扣分）。`
+                    : `中奖才扣 ${box?.Cost ?? ''} 分，未中奖自动退回冻结分。`}
                 </p>
               </div>
               {box && (

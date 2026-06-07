@@ -7,6 +7,7 @@ export default defineConfig({
   plugins: [react(), unocss(cpmUnoConfig)],
   server: {
     host: true,
+    allowedHosts: ['cxd.local'],
     port: 5174,
     proxy: {
       '/api': { target: 'http://localhost:18080', changeOrigin: true },

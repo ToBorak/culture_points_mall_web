@@ -1,5 +1,6 @@
 import 'virtual:uno.css';
 import '@cpm/ui/tokens.css';
+import './index.css';
 import { setupHttp } from '@cpm/api-client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { StrictMode } from 'react';

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AuroraBg } from '@cpm/ui';
+import { AuroraBg, useBreakpoint } from '@cpm/ui';
 
 interface Quiz {
   question: string;
@@ -40,6 +40,7 @@ export function SigninPage() {
   const activityId = Number(params.get('a') ?? 0);
   const code = params.get('c') ?? '';
   const navigate = useNavigate();
+  const { isDesktop } = useBreakpoint();
 
   const [step, setStep] = useState<Step>('gps');
   const [gps, setGps] = useState<{ lat: number; lng: number } | null>(null);
@@ -109,26 +110,31 @@ export function SigninPage() {
             marginBottom: 20,
           }}
         >
-          <motion.button
-            onClick={() => navigate(-1)}
-            whileTap={{ scale: 0.88 }}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              padding: '6px 12px',
-              borderRadius: 10,
-              background: '#fff',
-              border: '1px solid var(--cpm-card-border)',
-              boxShadow: 'var(--cpm-shadow-soft)',
-              cursor: 'pointer',
-              fontSize: 13,
-              fontWeight: 500,
-              color: 'var(--cpm-text-primary)',
-            }}
-          >
-            ← 返回
-          </motion.button>
+          {/* 移动端依赖钉钉自带返回；桌面端保留顶部返回 */}
+          {isDesktop ? (
+            <motion.button
+              onClick={() => navigate(-1)}
+              whileTap={{ scale: 0.88 }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '6px 12px',
+                borderRadius: 10,
+                background: '#fff',
+                border: '1px solid var(--cpm-card-border)',
+                boxShadow: 'var(--cpm-shadow-soft)',
+                cursor: 'pointer',
+                fontSize: 13,
+                fontWeight: 500,
+                color: 'var(--cpm-text-primary)',
+              }}
+            >
+              ← 返回
+            </motion.button>
+          ) : (
+            <div style={{ width: 60 }} />
+          )}
           <span
             style={{
               fontSize: 15,

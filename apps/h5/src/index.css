@@ -10,3 +10,18 @@ body {
   overflow: hidden;
   overscroll-behavior: none;
 }
+
+/* 登录中 loading 的旋转指示器 */
+@keyframes cpm-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.cpm-spinner {
+  animation: cpm-spin 0.8s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cpm-spinner {
+    animation-duration: 1.8s;
+  }
+}

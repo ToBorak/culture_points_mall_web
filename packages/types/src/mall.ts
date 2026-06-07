@@ -6,6 +6,35 @@ export interface MallItem {
   Cost: number;
   Stock: number | null;
   ImageURL: string;
+  // 仅 blindbox 有意义：未中奖是否也扣分（true=都扣，false=中奖才扣）
+  ChargeOnMiss?: boolean;
+}
+
+// GET /api/v1/mall/blindbox/:id/prizes —— 奖池展示（关联好物的实时名称/图片/积分）
+export interface BlindboxPrize {
+  id: number;
+  itemId: number | null; // null = 无奖品（谢谢参与）
+  prizeName: string;
+  prizeImage: string;
+  weight: number;
+  stock: number | null;
+  cost: number;
+}
+
+// GET /api/v1/admin/mall/blindbox/:id/config —— 后台奖池配置
+export interface BlindboxConfigPrize {
+  itemId: number;
+  weight: number;
+  stock: number | null;
+  name: string;
+  image: string;
+  cost: number;
+}
+export interface BlindboxConfig {
+  box: { id: number; name: string; cost: number; chargeOnMiss: boolean };
+  noPrizeWeight: number;
+  prizes: BlindboxConfigPrize[];
+  goods: MallItem[];
 }
 
 // GET /api/v1/me/orders（camelCase）

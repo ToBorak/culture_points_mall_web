@@ -68,7 +68,12 @@ export function LeaderboardRow({ entry, highlight = false }: LeaderboardRowProps
         <div style={{ fontFamily: 'var(--cpm-font-num)', fontWeight: 800, fontSize: 15, color: 'var(--cpm-gold-ink)' }}>
           {entry.score.toLocaleString('en-US')}
         </div>
-        <TrendIndicator value={entry.trend} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span style={{ fontFamily: 'var(--cpm-font-sans)', fontSize: 10.5, color: 'var(--cpm-ink-2)' }}>
+            累计 {(entry.earned ?? 0).toLocaleString('en-US')}
+          </span>
+          <TrendIndicator value={entry.trend} />
+        </div>
       </div>
     </div>
   );

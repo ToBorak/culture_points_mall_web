@@ -29,3 +29,10 @@ export function useMyBadges() {
     queryFn: async () => (await http().get('/api/v1/me/badges')).data,
   });
 }
+
+// checkNewBadges 结算并返回本次「新解锁」的勋章（后端只返回首次达成的，已拥有不再返回）。
+// 供全局庆祝弹窗在积分变化后调用。
+export async function checkNewBadges(): Promise<Badge[]> {
+  const { data } = await http().post<{ items: Badge[] }>('/api/v1/me/badges/check');
+  return data.items ?? [];
+}

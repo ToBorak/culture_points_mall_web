@@ -1,3 +1,4 @@
+import { useBreakpoint } from '@cpm/ui';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -24,6 +25,7 @@ interface DNAReport {
 
 export function DNAReportPage() {
   const navigate = useNavigate();
+  const { isDesktop } = useBreakpoint();
   const [data, setData] = useState<DNAReport | null>(null);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
@@ -133,28 +135,30 @@ export function DNAReportPage() {
           />
         ))}
       </div>
-      {/* 关闭 */}
-      <button
-        type="button"
-        onClick={() => navigate(-1)}
-        style={{
-          position: 'absolute',
-          top: 24,
-          right: 18,
-          width: 32,
-          height: 32,
-          borderRadius: 16,
-          border: 'none',
-          background: 'rgba(255,255,255,0.15)',
-          color: '#fff',
-          fontSize: 16,
-          cursor: 'pointer',
-          zIndex: 10,
-          backdropFilter: 'blur(8px)',
-        }}
-      >
-        ✕
-      </button>
+      {/* 关闭：移动端用钉钉自带返回，仅桌面端显示 */}
+      {isDesktop && (
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          style={{
+            position: 'absolute',
+            top: 24,
+            right: 18,
+            width: 32,
+            height: 32,
+            borderRadius: 16,
+            border: 'none',
+            background: 'rgba(255,255,255,0.15)',
+            color: '#fff',
+            fontSize: 16,
+            cursor: 'pointer',
+            zIndex: 10,
+            backdropFilter: 'blur(8px)',
+          }}
+        >
+          ✕
+        </button>
+      )}
 
       <AnimatePresence mode="wait">{stages[stage]}</AnimatePresence>
 

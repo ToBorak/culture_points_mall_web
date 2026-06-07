@@ -77,10 +77,13 @@ export function MeHero({
 
 export function DnaEntry() {
   const navigate = useNavigate();
+  const [hover, setHover] = useState(false);
   return (
     <button
       type="button"
       onClick={() => navigate('/dna')}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -92,7 +95,8 @@ export function DnaEntry() {
         cursor: 'pointer',
         textAlign: 'left',
         background: 'var(--cpm-primary-soft)',
-        boxShadow: 'var(--cpm-elev-soft)',
+        boxShadow: hover ? 'var(--cpm-elev-candy)' : 'var(--cpm-elev-soft)',
+        transition: 'box-shadow 200ms ease',
       }}
     >
       <div
@@ -122,7 +126,7 @@ export function DnaEntry() {
 // AdminEntry：「我的」页的后台入口。仅管理员（登录 JWT 的 roles 含 admin）可见，
 // 点击时携带当前登录 token 跳到管理后台并自动登录。真正的鉴权在后端 RequireRole("admin")，
 // 这里的显隐只是体验层。
-const ADMIN_ORIGIN = 'http://localhost:5174'; // 本地开发地址；生产部署需改为后台域名
+const ADMIN_ORIGIN = 'http://10.101.150.132:5174'; // 本地开发地址；生产部署需改为后台域名
 
 function rolesFromJwt(token: string | null): string[] {
   if (!token) return [];
@@ -135,6 +139,11 @@ function rolesFromJwt(token: string | null): string[] {
   } catch {
     return [];
   }
+}
+
+// 当前登录用户是否管理员（roles 含 admin）。供「我的」页决定后台入口的显隐与排版。
+export function useIsAdmin(): boolean {
+  return rolesFromJwt(useAuth((s) => s.token)).includes('admin');
 }
 
 export function AdminEntry() {

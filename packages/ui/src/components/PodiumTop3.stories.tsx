@@ -9,6 +9,7 @@ const mk = (rank: number, name: string, score: number): LeaderboardEntry => ({
   avatarUrl: '',
   deptName: '',
   score,
+  earned: score,
   trend: 0,
 });
 

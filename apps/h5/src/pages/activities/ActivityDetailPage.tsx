@@ -2,7 +2,6 @@ import { useActivity, useEnroll, useUnenroll } from '@cpm/api-client';
 import { Button, DimensionTag, useBreakpoint } from '@cpm/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  ArrowLeft,
   CalendarDays,
   CalendarPlus,
   CheckCircle2,
@@ -134,33 +133,7 @@ export function ActivityDetailPage() {
           fontFamily: 'var(--cpm-font-sans)',
         }}
       >
-        {/* 返回 */}
-        <div style={{ padding: isDesktop ? '20px 24px 0' : '12px 16px 0' }}>
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            aria-label="返回"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              minHeight: 40,
-              padding: '8px 12px 8px 8px',
-              borderRadius: 12,
-              border: '1px solid var(--cpm-border-subtle)',
-              background: 'var(--cpm-surface)',
-              color: 'var(--cpm-ink-1)',
-              fontSize: 14,
-              fontWeight: 600,
-              cursor: 'pointer',
-              touchAction: 'manipulation',
-            }}
-          >
-            <ArrowLeft size={18} /> 返回
-          </button>
-        </div>
-
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14, padding: isDesktop ? '16px 24px 24px' : '14px 16px 20px' }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14, padding: isDesktop ? '20px 24px 24px' : '16px 16px 20px' }}>
           {/* 英雄区 */}
           <motion.section
             initial={{ opacity: 0, y: 12 }}

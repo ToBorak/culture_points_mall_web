@@ -62,7 +62,9 @@ test('盲盒商城入口和详情页适配新视觉', async ({ page }) => {
   await page.getByRole('button', { name: /AI 文化盲盒 · 普通/ }).click();
   await page.waitForSelector('canvas', { timeout: 8000 });
 
-  await expect(page.getByRole('button', { name: /返回/ })).toHaveCount(0);
+  // 全局返回规范：移动端无页内返回（钉钉自带）；桌面端返回在顶栏。
+  const isMobile = test.info().project.name === 'mobile';
+  await expect(page.getByRole('button', { name: /返回/ })).toHaveCount(isMobile ? 0 : 1);
   await expect(page.getByRole('button', { name: /开启盲盒/ })).toContainText('5 分');
   await expect(page.getByRole('button', { name: '商城' })).toBeVisible();
 });

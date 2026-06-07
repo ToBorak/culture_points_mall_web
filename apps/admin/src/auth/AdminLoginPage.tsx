@@ -1,33 +1,9 @@
 import { motion } from 'framer-motion';
-import axios from 'axios';
-import { useState } from 'react';
-import { useAuth } from '../store/auth';
 
+// 管理后台不再提供独立登录：去掉 User ID / dev-login（已从后端移除）。
+// 唯一入口是从钉钉「文化官」H5「我的」页点「前往后台」，由当前钉钉身份握手进入。
 export function AdminLoginPage() {
-  const [userId, setUserId] = useState('1');
-  const [err, setErr] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const { setSession } = useAuth();
-
-  const submit = async () => {
-    if (loading) return;
-    setLoading(true);
-    setErr(null);
-    try {
-      const { data } = await axios.post<{ token: string; userId: number; tenantId: number; name: string }>(
-        '/auth/dev/login',
-        { userId: Number(userId) },
-      );
-      setSession(data.token, data.userId, data.tenantId, data.name);
-      window.location.href = '/';
-    } catch (e) {
-      const err = e as { response?: { data?: { error?: string } } };
-      setErr(err?.response?.data?.error ?? String(e));
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  const steps = ['打开钉钉 →「工作台」', '进入「文化官」应用', '底部切到「我的」页', '点击「前往后台」'];
   return (
     <div
       style={{
@@ -39,6 +15,7 @@ export function AdminLoginPage() {
         fontFamily: 'var(--cpm-font-sans)',
         position: 'relative',
         overflow: 'hidden',
+        padding: 20,
       }}
     >
       {/* Mesh gradient 背景 */}
@@ -73,29 +50,14 @@ export function AdminLoginPage() {
           pointerEvents: 'none',
         }}
       />
-      <div
-        aria-hidden
-        style={{
-          position: 'absolute',
-          width: 360,
-          height: 360,
-          left: '5%',
-          bottom: '10%',
-          background: 'radial-gradient(circle, var(--cpm-mesh-2) 0%, transparent 65%)',
-          filter: 'blur(80px)',
-          borderRadius: '50%',
-          opacity: 0.45,
-          pointerEvents: 'none',
-        }}
-      />
 
-      {/* 登录卡片 */}
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.97 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         style={{
-          width: 420,
+          width: 440,
+          maxWidth: '100%',
           background: '#fff',
           borderRadius: 24,
           border: '1px solid var(--cpm-card-border)',
@@ -106,14 +68,7 @@ export function AdminLoginPage() {
         }}
       >
         {/* Logo */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-            marginBottom: 28,
-          }}
-        >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 28 }}>
           <div
             style={{
               width: 48,
@@ -133,147 +88,65 @@ export function AdminLoginPage() {
             ✦
           </div>
           <div>
-            <div
-              style={{
-                fontSize: 18,
-                fontWeight: 700,
-                color: 'var(--cpm-text-primary)',
-                letterSpacing: '-0.01em',
-              }}
-            >
+            <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--cpm-text-primary)', letterSpacing: '-0.01em' }}>
               CPM 管理后台
             </div>
-            <div style={{ fontSize: 12, color: 'var(--cpm-text-muted)', marginTop: 1 }}>
-              Culture Points Mall
-            </div>
+            <div style={{ fontSize: 12, color: 'var(--cpm-text-muted)', marginTop: 1 }}>Culture Points Mall</div>
           </div>
         </div>
 
         {/* 标题 */}
         <h1
           style={{
-            fontSize: 26,
+            fontSize: 24,
             fontWeight: 700,
             color: 'var(--cpm-text-primary)',
             letterSpacing: '-0.02em',
-            margin: '0 0 6px',
+            margin: '0 0 8px',
           }}
         >
-          欢迎回来
+          请从「文化官」进入
         </h1>
-        <p style={{ fontSize: 14, color: 'var(--cpm-text-tertiary)', margin: '0 0 28px' }}>
-          登录以访问 HR-Agent 与运营数据
+        <p style={{ fontSize: 14, color: 'var(--cpm-text-tertiary)', lineHeight: 1.6, margin: '0 0 24px' }}>
+          管理后台仅支持钉钉身份进入，不再提供独立登录。请在钉钉里按下面步骤打开：
         </p>
 
-        {/* User ID 输入框 */}
-        <div style={{ marginBottom: 20 }}>
-          <label
-            style={{
-              display: 'block',
-              fontSize: 13,
-              fontWeight: 600,
-              color: 'var(--cpm-text-secondary)',
-              marginBottom: 8,
-              letterSpacing: '0.02em',
-            }}
-          >
-            User ID
-          </label>
-          <input
-            value={userId}
-            onChange={(e) => setUserId(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') void submit();
-            }}
-            style={{
-              display: 'block',
-              width: '100%',
-              padding: '11px 14px',
-              borderRadius: 12,
-              border: '1.5px solid var(--cpm-card-border-strong)',
-              background: 'var(--cpm-bg-0)',
-              fontSize: 15,
-              color: 'var(--cpm-text-primary)',
-              outline: 'none',
-              fontFamily: 'var(--cpm-font-sans)',
-              transition: 'border-color 0.2s, box-shadow 0.2s',
-              boxSizing: 'border-box',
-            }}
-            onFocus={(e) => {
-              e.currentTarget.style.borderColor = 'var(--cpm-brand-violet)';
-              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(124,58,237,0.12)';
-            }}
-            onBlur={(e) => {
-              e.currentTarget.style.borderColor = 'var(--cpm-card-border-strong)';
-              e.currentTarget.style.boxShadow = 'none';
-            }}
-          />
-        </div>
+        {/* 步骤 */}
+        <ol style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {steps.map((step, i) => (
+            <li key={step} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <span
+                style={{
+                  width: 24,
+                  height: 24,
+                  borderRadius: '50%',
+                  background: 'var(--cpm-brand-violet-bg)',
+                  color: 'var(--cpm-brand-violet)',
+                  fontSize: 12,
+                  fontWeight: 700,
+                  display: 'grid',
+                  placeItems: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                {i + 1}
+              </span>
+              <span style={{ fontSize: 14, color: 'var(--cpm-text-secondary)' }}>{step}</span>
+            </li>
+          ))}
+        </ol>
 
-        {/* 错误提示 */}
-        {err && (
-          <motion.div
-            initial={{ opacity: 0, y: -6 }}
-            animate={{ opacity: 1, y: 0 }}
-            style={{
-              marginBottom: 16,
-              padding: '10px 14px',
-              borderRadius: 10,
-              background: 'rgba(239,68,68,0.08)',
-              border: '1px solid rgba(239,68,68,0.2)',
-              color: 'var(--cpm-danger)',
-              fontSize: 13,
-            }}
-          >
-            {err}
-          </motion.div>
-        )}
-
-        {/* 登录按钮 */}
-        <motion.button
-          type="button"
-          onClick={submit}
-          disabled={loading}
-          whileHover={loading ? undefined : { scale: 1.02 }}
-          whileTap={loading ? undefined : { scale: 0.97 }}
-          transition={{ type: 'spring', stiffness: 350, damping: 22 }}
-          style={{
-            display: 'block',
-            width: '100%',
-            padding: '13px 20px',
-            borderRadius: 12,
-            border: 'none',
-            background: loading
-              ? 'rgba(124,58,237,0.4)'
-              : 'linear-gradient(135deg, var(--cpm-brand-violet) 0%, #6d28d9 100%)',
-            color: '#fff',
-            fontSize: 15,
-            fontWeight: 600,
-            cursor: loading ? 'not-allowed' : 'pointer',
-            boxShadow: loading ? 'none' : 'var(--cpm-shadow-glow-violet)',
-            fontFamily: 'var(--cpm-font-sans)',
-            letterSpacing: '0.01em',
-            transition: 'background 0.2s',
-          }}
-        >
-          {loading ? '登录中...' : '登录'}
-        </motion.button>
-
-        {/* 底部提示 */}
         <div
           style={{
-            marginTop: 20,
+            marginTop: 24,
             padding: '12px 14px',
             borderRadius: 10,
             background: 'var(--cpm-brand-violet-bg)',
             border: '1px solid rgba(124,58,237,0.12)',
           }}
         >
-          <div style={{ fontSize: 12, color: 'var(--cpm-brand-violet)', fontWeight: 600, marginBottom: 2 }}>
-            DEMO 模式
-          </div>
           <div style={{ fontSize: 12, color: 'var(--cpm-text-tertiary)', lineHeight: 1.5 }}>
-            输入任意员工 User ID 即可登录。钉钉 OAuth 登录在后续 Phase 上线。
+            「前往后台」入口仅对授权管理员显示。如看不到，请联系管理员开通权限。
           </div>
         </div>
       </motion.div>

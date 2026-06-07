@@ -1,8 +1,9 @@
 import { usePassport } from '@cpm/api-client';
 import { BottomTabBar, PointsPill, SideNav, type TabItem, useBreakpoint } from '@cpm/ui';
-import { Gift, Sparkles, Target, Trophy, User } from 'lucide-react';
+import { ArrowLeft, Gift, Sparkles, Target, Trophy, User } from 'lucide-react';
 import { useMemo } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { BadgeCelebration } from './BadgeCelebration';
 
 interface ShellTab extends TabItem {
   path: string;
@@ -30,9 +31,15 @@ export function AppShell() {
     if (tab) navigate(tab.path);
   };
 
+  // 详情/子页（非 4 个 Tab 根路由）时，桌面端在顶栏显示返回；
+  // 移动端一律不显示（钉钉应用顶部自带返回）。全局统一，无需各页自带返回按钮。
+  const isRootTab = location.pathname === '/' || TABS.some((t) => t.path === location.pathname);
+  const showBack = !isRootTab;
+
   if (isDesktop) {
     return (
       <div style={{ display: 'flex', height: '100%', background: 'var(--cpm-app-bg)' }}>
+        <BadgeCelebration />
         <SideNav
           items={TABS}
           activeKey={activeKey}
@@ -70,6 +77,30 @@ export function AppShell() {
               borderBottom: '1px solid var(--cpm-border-subtle)',
             }}
           >
+            {showBack && (
+              <button
+                type="button"
+                onClick={() => navigate(-1)}
+                aria-label="返回"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  minHeight: 38,
+                  padding: '8px 14px 8px 10px',
+                  borderRadius: 10,
+                  border: '1px solid var(--cpm-border-subtle)',
+                  background: 'var(--cpm-surface)',
+                  color: 'var(--cpm-ink-1)',
+                  fontSize: 14,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  fontFamily: 'var(--cpm-font-sans)',
+                }}
+              >
+                <ArrowLeft size={18} /> 返回
+              </button>
+            )}
             <div style={{ flex: 1 }} />
             <PointsPill value={points} />
           </header>
@@ -83,6 +114,7 @@ export function AppShell() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: 'var(--cpm-app-bg)' }}>
+      <BadgeCelebration />
       <div style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
         <Outlet />
       </div>

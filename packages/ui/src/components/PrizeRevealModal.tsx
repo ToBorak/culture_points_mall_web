@@ -14,6 +14,12 @@ export interface PrizeRevealModalProps {
   rarityPct?: number;
   onClose: () => void;
   onAgain?: () => void;
+  /** 顶部小标题覆盖（默认中奖 CONGRATULATIONS / 未中奖 BETTER LUCK NEXT TIME）。兑换成功可传「兑换成功」 */
+  topLabel?: string;
+  /** 是否显示稀有度胶囊（盲盒用；积分兑换传 false） */
+  showTier?: boolean;
+  /** 关闭按钮文案（默认「收下」） */
+  closeLabel?: string;
 }
 
 const rarityTheme: Record<
@@ -100,6 +106,9 @@ export function PrizeRevealModal({
   rarityPct = 50,
   onClose,
   onAgain,
+  topLabel,
+  showTier = true,
+  closeLabel = '收下',
 }: PrizeRevealModalProps) {
   const tier = useMemo(() => tierOf(win, rarityPct), [win, rarityPct]);
   const t = rarityTheme[tier];
@@ -229,30 +238,32 @@ export function PrizeRevealModal({
               }}
             />
 
-            {/* 稀有度顶部胶囊 */}
-            <motion.div
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 }}
-              style={{
-                position: 'relative',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                padding: '5px 14px',
-                borderRadius: 999,
-                background: t.ring,
-                color: '#fff',
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: 0,
-                marginBottom: 16,
-                boxShadow: `0 6px 16px -4px ${t.glow}`,
-              }}
-            >
-              <TierIcon tier={tier} size={13} />
-              <span>{t.label.toUpperCase()}</span>
-            </motion.div>
+            {/* 稀有度顶部胶囊（盲盒用；积分兑换隐藏） */}
+            {showTier && (
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15 }}
+                style={{
+                  position: 'relative',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '5px 14px',
+                  borderRadius: 999,
+                  background: t.ring,
+                  color: '#fff',
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: 0,
+                  marginBottom: 16,
+                  boxShadow: `0 6px 16px -4px ${t.glow}`,
+                }}
+              >
+                <TierIcon tier={tier} size={13} />
+                <span>{t.label.toUpperCase()}</span>
+              </motion.div>
+            )}
 
             {/* 奖品图片 + 旋转光环 */}
             <div
@@ -331,7 +342,7 @@ export function PrizeRevealModal({
                 marginBottom: 4,
               }}
             >
-              {win ? 'CONGRATULATIONS' : 'BETTER LUCK NEXT TIME'}
+              {topLabel ?? (win ? 'CONGRATULATIONS' : 'BETTER LUCK NEXT TIME')}
             </motion.div>
 
             {/* 奖品名 */}
@@ -366,6 +377,10 @@ export function PrizeRevealModal({
               {win ? (
                 <>
                   已扣除 <strong style={{ color: t.text }}>{amount}</strong> 积分
+                </>
+              ) : amount > 0 ? (
+                <>
+                  本次未中奖，已扣除 <strong style={{ color: t.text }}>{amount}</strong> 积分，鼓励再接再厉
                 </>
               ) : (
                 <>
@@ -421,7 +436,7 @@ export function PrizeRevealModal({
                   backdropFilter: 'blur(4px)',
                 }}
               >
-                收下
+                {closeLabel}
               </motion.button>
             </motion.div>
           </motion.div>

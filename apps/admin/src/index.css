@@ -1,0 +1,11 @@
+/* admin 全局：撑满视口、去掉 body 默认 margin，外层不滚动（滚动只发生在主内容区内部） */
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+}

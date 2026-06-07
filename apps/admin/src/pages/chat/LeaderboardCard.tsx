@@ -10,9 +10,10 @@ export interface RawEntry {
   avatarUrl?: string;
   deptName?: string;
   score: number;
+  earned?: number;
 }
 
-// 后端 leaderboard.Entry 无 trend 字段，这里补 0 以满足组件的 LeaderboardEntry 形状。
+// 后端 Agent 工具结果可能缺少 trend / earned 字段，这里做展示兜底。
 function toEntry(e: RawEntry) {
   return {
     rank: e.rank,
@@ -21,6 +22,7 @@ function toEntry(e: RawEntry) {
     avatarUrl: e.avatarUrl ?? '',
     deptName: e.deptName ?? '',
     score: e.score,
+    earned: e.earned ?? e.score,
     trend: 0,
   };
 }

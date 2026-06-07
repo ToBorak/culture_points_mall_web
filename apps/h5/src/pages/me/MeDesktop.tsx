@@ -1,9 +1,10 @@
 import { BadgeCard, PointLedgerRow } from '@cpm/ui';
-import { AdminEntry, DnaEntry, MeEmpty, MeHero, MePanel, loadMoreStyle } from './MeParts';
+import { AdminEntry, DnaEntry, MeEmpty, MeHero, MePanel, loadMoreStyle, useIsAdmin } from './MeParts';
 import type { MeState } from './useMeState';
 
 export function MeDesktop(s: MeState) {
   const dimCount = s.dims.filter((d) => d.totalScore > 0).length;
+  const isAdmin = useIsAdmin();
   return (
     <div
       style={{
@@ -35,6 +36,11 @@ export function MeDesktop(s: MeState) {
         loading={s.p.isLoading}
       />
 
+      <div style={{ display: 'grid', gridTemplateColumns: isAdmin ? '1fr 1fr' : '1fr', gap: 18 }}>
+        <DnaEntry />
+        <AdminEntry />
+      </div>
+
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 22, alignItems: 'start' }}>
         <MePanel title="徽章墙">
           {s.badges.length === 0 ? (
@@ -48,32 +54,28 @@ export function MeDesktop(s: MeState) {
           )}
         </MePanel>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-          <DnaEntry />
-          <AdminEntry />
-          <MePanel title="积分流水">
-            {s.txItems.length === 0 && !s.txQ.isLoading ? (
-              <MeEmpty text="还没有积分流水" />
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {s.txItems.map((t) => (
-                  <PointLedgerRow key={t.id} tx={t} />
-                ))}
-                {s.txQ.hasNextPage && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      s.txQ.fetchNextPage();
-                    }}
-                    style={loadMoreStyle}
-                  >
-                    加载更多
-                  </button>
-                )}
-              </div>
-            )}
-          </MePanel>
-        </div>
+        <MePanel title="积分流水">
+          {s.txItems.length === 0 && !s.txQ.isLoading ? (
+            <MeEmpty text="还没有积分流水" />
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {s.txItems.map((t) => (
+                <PointLedgerRow key={t.id} tx={t} />
+              ))}
+              {s.txQ.hasNextPage && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    s.txQ.fetchNextPage();
+                  }}
+                  style={loadMoreStyle}
+                >
+                  加载更多
+                </button>
+              )}
+            </div>
+          )}
+        </MePanel>
       </div>
     </div>
   );

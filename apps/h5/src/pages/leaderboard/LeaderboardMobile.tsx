@@ -67,7 +67,8 @@ export function LeaderboardMobile(s: LeaderboardState) {
           <>
             {entries.length >= 3 && <PodiumTop3 entries={entries} />}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {entries.slice(3).map((e) => (
+              {/* ≥3 人时前 3 名已在领奖台展示，列表从第 4 名起；不足 3 人时领奖台不出现，整张榜单都在这里展示 */}
+              {(entries.length >= 3 ? entries.slice(3) : entries).map((e) => (
                 <LeaderboardRow key={e.userId} entry={e} highlight={e.userId === myEntry?.userId} />
               ))}
             </div>
@@ -118,7 +119,12 @@ export function LeaderboardMobile(s: LeaderboardState) {
             >
               {myEntry.score.toLocaleString('en-US')}
             </span>
-            <TrendIndicator value={myEntry.trend} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ fontFamily: 'var(--cpm-font-sans)', fontSize: 10.5, color: 'var(--cpm-ink-2)' }}>
+                累计 {(myEntry.earned ?? 0).toLocaleString('en-US')}
+              </span>
+              <TrendIndicator value={myEntry.trend} />
+            </div>
           </div>
         </div>
       )}

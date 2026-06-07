@@ -35,18 +35,81 @@ export function AuthGate({ children }: { children: ReactNode }) {
   }, [token, setSession]);
 
   if (status !== 'ready') {
-    return (
-      <div className="p-6 font-kuaile">
-        {status === 'error' ? (
-          <div>
-            <div>登录失败</div>
-            <div style={{ fontSize: 12, color: '#888', marginTop: 8, wordBreak: 'break-all' }}>{err}</div>
-          </div>
-        ) : (
-          '登录中...'
-        )}
-      </div>
-    );
+    return <LoginScreen error={status === 'error' ? err : null} />;
   }
   return <>{children}</>;
+}
+
+// 进入文化官时的全屏登录态：品牌化的「登录中」与「登录失败」，替代旧的白屏「登录中...」。
+function LoginScreen({ error }: { error: string | null }) {
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 16,
+        padding: 24,
+        textAlign: 'center',
+        background: 'var(--cpm-app-bg)',
+        fontFamily: 'var(--cpm-font-sans)',
+      }}
+    >
+      <div
+        style={{
+          width: 64,
+          height: 64,
+          borderRadius: 20,
+          background: 'var(--cpm-grad-brand)',
+          display: 'grid',
+          placeItems: 'center',
+          boxShadow: 'var(--cpm-elev-candy)',
+          color: '#fff',
+          fontSize: 30,
+          lineHeight: 1,
+        }}
+      >
+        ✦
+      </div>
+      <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--cpm-ink-1)', letterSpacing: '0.04em' }}>文化官</div>
+
+      {error ? (
+        <>
+          <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--cpm-ink-1)', marginTop: 2 }}>登录失败</div>
+          <div
+            style={{
+              fontSize: 12.5,
+              color: 'var(--cpm-ink-2)',
+              maxWidth: 300,
+              lineHeight: 1.6,
+              wordBreak: 'break-all',
+            }}
+          >
+            {error}
+          </div>
+          <div style={{ fontSize: 12.5, color: 'var(--cpm-ink-2)', marginTop: 2 }}>
+            请退出后在钉钉里重新打开「文化官」重试
+          </div>
+        </>
+      ) : (
+        <>
+          <div
+            className="cpm-spinner"
+            style={{
+              width: 24,
+              height: 24,
+              borderRadius: '50%',
+              border: '2.5px solid var(--cpm-primary-soft)',
+              borderTopColor: 'var(--cpm-primary)',
+              marginTop: 2,
+            }}
+          />
+          <div style={{ fontSize: 13.5, color: 'var(--cpm-ink-2)' }}>正在通过钉钉验证身份…</div>
+        </>
+      )}
+    </div>
+  );
 }

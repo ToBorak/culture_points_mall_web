@@ -16,7 +16,8 @@ export function AdminLayout({ children }: { children: ReactNode }) {
     <div
       style={{
         display: 'flex',
-        minHeight: '100vh',
+        height: '100vh',
+        overflow: 'hidden',
         background: 'var(--cpm-bg-0)',
         fontFamily: 'var(--cpm-font-sans)',
         position: 'relative',

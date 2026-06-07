@@ -9,6 +9,7 @@ const base: LeaderboardEntry = {
   avatarUrl: '',
   deptName: '市场部',
   score: 2040,
+  earned: 2680,
   trend: 2,
 };
 

@@ -1,6 +1,6 @@
 import { useMallItems, useMyOrders, usePassport, useRedeemItem } from '@cpm/api-client';
 import type { MallItem } from '@cpm/types';
-import { PointsPill, useBreakpoint } from '@cpm/ui';
+import { PointsPill, PrizeRevealModal, useBreakpoint } from '@cpm/ui';
 import { Coins, Gift, Package, Sparkles, X } from 'lucide-react';
 import { type CSSProperties, type ReactNode, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -83,8 +83,9 @@ function GoodRow({
   redeeming,
   onRedeem,
 }: { item: MallItem; affordable: boolean; redeeming: boolean; onRedeem: (item: MallItem) => void }) {
+  const placeholder = item.Cost <= 0; // 「实时上新」占位商品，不可兑换
   const out = item.Stock !== null && item.Stock <= 0;
-  const disabled = out || !affordable || redeeming;
+  const disabled = placeholder || out || !affordable || redeeming;
   const handleRedeem = () => {
     if (disabled) return;
     onRedeem(item);
@@ -107,34 +108,55 @@ function GoodRow({
         <div style={{ fontFamily: 'var(--cpm-font-sans)', fontWeight: 600, fontSize: 14, color: 'var(--cpm-ink-1)' }}>
           {item.Name}
         </div>
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 4,
-            marginTop: 3,
-            fontFamily: 'var(--cpm-font-num)',
-            fontWeight: 800,
-            fontSize: 15,
-            color: 'var(--cpm-gold-ink)',
-          }}
-        >
-          <Coins size={14} style={{ color: 'var(--cpm-gold)' }} />
-          {item.Cost}
-          {item.Stock !== null && (
-            <span
-              style={{
-                fontFamily: 'var(--cpm-font-sans)',
-                fontWeight: 500,
-                fontSize: 11,
-                color: 'var(--cpm-ink-2)',
-                marginLeft: 6,
-              }}
-            >
-              库存 {item.Stock}
-            </span>
-          )}
-        </div>
+        {placeholder ? (
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
+              marginTop: 4,
+              padding: '3px 9px',
+              borderRadius: 999,
+              background: 'var(--cpm-primary-soft)',
+              color: 'var(--cpm-primary-strong)',
+              fontFamily: 'var(--cpm-font-sans)',
+              fontWeight: 700,
+              fontSize: 12,
+            }}
+          >
+            <Sparkles size={12} aria-hidden />
+            实时上新
+          </div>
+        ) : (
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              marginTop: 3,
+              fontFamily: 'var(--cpm-font-num)',
+              fontWeight: 800,
+              fontSize: 15,
+              color: 'var(--cpm-gold-ink)',
+            }}
+          >
+            <Coins size={14} style={{ color: 'var(--cpm-gold)' }} />
+            {item.Cost}
+            {item.Stock !== null && (
+              <span
+                style={{
+                  fontFamily: 'var(--cpm-font-sans)',
+                  fontWeight: 500,
+                  fontSize: 11,
+                  color: 'var(--cpm-ink-2)',
+                  marginLeft: 6,
+                }}
+              >
+                库存 {item.Stock}
+              </span>
+            )}
+          </div>
+        )}
       </div>
       <button
         type="button"
@@ -156,7 +178,7 @@ function GoodRow({
           transition: 'all 200ms ease',
         }}
       >
-        {redeeming ? '兑换中…' : out ? '已售罄' : !affordable ? '积分不足' : '兑换'}
+        {placeholder ? '敬请期待' : redeeming ? '兑换中…' : out ? '已售罄' : !affordable ? '积分不足' : '兑换'}
       </button>
     </div>
   );
@@ -185,7 +207,14 @@ function ShopView({
       {blindboxes.length > 0 && (
         <section style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <SectionTitle icon={<Sparkles size={16} style={{ color: 'var(--cpm-primary)' }} />} text="盲盒抽奖" />
-          <div style={gridStyle(isDesktop, 320)}>
+          {/* 桌面端盲盒用两列网格：单个盲盒只占半屏，不全宽铺满 */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: isDesktop ? 'repeat(2, minmax(0, 1fr))' : '1fr',
+              gap: isDesktop ? 14 : 10,
+            }}
+          >
             {blindboxes.map((b) => (
               <button
                 key={b.ID}
@@ -539,6 +568,9 @@ export function MallPage() {
   const [view, setView] = useState<'shop' | 'orders'>('shop');
   const [redeemItem, setRedeemItem] = useState<MallItem | null>(null);
   const [redeemError, setRedeemError] = useState<string | null>(null);
+  const [redeemSuccess, setRedeemSuccess] = useState<{ name: string; cost: number; image: string } | null>(
+    null,
+  );
   const itemsQ = useMallItems();
   const points = usePassport().data?.totalScore ?? 0;
   const redeem = useRedeemItem();
@@ -560,8 +592,10 @@ export function MallPage() {
   const confirmRedeem = () => {
     if (!redeemItem || redeem.isPending) return;
     setRedeemError(null);
+    const image = redeemItem.ImageURL;
     redeem.mutate(redeemItem.ID, {
-      onSuccess: () => {
+      onSuccess: (res) => {
+        setRedeemSuccess({ name: res.itemName, cost: res.cost, image });
         setRedeemItem(null);
       },
       onError: (e) => {
@@ -625,6 +659,17 @@ export function MallPage() {
         error={redeemError}
         onClose={closeRedeem}
         onConfirm={confirmRedeem}
+      />
+      <PrizeRevealModal
+        open={!!redeemSuccess}
+        win
+        topLabel="兑换成功"
+        showTier={false}
+        closeLabel="完成"
+        prizeName={redeemSuccess?.name ?? ''}
+        prizeImage={redeemSuccess?.image}
+        amount={redeemSuccess?.cost ?? 0}
+        onClose={() => setRedeemSuccess(null)}
       />
     </div>
   );

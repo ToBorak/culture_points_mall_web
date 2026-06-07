@@ -119,9 +119,15 @@ export function LeaderboardDesktop(s: LeaderboardState) {
                   </div>
                   <div style={{ display: 'flex', gap: 24, marginTop: 16 }}>
                     <div>
-                      <div style={{ opacity: 0.8, fontSize: 11 }}>我的文化分</div>
+                      <div style={{ opacity: 0.8, fontSize: 11 }}>当前文化分</div>
                       <div style={{ fontFamily: 'var(--cpm-font-num)', fontSize: 18, fontWeight: 800 }}>
                         {myEntry.score.toLocaleString('en-US')}
+                      </div>
+                    </div>
+                    <div>
+                      <div style={{ opacity: 0.8, fontSize: 11 }}>累计获得</div>
+                      <div style={{ fontFamily: 'var(--cpm-font-num)', fontSize: 18, fontWeight: 800 }}>
+                        {(myEntry.earned ?? 0).toLocaleString('en-US')}
                       </div>
                     </div>
                     <div>
