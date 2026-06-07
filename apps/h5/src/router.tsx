@@ -7,6 +7,10 @@ import { LeaderboardPage } from './pages/leaderboard/LeaderboardPage';
 import { BlindboxDrawPage } from './pages/mall/BlindboxDrawPage';
 import { MallPage } from './pages/mall/MallPage';
 import { MePage } from './pages/me/MePage';
+import { CultureQAPage } from './pages/publications/CultureQAPage';
+import { MyNominationsPage } from './pages/publications/MyNominationsPage';
+import { NominatePage } from './pages/publications/NominatePage';
+import { PublicationsPage } from './pages/publications/PublicationsPage';
 import { SigninPage } from './pages/signin/SigninPage';
 
 export function AppRouter() {
@@ -20,6 +24,10 @@ export function AppRouter() {
         <Route path="/activities/:id" element={<ActivityDetailPage />} />
         <Route path="/mall" element={<MallPage />} />
         <Route path="/mall/blindbox/:id" element={<BlindboxDrawPage />} />
+        <Route path="/publications" element={<PublicationsPage />} />
+        <Route path="/publications/nominate" element={<NominatePage />} />
+        <Route path="/publications/mine" element={<MyNominationsPage />} />
+        <Route path="/publications/qa" element={<CultureQAPage />} />
         <Route path="/me" element={<MePage />} />
       </Route>
       {/* 全屏路由（不带外壳） */}
