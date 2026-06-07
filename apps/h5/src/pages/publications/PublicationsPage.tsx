@@ -6,8 +6,8 @@ import type React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PubSection } from './SectionRenderer';
 
-// 文化刊固定栏目顺序（前端写死，不依赖后台配置）；leaderboard / editorial 不在此展示。
-const SECTION_ORDER = ['star', 'values', 'honors', 'lottery', 'activity', 'innovation', 'custom'];
+// 文化刊固定栏目顺序（前端写死，不依赖后台配置）；leaderboard / activity / custom(领导寄语) / editorial 不展示。
+const SECTION_ORDER = ['star', 'values', 'honors', 'lottery', 'innovation'];
 
 export function PublicationsPage() {
   const nav = useNavigate();
