@@ -10,3 +10,7 @@ storybook-static/
 **/vite.config.ts.timestamp-*
 
 e2e/test-results/
+
+# IDE / local config
+.idea/
+.claude/

@@ -1,15 +1,44 @@
 import { Button } from '@cpm/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { ActivityScheduleForm } from './ActivityScheduleForm';
+import { BatchCard } from './BatchCard';
+import { MallBatchTable } from './MallBatchTable';
 import { SessionsSidebar } from './SessionsSidebar';
+import { SlotForm } from './SlotForm';
 import { StepBubble } from './StepBubble';
+import { Suggestions } from './Suggestions';
 import { useAgentChat } from './useAgentChat';
 
 export function ChatPage() {
-  const { turns, busy, send, publishActivity, formOpen, formPrefill, openForm, closeForm } = useAgentChat();
+  const {
+    turns,
+    busy,
+    send,
+    publishActivity,
+    formOpen,
+    formPrefill,
+    openForm,
+    closeForm,
+    slotForm,
+    closeSlotForm,
+    submitSlot,
+    batch,
+    closeBatch,
+    submitBatch,
+    batchForm,
+    closeBatchForm,
+    submitBatchForm,
+    undo,
+    sessionId,
+    sessionsVersion,
+    loadSession,
+    newSession,
+    endSession,
+  } = useAgentChat();
   const [text, setText] = useState('');
-  const [activeSessionId, setActiveSessionId] = useState<number | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -17,20 +46,20 @@ export function ChatPage() {
     scrollRef.current?.scrollTo({ top: 1e6, behavior: 'smooth' });
   });
 
+  // 从「AI 智能搜索」点历史会话进来：/chat?session=<id> → 加载该会话并清掉参数
+  useEffect(() => {
+    const sid = searchParams.get('session');
+    if (sid) {
+      void loadSession(Number(sid));
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, loadSession, setSearchParams]);
+
   const submit = () => {
     if (!text.trim() || busy) return;
     void send(text.trim());
     setText('');
     textareaRef.current?.focus();
-  };
-
-  const onPickSession = (id: number) => {
-    setActiveSessionId(id);
-  };
-
-  const clearChat = () => {
-    // 仅前端清空视图（后续 Phase 补完完整加载历史）
-    window.location.reload();
   };
 
   return (
@@ -43,7 +72,14 @@ export function ChatPage() {
       }}
     >
       {/* Sessions sidebar */}
-      <SessionsSidebar onPick={onPickSession} activeId={activeSessionId} />
+      <SessionsSidebar
+        onPick={(id) => {
+          void loadSession(id);
+        }}
+        onNew={newSession}
+        activeId={sessionId}
+        reloadKey={sessionsVersion}
+      />
 
       {/* 主聊天区 */}
       <div
@@ -123,23 +159,27 @@ export function ChatPage() {
           </motion.button>
           <motion.button
             type="button"
-            onClick={clearChat}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.94 }}
+            onClick={() => {
+              void endSession();
+            }}
+            disabled={turns.length === 0}
+            whileHover={{ scale: turns.length === 0 ? 1 : 1.05 }}
+            whileTap={{ scale: turns.length === 0 ? 1 : 0.94 }}
             transition={{ type: 'spring', stiffness: 350, damping: 22 }}
+            title="结束当前会话并归档摘要，开启新会话"
             style={{
               padding: '5px 12px',
               borderRadius: 8,
               border: '1px solid var(--cpm-card-border-strong)',
               background: 'transparent',
-              color: 'var(--cpm-text-tertiary)',
+              color: turns.length === 0 ? 'var(--cpm-text-muted)' : 'var(--cpm-text-tertiary)',
               fontSize: 12,
               fontWeight: 500,
-              cursor: 'pointer',
+              cursor: turns.length === 0 ? 'default' : 'pointer',
               fontFamily: 'var(--cpm-font-sans)',
             }}
           >
-            清空
+            结束会话
           </motion.button>
         </div>
 
@@ -194,8 +234,13 @@ export function ChatPage() {
                 HR-Agent 已就绪
               </div>
               <div style={{ fontSize: 13, color: 'var(--cpm-text-tertiary)', lineHeight: 1.6 }}>
-                你可以说：「发布一场下周的团队协作分享会，奖励 50 分」
+                你可以说：「发布一场下周的坦诚沟通分享会，奖励 50 分」
               </div>
+              <Suggestions
+                onPick={(s) => {
+                  void send(s);
+                }}
+              />
             </motion.div>
           )}
 
@@ -234,7 +279,7 @@ export function ChatPage() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingLeft: 4 }}>
                   {t.steps.map((s, j) => (
                     // biome-ignore lint/suspicious/noArrayIndexKey: steps have no stable ID; order-stable within a turn
-                    <StepBubble key={j} step={s} />
+                    <StepBubble key={j} step={s} onUndo={undo} />
                   ))}
                 </div>
               </motion.div>
@@ -287,6 +332,45 @@ export function ChatPage() {
                 void publishActivity(payload);
               }}
               onCancel={closeForm}
+            />
+          </div>
+        )}
+
+        {/* 对话式收集信息表单（ask_user / 积分·商品·徽章·日程卡片）：同样停靠输入框上方 */}
+        {slotForm && (
+          <div style={{ padding: '12px 20px 0', flexShrink: 0, background: 'var(--cpm-bg-0)' }}>
+            <SlotForm
+              spec={slotForm}
+              onSubmit={(text) => {
+                void submitSlot(text);
+              }}
+              onCancel={closeSlotForm}
+            />
+          </div>
+        )}
+
+        {/* 商品批量表格（open_mall_batch）：停靠输入框上方 */}
+        {batch && (
+          <div style={{ padding: '12px 20px 0', flexShrink: 0, background: 'var(--cpm-bg-0)' }}>
+            <MallBatchTable
+              spec={batch}
+              onSubmit={(text) => {
+                void submitBatch(text);
+              }}
+              onCancel={closeBatch}
+            />
+          </div>
+        )}
+
+        {/* 通用批量卡（积分/活动）：停靠输入框上方 */}
+        {batchForm && (
+          <div style={{ padding: '12px 20px 0', flexShrink: 0, background: 'var(--cpm-bg-0)' }}>
+            <BatchCard
+              spec={batchForm}
+              onSubmit={(text) => {
+                void submitBatchForm(text);
+              }}
+              onCancel={closeBatchForm}
             />
           </div>
         )}

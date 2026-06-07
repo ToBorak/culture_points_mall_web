@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { AiSearch } from './AiSearch';
 import { Sidebar } from './Sidebar';
 
 const meshStyle: React.CSSProperties = {
@@ -96,26 +97,8 @@ export function AdminLayout({ children }: { children: ReactNode }) {
             gap: 16,
           }}
         >
-          {/* 搜索框占位 */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '7px 14px',
-              borderRadius: 10,
-              border: '1px solid var(--cpm-card-border)',
-              background: 'rgba(15,23,42,0.03)',
-              color: 'var(--cpm-text-muted)',
-              fontSize: 13,
-              flex: 1,
-              maxWidth: 320,
-              cursor: 'text',
-            }}
-          >
-            <span style={{ fontSize: 14, opacity: 0.5 }}>⌕</span>
-            <span>搜索...</span>
-          </div>
+          {/* AI 智能搜索：自然语言 → 跳到最匹配的后台功能 */}
+          <AiSearch />
 
           {/* 右侧操作区 */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>

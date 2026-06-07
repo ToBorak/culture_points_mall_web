@@ -1,16 +1,16 @@
+import {
+  AiCoachCard,
+  type AiCoachData,
+  AuroraBg,
+  ChallengeCard,
+  type ChallengeData,
+  type ChallengeSubmitResult,
+} from '@cpm/ui';
+import axios from 'axios';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
-import {
-  AuroraBg,
-  AiCoachCard,
-  ChallengeCard,
-  type AiCoachData,
-  type ChallengeData,
-  type ChallengeSubmitResult,
-} from '@cpm/ui';
 
 interface Passport {
   totalScore: number;
@@ -45,11 +45,9 @@ const iconEntries = [
 
 const dimColor: Record<string, string> = {
   customer_first: '#f97316',
-  team_collab: '#0ea5e9',
+  candor: '#0ea5e9',
   innovation: '#ec4899',
-  integrity: '#10b981',
-  craftsmanship: '#8b5cf6',
-  growth: '#eab308',
+  ownership: '#10b981',
 };
 
 function levelOf(total: number) {
@@ -64,18 +62,24 @@ export function HomePage() {
   const [pp, setPp] = useState<Passport | null>(null);
   const [coach, setCoach] = useState<AiCoachData | null>(null);
   const [challenge, setChallenge] = useState<ChallengeData | null>(null);
-  const [layout, setLayout] = useState<LayoutConfig | null>(null);
+  // 首页模块顺序用固定默认布局（后台「首页编排」已下线，不再请求 /api/v1/layout）
+  const [layout] = useState<LayoutConfig>(DEFAULT_LAYOUT);
 
   useEffect(() => {
     const token = localStorage.getItem('cpm_jwt');
     const h = { Authorization: `Bearer ${token}` };
-    axios.get<Passport>('/api/v1/me/passport', { headers: h }).then((r) => setPp(r.data)).catch(() => {});
-    axios.get<AiCoachData>('/api/v1/me/coach', { headers: h }).then((r) => setCoach(r.data)).catch(() => {});
-    axios.get<ChallengeData>('/api/v1/me/challenge/today', { headers: h }).then((r) => setChallenge(r.data)).catch(() => {});
     axios
-      .get<LayoutConfig>('/api/v1/layout', { headers: h })
-      .then((r) => setLayout(r.data))
-      .catch(() => setLayout(DEFAULT_LAYOUT));
+      .get<Passport>('/api/v1/me/passport', { headers: h })
+      .then((r) => setPp(r.data))
+      .catch(() => {});
+    axios
+      .get<AiCoachData>('/api/v1/me/coach', { headers: h })
+      .then((r) => setCoach(r.data))
+      .catch(() => {});
+    axios
+      .get<ChallengeData>('/api/v1/me/challenge/today', { headers: h })
+      .then((r) => setChallenge(r.data))
+      .catch(() => {});
   }, []);
 
   const submitChallenge = async (proof: string): Promise<ChallengeSubmitResult> => {
@@ -106,8 +110,7 @@ export function HomePage() {
         position: 'relative',
         borderRadius: 24,
         padding: 22,
-        background:
-          'linear-gradient(135deg, #fef3ff 0%, #f0e9ff 40%, #e0f2fe 100%)',
+        background: 'linear-gradient(135deg, #fef3ff 0%, #f0e9ff 40%, #e0f2fe 100%)',
         border: '1px solid rgba(255,255,255,0.6)',
         boxShadow: 'var(--cpm-shadow-pop)',
         overflow: 'hidden',
@@ -199,9 +202,7 @@ export function HomePage() {
           </div>
           <div style={{ flex: 1 }} />
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--cpm-text-primary)' }}>
-              {pp?.badgeCount ?? 0}
-            </div>
+            <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--cpm-text-primary)' }}>{pp?.badgeCount ?? 0}</div>
             <div style={{ fontSize: 11, color: 'var(--cpm-text-tertiary)' }}>徽章</div>
           </div>
           <div style={{ textAlign: 'center' }}>
@@ -324,9 +325,7 @@ export function HomePage() {
               >
                 {it.icon}
               </div>
-              <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--cpm-text-primary)' }}>
-                {it.label}
-              </span>
+              <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--cpm-text-primary)' }}>{it.label}</span>
             </motion.div>
           </Link>
         </motion.div>
@@ -334,9 +333,7 @@ export function HomePage() {
     </motion.section>
   );
 
-  const challengeNode: ReactNode = (
-    <ChallengeCard data={challenge} loading={!challenge} onSubmit={submitChallenge} />
-  );
+  const challengeNode: ReactNode = <ChallengeCard data={challenge} loading={!challenge} onSubmit={submitChallenge} />;
 
   const coachNode: ReactNode = <AiCoachCard data={coach} loading={!coach} />;
 
@@ -415,8 +412,7 @@ export function HomePage() {
           position: 'relative',
           borderRadius: 20,
           padding: 18,
-          background:
-            'linear-gradient(135deg, #ffe4e6 0%, #fce7f3 60%, #f3e8ff 100%)',
+          background: 'linear-gradient(135deg, #ffe4e6 0%, #fce7f3 60%, #f3e8ff 100%)',
           border: '1px solid rgba(255,255,255,0.6)',
           boxShadow: 'var(--cpm-shadow-soft)',
           overflow: 'hidden',
@@ -527,9 +523,7 @@ export function HomePage() {
           >
             #1
           </div>
-          <div style={{ fontSize: 11, color: 'var(--cpm-text-tertiary)', marginTop: 4 }}>
-            超越 98% 同事
-          </div>
+          <div style={{ fontSize: 11, color: 'var(--cpm-text-tertiary)', marginTop: 4 }}>超越 98% 同事</div>
         </div>
       </Link>
       <Link to="/activities" style={{ textDecoration: 'none' }}>
@@ -557,9 +551,7 @@ export function HomePage() {
           >
             测试月底冲刺
           </div>
-          <div style={{ fontSize: 11, color: 'var(--cpm-text-tertiary)', marginTop: 6 }}>
-            团队协作 · 奖励 50 分
-          </div>
+          <div style={{ fontSize: 11, color: 'var(--cpm-text-tertiary)', marginTop: 6 }}>坦诚沟通 · 奖励 50 分</div>
         </div>
       </Link>
     </motion.section>

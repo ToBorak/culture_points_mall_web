@@ -31,10 +31,13 @@
   --cpm-brand-amber: #d97706;
   --cpm-brand-amber-bg: rgba(217, 119, 6, 0.08);
 
-  /* === 6 维度色 === */
+  /* === 维度色（启用 4 个）=== */
   --cpm-dim-customer_first: #f97316;
-  --cpm-dim-team_collab: #0ea5e9;
+  --cpm-dim-candor: #0ea5e9;
+  --cpm-dim-ownership: #10b981;
   --cpm-dim-innovation: #ec4899;
+  /* 旧维度色：保留供 --cpm-yellow 等别名与统计卡片引用 */
+  --cpm-dim-team_collab: #0ea5e9;
   --cpm-dim-integrity: #10b981;
   --cpm-dim-craftsmanship: #8b5cf6;
   --cpm-dim-growth: #eab308;

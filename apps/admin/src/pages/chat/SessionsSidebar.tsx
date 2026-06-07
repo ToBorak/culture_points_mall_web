@@ -5,24 +5,28 @@ import { useEffect, useState } from 'react';
 interface Sess {
   ID: number;
   Title: string;
+  Summary?: string;
   CreatedAt: string;
 }
 
 interface Props {
   onPick: (id: number) => void;
+  onNew: () => void;
   activeId?: number | null;
+  reloadKey?: number;
 }
 
-export function SessionsSidebar({ onPick, activeId }: Props) {
+export function SessionsSidebar({ onPick, onNew, activeId, reloadKey }: Props) {
   const [rows, setRows] = useState<Sess[]>([]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reloadKey 仅作刷新触发器
   useEffect(() => {
     const token = localStorage.getItem('cpm_admin_jwt');
     axios
       .get<{ items: Sess[] | null }>('/admin/agent/sessions', { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => setRows(r.data.items ?? []))
       .catch(() => {});
-  }, []);
+  }, [reloadKey]);
 
   return (
     <aside
@@ -40,6 +44,7 @@ export function SessionsSidebar({ onPick, activeId }: Props) {
       <div style={{ padding: '14px 12px 10px' }}>
         <motion.button
           type="button"
+          onClick={onNew}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.96 }}
           transition={{ type: 'spring', stiffness: 350, damping: 22 }}
@@ -127,8 +132,18 @@ export function SessionsSidebar({ onPick, activeId }: Props) {
                   >
                     {s.Title || '未命名会话'}
                   </div>
-                  <div style={{ fontSize: 11, color: 'var(--cpm-text-muted)', marginTop: 2 }}>
-                    {(s.CreatedAt ?? '').slice(0, 10)}
+                  <div
+                    style={{
+                      fontSize: 11,
+                      color: 'var(--cpm-text-muted)',
+                      marginTop: 2,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                    title={s.Summary || undefined}
+                  >
+                    {s.Summary ? s.Summary : (s.CreatedAt ?? '').slice(0, 10)}
                   </div>
                 </button>
               </motion.li>

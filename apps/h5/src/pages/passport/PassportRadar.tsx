@@ -12,11 +12,9 @@ const isLowEndDevice = () => {
 
 const colorByCode: Record<string, string> = {
   customer_first: '#ff9f43',
-  team_collab: '#4facfe',
+  candor: '#4facfe',
   innovation: '#ff7eb3',
-  integrity: '#6dd5a3',
-  craftsmanship: '#a55eea',
-  growth: '#ffd93d',
+  ownership: '#6dd5a3',
 };
 
 export function PassportRadar({ scoresByDimension }: PassportRadarProps) {

@@ -112,7 +112,6 @@ export function MockOutboxPage() {
     <div>
       <PageHeader
         title="钉钉推送"
-        subtitle="演示用 · 展示系统接入真钉钉时会发什么"
         badge={<LiveBadge />}
       />
 

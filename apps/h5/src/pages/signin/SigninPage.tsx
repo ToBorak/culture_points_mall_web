@@ -11,15 +11,13 @@ interface Quiz {
 
 type Step = 'gps' | 'quiz' | 'submit' | 'ok' | 'fail';
 
-const QUIZ_OPTIONS = ['客户至上', '团队协作', '创新求变', '诚信务实', '极致专注', '学习成长'];
+const QUIZ_OPTIONS = ['客户第一', '坦诚沟通', '一号位', '敢于创新'];
 
 const QUIZ_COLORS = [
   { bg: 'rgba(249,115,22,0.10)', color: '#f97316' },
   { bg: 'rgba(14,165,233,0.10)', color: '#0ea5e9' },
-  { bg: 'rgba(236,72,153,0.10)', color: '#ec4899' },
   { bg: 'rgba(16,185,129,0.10)', color: '#10b981' },
-  { bg: 'rgba(139,92,246,0.10)', color: '#8b5cf6' },
-  { bg: 'rgba(234,179,8,0.10)', color: '#eab308' },
+  { bg: 'rgba(236,72,153,0.10)', color: '#ec4899' },
 ];
 
 // animated counting number
@@ -50,7 +48,7 @@ export function SigninPage() {
   const [earnedPoints, setEarnedPoints] = useState(0);
   const [quiz] = useState<Quiz>({
     question: '今天活动主题中哪个价值观最重要？',
-    expect: '客户至上',
+    expect: '客户第一',
   });
 
   useEffect(() => {

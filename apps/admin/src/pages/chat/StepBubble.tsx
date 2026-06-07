@@ -1,9 +1,19 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { type CSSProperties, useState } from 'react';
+import { LeaderboardCard, type RawEntry } from './LeaderboardCard';
+import { MallItemsCard, type RawItem } from './MallItemsCard';
+import { Markdown } from './Markdown';
 import type { Step } from './types';
+
+export interface UndoDescriptor {
+  label?: string;
+  action: string;
+  params?: Record<string, unknown>;
+}
 
 interface Props {
   step: Step;
+  onUndo?: (undo: UndoDescriptor) => void;
 }
 
 function CollapseBtn({
@@ -54,8 +64,10 @@ const codeStyle: CSSProperties = {
   color: '#9a3412',
 };
 
-export function StepBubble({ step }: Props) {
+export function StepBubble({ step, onUndo }: Props) {
   const [open, setOpen] = useState(false);
+  const [undone, setUndone] = useState(false);
+  const undo = (step.output as { _undo?: UndoDescriptor } | undefined)?._undo;
 
   if (step.kind === 'llm_text') {
     return (
@@ -75,10 +87,9 @@ export function StepBubble({ step }: Props) {
           lineHeight: 1.65,
           color: 'var(--cpm-text-primary)',
           fontFamily: 'var(--cpm-font-sans)',
-          whiteSpace: 'pre-wrap',
         }}
       >
-        {step.text}
+        <Markdown text={step.text ?? ''} />
       </motion.div>
     );
   }
@@ -165,6 +176,34 @@ export function StepBubble({ step }: Props) {
 
   if (step.kind === 'tool_result') {
     const isErr = Boolean(step.error);
+    // 只读查询的结果直接渲染成漂亮组件（排行榜对齐 H5 样式、商品列表），而非折叠 JSON。
+    if (!isErr) {
+      const out = step.output as { entries?: RawEntry[]; items?: RawItem[] } | undefined;
+      if (step.toolName === 'get_leaderboard' && Array.isArray(out?.entries)) {
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            style={{ maxWidth: '80%' }}
+          >
+            <LeaderboardCard entries={out.entries} />
+          </motion.div>
+        );
+      }
+      if (step.toolName === 'list_mall_items' && Array.isArray(out?.items)) {
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            style={{ maxWidth: '80%' }}
+          >
+            <MallItemsCard items={out.items} />
+          </motion.div>
+        );
+      }
+    }
     const borderColor = isErr ? 'rgba(239,68,68,0.3)' : 'rgba(16,185,129,0.3)';
     const bgColor = isErr ? 'rgba(239,68,68,0.04)' : 'rgba(16,185,129,0.04)';
     const iconBg = isErr ? 'rgba(239,68,68,0.12)' : 'rgba(16,185,129,0.12)';
@@ -220,6 +259,33 @@ export function StepBubble({ step }: Props) {
           >
             {isErr ? `${step.toolName} 出错` : `${step.toolName} 完成`}
           </span>
+          {!isErr && onUndo && undo && (
+            <button
+              type="button"
+              disabled={undone}
+              onClick={() => {
+                onUndo(undo);
+                setUndone(true);
+              }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                padding: '3px 10px',
+                borderRadius: 6,
+                border: `1px solid ${undone ? 'rgba(15,23,42,0.12)' : 'rgba(217,119,6,0.35)'}`,
+                background: undone ? 'rgba(15,23,42,0.04)' : 'rgba(245,158,11,0.1)',
+                color: undone ? 'var(--cpm-text-muted)' : '#b45309',
+                fontSize: 11,
+                fontWeight: 600,
+                cursor: undone ? 'default' : 'pointer',
+                fontFamily: 'var(--cpm-font-sans)',
+              }}
+              title={undo.label}
+            >
+              {undone ? '已回撤' : '↩ 回撤'}
+            </button>
+          )}
           {!isErr && <CollapseBtn open={open} onToggle={() => setOpen((p) => !p)} label="输出" />}
         </div>
         {isErr && (

@@ -2,6 +2,7 @@ import { Button } from '@cpm/ui';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import { type CSSProperties, useEffect, useMemo, useState } from 'react';
+import { UserDeptTree } from './UserDeptTree';
 
 interface Dimension {
   id: number;
@@ -14,11 +15,6 @@ interface Room {
   capacity: number;
   location: string;
 }
-interface UserItem {
-  id: number;
-  dingUserId: string;
-  name: string;
-}
 interface Robot {
   id: string;
   name: string;
@@ -30,6 +26,7 @@ export interface PublishPayload {
   startAt: string;
   endAt: string;
   pointsReward: number;
+  createSchedule: boolean;
   location: string;
   roomIds: string[];
   attendeeAll: boolean;
@@ -75,7 +72,6 @@ const inputStyle: CSSProperties = {
 export function ActivityScheduleForm({ prefill, onSubmit, onCancel }: Props) {
   const [dims, setDims] = useState<Dimension[]>([]);
   const [rooms, setRooms] = useState<Room[]>([]);
-  const [users, setUsers] = useState<UserItem[]>([]);
   const [robots, setRobots] = useState<Robot[]>([]);
   const [roomsErr, setRoomsErr] = useState<string>('');
 
@@ -89,6 +85,7 @@ export function ActivityScheduleForm({ prefill, onSubmit, onCancel }: Props) {
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
   const [pushGroup, setPushGroup] = useState(false);
   const [groupIds, setGroupIds] = useState<string[]>([]);
+  const [createSchedule, setCreateSchedule] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -105,10 +102,6 @@ export function ActivityScheduleForm({ prefill, onSubmit, onCancel }: Props) {
       .get<{ items: Room[] }>('/admin/dingtalk/meeting-rooms', { headers })
       .then((r) => setRooms(r.data.items ?? []))
       .catch((e) => setRoomsErr(e?.response?.data?.error ?? '会议室加载失败'));
-    axios
-      .get<{ items: UserItem[] }>('/admin/users', { headers })
-      .then((r) => setUsers(r.data.items ?? []))
-      .catch(() => {});
     axios
       .get<{ items: Robot[] }>('/admin/dingtalk/robots', { headers })
       .then((r) => setRobots(r.data.items ?? []))
@@ -130,16 +123,15 @@ export function ActivityScheduleForm({ prefill, onSubmit, onCancel }: Props) {
       startAt: new Date(startAt).toISOString(),
       endAt: new Date(endAt).toISOString(),
       pointsReward: Number(pointsReward) || 0,
-      location: room?.roomName ?? '',
-      roomIds: roomId ? [roomId] : [],
+      createSchedule,
+      location: createSchedule ? (room?.roomName ?? '') : '',
+      roomIds: createSchedule && roomId ? [roomId] : [],
       attendeeAll,
-      attendeeUserIds: attendeeAll ? [] : selectedUserIds,
-      pushGroup,
-      groupIds: pushGroup ? groupIds : [],
+      attendeeUserIds: createSchedule && !attendeeAll ? selectedUserIds : [],
+      pushGroup: createSchedule ? pushGroup : false,
+      groupIds: createSchedule && pushGroup ? groupIds : [],
     });
   };
-
-  const toggle = (list: string[], v: string) => (list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
 
   return (
     <motion.div
@@ -181,7 +173,7 @@ export function ActivityScheduleForm({ prefill, onSubmit, onCancel }: Props) {
             style={inputStyle}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="如：团队协作分享会"
+            placeholder="如：坦诚沟通分享会"
           />
         </div>
 
@@ -214,99 +206,89 @@ export function ActivityScheduleForm({ prefill, onSubmit, onCancel }: Props) {
         </div>
 
         <div>
-          <div style={labelStyle}>会议室（可选）</div>
-          <select
-            style={inputStyle}
-            value={roomId}
-            onChange={(e) => setRoomId(e.target.value)}
-            disabled={rooms.length === 0}
-          >
-            <option value="">不预定会议室</option>
-            {rooms.map((r) => (
-              <option key={r.roomId} value={r.roomId}>
-                {r.roomName}
-                {r.capacity ? `（${r.capacity}人）` : ''}
-                {r.location ? ` · ${r.location}` : ''}
-              </option>
-            ))}
-          </select>
-          {rooms.length === 0 && (
-            <div style={{ fontSize: 11, color: 'var(--cpm-text-muted)', marginTop: 4 }}>
-              {roomsErr || '暂无可选会议室：在钉钉后台把会议室「可预订范围」配给当前账号后即可选择。'}
-            </div>
-          )}
+          <div style={labelStyle}>奖励积分</div>
+          <input
+            type="number"
+            style={{ ...inputStyle, maxWidth: 160 }}
+            value={pointsReward}
+            onChange={(e) => setPointsReward(Number(e.target.value))}
+          />
         </div>
 
-        <div>
-          <div style={labelStyle}>参与人员</div>
-          <div style={{ display: 'flex', gap: 14, marginBottom: selectedUserIds && !attendeeAll ? 8 : 0 }}>
-            <label style={{ fontSize: 13, display: 'flex', alignItems: 'center', gap: 5, cursor: 'pointer' }}>
-              <input type="radio" checked={attendeeAll} onChange={() => setAttendeeAll(true)} /> 全员（默认）
-            </label>
-            <label style={{ fontSize: 13, display: 'flex', alignItems: 'center', gap: 5, cursor: 'pointer' }}>
-              <input type="radio" checked={!attendeeAll} onChange={() => setAttendeeAll(false)} /> 指定人员
-            </label>
-          </div>
-          {!attendeeAll && (
-            <div
-              style={{
-                maxHeight: 132,
-                overflowY: 'auto',
-                border: '1px solid var(--cpm-card-border)',
-                borderRadius: 9,
-                padding: 8,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 4,
-              }}
-            >
-              {users.length === 0 && <span style={{ fontSize: 12, color: 'var(--cpm-text-muted)' }}>暂无成员</span>}
-              {users.map((u) => (
-                <label
-                  key={u.id}
-                  style={{ fontSize: 12.5, display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedUserIds.includes(u.dingUserId)}
-                    disabled={!u.dingUserId}
-                    onChange={() => setSelectedUserIds((p) => toggle(p, u.dingUserId))}
-                  />
-                  {u.name}
-                  {!u.dingUserId && <span style={{ color: 'var(--cpm-text-muted)' }}>（未绑定钉钉）</span>}
+        <label
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            cursor: 'pointer',
+            fontSize: 13,
+            fontWeight: 600,
+            color: 'var(--cpm-text-secondary)',
+            borderTop: '1px dashed var(--cpm-card-border)',
+            paddingTop: 13,
+          }}
+        >
+          <input type="checkbox" checked={createSchedule} onChange={(e) => setCreateSchedule(e.target.checked)} />
+          同时创建钉钉日程（在参与人的钉钉日历里生成日程）
+        </label>
+
+        {createSchedule && (
+          <>
+            <div>
+              <div style={labelStyle}>会议室（可选）</div>
+              <select
+                style={inputStyle}
+                value={roomId}
+                onChange={(e) => setRoomId(e.target.value)}
+                disabled={rooms.length === 0}
+              >
+                <option value="">不预定会议室</option>
+                {rooms.map((r) => (
+                  <option key={r.roomId} value={r.roomId}>
+                    {r.roomName}
+                    {r.capacity ? `（${r.capacity}人）` : ''}
+                    {r.location ? ` · ${r.location}` : ''}
+                  </option>
+                ))}
+              </select>
+              {rooms.length === 0 && (
+                <div style={{ fontSize: 11, color: 'var(--cpm-text-muted)', marginTop: 4 }}>
+                  {roomsErr || '暂无可选会议室：在钉钉后台把会议室「可预订范围」配给当前账号后即可选择。'}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <div style={labelStyle}>参与人员</div>
+              <div style={{ display: 'flex', gap: 14, marginBottom: selectedUserIds && !attendeeAll ? 8 : 0 }}>
+                <label style={{ fontSize: 13, display: 'flex', alignItems: 'center', gap: 5, cursor: 'pointer' }}>
+                  <input type="radio" checked={attendeeAll} onChange={() => setAttendeeAll(true)} /> 全员（默认）
                 </label>
-              ))}
+                <label style={{ fontSize: 13, display: 'flex', alignItems: 'center', gap: 5, cursor: 'pointer' }}>
+                  <input type="radio" checked={!attendeeAll} onChange={() => setAttendeeAll(false)} /> 指定人员
+                </label>
+              </div>
+              {!attendeeAll && <UserDeptTree value={selectedUserIds} onChange={setSelectedUserIds} />}
             </div>
-          )}
-        </div>
 
-        <div style={{ display: 'flex', gap: 10 }}>
-          <div style={{ width: 120 }}>
-            <div style={labelStyle}>奖励积分</div>
-            <input
-              type="number"
-              style={inputStyle}
-              value={pointsReward}
-              onChange={(e) => setPointsReward(Number(e.target.value))}
-            />
-          </div>
-          <div style={{ flex: 1 }}>
-            <div style={labelStyle}>钉钉群推送（可选）</div>
-            <label
-              style={{ fontSize: 13, display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', height: 36 }}
-            >
-              <input
-                type="checkbox"
-                checked={pushGroup}
-                onChange={(e) => {
-                  setPushGroup(e.target.checked);
-                  if (e.target.checked && groupIds.length === 0) setGroupIds(robots.map((r) => r.id));
-                }}
-              />
-              {pushGroup ? `推送到 ${groupIds.length} 个群` : '同时推送到钉钉群'}
-            </label>
-          </div>
-        </div>
+            <div>
+              <div style={labelStyle}>钉钉群推送（可选）</div>
+              <label
+                style={{ fontSize: 13, display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', height: 36 }}
+              >
+                <input
+                  type="checkbox"
+                  checked={pushGroup}
+                  onChange={(e) => {
+                    setPushGroup(e.target.checked);
+                    if (e.target.checked && groupIds.length === 0) setGroupIds(robots.map((r) => r.id));
+                  }}
+                />
+                {pushGroup ? `推送到 ${groupIds.length} 个群` : '同时推送到钉钉群'}
+              </label>
+            </div>
+          </>
+        )}
       </div>
 
       {/* 常驻页脚：按钮永远可见，不会被字段挤出可视区 */}

@@ -1,7 +1,7 @@
+import { PageHeader } from '@cpm/ui';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
-import { PageHeader } from '@cpm/ui';
 
 interface Dim {
   id: number;
@@ -27,29 +27,23 @@ interface LbResp {
 
 const colorByCode: Record<string, string> = {
   customer_first: '#f97316',
-  team_collab: '#0ea5e9',
+  candor: '#0ea5e9',
+  ownership: '#10b981',
   innovation: '#ec4899',
-  integrity: '#10b981',
-  craftsmanship: '#8b5cf6',
-  growth: '#eab308',
 };
 
 const bgByCode: Record<string, string> = {
   customer_first: 'linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%)',
-  team_collab: 'linear-gradient(135deg, #ecfeff 0%, #bae6fd 100%)',
+  candor: 'linear-gradient(135deg, #ecfeff 0%, #bae6fd 100%)',
+  ownership: 'linear-gradient(135deg, #f0fdf4 0%, #bbf7d0 100%)',
   innovation: 'linear-gradient(135deg, #fdf2f8 0%, #fbcfe8 100%)',
-  integrity: 'linear-gradient(135deg, #f0fdf4 0%, #bbf7d0 100%)',
-  craftsmanship: 'linear-gradient(135deg, #faf5ff 0%, #e9d5ff 100%)',
-  growth: 'linear-gradient(135deg, #fefce8 0%, #fef08a 100%)',
 };
 
 const keywordsByCode: Record<string, string[]> = {
   customer_first: ['客户优先', '服务思维', '用户洞察', '同理心'],
-  team_collab: ['团队协作', '开放沟通', '互信互助', '跨职能'],
-  innovation: ['创新突破', '拥抱变化', '敢于试错', '设计思维'],
-  integrity: ['诚信透明', '言行一致', '专业负责', '伦理底线'],
-  craftsmanship: ['极致品质', '持续打磨', '工匠精神', '细节之美'],
-  growth: ['持续学习', '成长心态', '知识分享', '开放反馈'],
+  candor: ['开诚布公', '就事论事', '直面问题', '互信坦率'],
+  ownership: ['主人翁意识', '担当负责', '结果导向', '主动补位'],
+  innovation: ['突破常规', '拥抱变化', '敢于试错', '设计思维'],
 };
 
 const containerVariants = {
@@ -77,10 +71,7 @@ export function ValuesPage() {
         const scores: Record<number, number> = {};
         for (const d of r.data.items) {
           try {
-            const lb = await axios.get<LbResp>(
-              `/api/v1/leaderboard?scope=dim&dimension_id=${d.id}`,
-              { headers: h },
-            );
+            const lb = await axios.get<LbResp>(`/api/v1/leaderboard?scope=dim&dimension_id=${d.id}`, { headers: h });
             scores[d.id] = (lb.data.entries ?? []).reduce((s, e) => s + e.score, 0);
           } catch {
             scores[d.id] = 0;
@@ -94,13 +85,9 @@ export function ValuesPage() {
 
   return (
     <div>
-      <PageHeader title="价值观维度" subtitle="6 大企业文化核心方向" />
+      <PageHeader title="价值观维度" subtitle="4 大企业文化核心方向" />
 
-      {loading && (
-        <div style={{ color: 'var(--cpm-text-tertiary)', fontSize: 14, padding: '20px 0' }}>
-          加载中...
-        </div>
-      )}
+      {loading && <div style={{ color: 'var(--cpm-text-tertiary)', fontSize: 14, padding: '20px 0' }}>加载中...</div>}
 
       <motion.div
         initial="hidden"
@@ -108,8 +95,8 @@ export function ValuesPage() {
         variants={containerVariants}
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: 18,
+          gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+          gap: 20,
         }}
       >
         {dims.map((d) => {
@@ -128,8 +115,8 @@ export function ValuesPage() {
               style={{
                 background: bgGrad,
                 border: '1px solid var(--cpm-card-border)',
-                borderRadius: 20,
-                padding: 20,
+                borderRadius: 22,
+                padding: 24,
                 boxShadow: 'var(--cpm-shadow-soft)',
                 overflow: 'hidden',
                 position: 'relative',
@@ -162,17 +149,17 @@ export function ValuesPage() {
                 >
                   <div
                     style={{
-                      width: 44,
-                      height: 44,
-                      borderRadius: 12,
+                      width: 48,
+                      height: 48,
+                      borderRadius: 14,
                       background: color,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: 20,
+                      fontSize: 22,
                       color: '#fff',
                       fontWeight: 700,
-                      boxShadow: `0 4px 12px -4px ${color}60`,
+                      boxShadow: `0 6px 16px -4px ${color}70`,
                     }}
                   >
                     {d.name.charAt(0)}
@@ -196,86 +183,59 @@ export function ValuesPage() {
                 {/* 维度名 */}
                 <div
                   style={{
-                    fontSize: 18,
+                    fontSize: 20,
                     fontWeight: 700,
                     color: 'var(--cpm-text-primary)',
                     letterSpacing: '-0.01em',
-                    marginBottom: 10,
+                    marginBottom: 14,
                   }}
                 >
                   {d.name}
                 </div>
 
-                {/* 关键词标签 */}
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 14 }}>
-                  {keywords.map((kw) => (
-                    <span
-                      key={kw}
+                {/* 关键词（左）｜ 累计积分（右） */}
+                <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16 }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, flex: 1, minWidth: 0 }}>
+                    {keywords.map((kw) => (
+                      <span
+                        key={kw}
+                        style={{
+                          fontSize: 11,
+                          fontWeight: 500,
+                          padding: '4px 10px',
+                          borderRadius: 999,
+                          background: `${color}14`,
+                          color: 'var(--cpm-text-secondary)',
+                          border: `1px solid ${color}28`,
+                        }}
+                      >
+                        {kw}
+                      </span>
+                    ))}
+                  </div>
+                  <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                    <div
                       style={{
-                        fontSize: 11,
-                        fontWeight: 500,
-                        padding: '3px 9px',
-                        borderRadius: 999,
-                        background: `${color}14`,
-                        color: 'var(--cpm-text-secondary)',
-                        border: `1px solid ${color}28`,
+                        fontSize: 36,
+                        fontWeight: 800,
+                        color,
+                        letterSpacing: '-0.02em',
+                        lineHeight: 1.05,
+                        fontFeatureSettings: '"tnum"',
                       }}
                     >
-                      {kw}
-                    </span>
-                  ))}
-                </div>
-
-                {/* 累计积分 */}
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'baseline',
-                    gap: 6,
-                    borderTop: '1px solid rgba(15,23,42,0.06)',
-                    paddingTop: 12,
-                    marginTop: 4,
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: 28,
-                      fontWeight: 700,
-                      color,
-                      letterSpacing: '-0.02em',
-                      fontFeatureSettings: '"tnum"',
-                    }}
-                  >
-                    {score.toLocaleString()}
-                  </span>
-                  <span style={{ fontSize: 12, color: 'var(--cpm-text-tertiary)', fontWeight: 500 }}>
-                    累计积分
-                  </span>
+                      {score.toLocaleString()}
+                    </div>
+                    <div style={{ fontSize: 11, color: 'var(--cpm-text-tertiary)', fontWeight: 500, marginTop: 3 }}>
+                      累计积分
+                    </div>
+                  </div>
                 </div>
               </div>
             </motion.div>
           );
         })}
       </motion.div>
-
-      {!loading && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          style={{
-            marginTop: 20,
-            padding: '12px 16px',
-            borderRadius: 12,
-            background: 'var(--cpm-brand-violet-bg)',
-            border: '1px solid rgba(124,58,237,0.12)',
-            fontSize: 12,
-            color: 'var(--cpm-text-tertiary)',
-          }}
-        >
-          ✧ 完整增删改功能在后续 Phase 上线。当前数据实时从 leaderboard API 聚合。
-        </motion.div>
-      )}
     </div>
   );
 }

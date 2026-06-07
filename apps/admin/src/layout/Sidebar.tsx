@@ -5,7 +5,6 @@ import { useAuth } from '../store/auth';
 const items = [
   { to: '/', label: '首页', icon: '✦', end: true },
   { to: '/chat', label: 'HR-Agent', icon: '⚡', end: false },
-  { to: '/layout', label: '首页编排', icon: '▦', end: false },
   { to: '/activities', label: '活动管理', icon: '◐', end: false },
   { to: '/values', label: '价值观维度', icon: '✧', end: false },
   { to: '/mall', label: '商城/盲盒', icon: '◈', end: false },
@@ -103,15 +102,8 @@ export function Sidebar() {
           style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 2 }}
         >
           {items.map((it) => (
-            <motion.li
-              key={it.to}
-              variants={{ hidden: { opacity: 0, x: -8 }, visible: { opacity: 1, x: 0 } }}
-            >
-              <NavLink
-                to={it.to}
-                end={it.end}
-                style={{ textDecoration: 'none', display: 'block' }}
-              >
+            <motion.li key={it.to} variants={{ hidden: { opacity: 0, x: -8 }, visible: { opacity: 1, x: 0 } }}>
+              <NavLink to={it.to} end={it.end} style={{ textDecoration: 'none', display: 'block' }}>
                 {({ isActive }) => (
                   <motion.div
                     whileHover={{ x: 2 }}
@@ -163,9 +155,7 @@ export function Sidebar() {
                       {it.icon}
                     </span>
                     <span style={{ flex: 1 }}>{it.label}</span>
-                    {isActive && (
-                      <span style={{ fontSize: 11, opacity: 0.6 }}>›</span>
-                    )}
+                    {isActive && <span style={{ fontSize: 11, opacity: 0.6 }}>›</span>}
                   </motion.div>
                 )}
               </NavLink>

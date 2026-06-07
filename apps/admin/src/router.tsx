@@ -8,7 +8,6 @@ import { ChatPage } from './pages/chat/ChatPage';
 import { MockOutboxPage } from './pages/dingtalk/MockOutboxPage';
 import { AdminHomePage } from './pages/home/AdminHomePage';
 import { InsightsPage } from './pages/insights/InsightsPage';
-import { LayoutEditorPage } from './pages/layout/LayoutEditorPage';
 import { MallAdminPage } from './pages/mall/MallAdminPage';
 import { SchedulePage } from './pages/schedules/SchedulePage';
 import { ValuesPage } from './pages/values/ValuesPage';
@@ -25,7 +24,6 @@ export function AdminRouter() {
       <Route path="/activities" element={wrap(<ActivitiesPage />)} />
       <Route path="/activities/:id/code" element={wrap(<ActivityCodePage />)} />
       <Route path="/mall" element={wrap(<MallAdminPage />)} />
-      <Route path="/layout" element={wrap(<LayoutEditorPage />)} />
       <Route path="/insights" element={wrap(<InsightsPage />)} />
       <Route path="/dingtalk/mock-outbox" element={wrap(<MockOutboxPage />)} />
       <Route path="/schedules" element={wrap(<SchedulePage />)} />

@@ -35,20 +35,16 @@ interface Dim {
 
 const colorByCode: Record<string, string> = {
   customer_first: '#f97316',
-  team_collab: '#0ea5e9',
+  candor: '#0ea5e9',
   innovation: '#ec4899',
-  integrity: '#10b981',
-  craftsmanship: '#8b5cf6',
-  growth: '#eab308',
+  ownership: '#10b981',
 };
 
 const bgByCode: Record<string, string> = {
   customer_first: 'rgba(249,115,22,0.1)',
-  team_collab: 'rgba(14,165,233,0.1)',
+  candor: 'rgba(14,165,233,0.1)',
   innovation: 'rgba(236,72,153,0.1)',
-  integrity: 'rgba(16,185,129,0.1)',
-  craftsmanship: 'rgba(139,92,246,0.1)',
-  growth: 'rgba(234,179,8,0.1)',
+  ownership: 'rgba(16,185,129,0.1)',
 };
 
 const statusLabel: Record<string, string> = {

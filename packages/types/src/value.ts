@@ -1,10 +1,4 @@
-export type DimensionCode =
-  | 'customer_first'
-  | 'team_collab'
-  | 'innovation'
-  | 'integrity'
-  | 'craftsmanship'
-  | 'growth';
+export type DimensionCode = 'customer_first' | 'candor' | 'ownership' | 'innovation';
 
 export interface Dimension {
   id: number;

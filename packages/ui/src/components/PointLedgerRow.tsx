@@ -2,11 +2,9 @@ import type { PointTransaction } from '@cpm/types';
 
 const DIM_COLOR: Record<string, string> = {
   customer_first: '#f97316',
-  team_collab: '#0ea5e9',
+  candor: '#0ea5e9',
   innovation: '#ec4899',
-  integrity: '#10b981',
-  craftsmanship: '#8b5cf6',
-  growth: '#eab308',
+  ownership: '#10b981',
 };
 
 export interface PointLedgerRowProps {
