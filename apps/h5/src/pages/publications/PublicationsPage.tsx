@@ -1,6 +1,6 @@
 import { useCurrentPublication } from '@cpm/api-client';
 import type { PublishedView, SectionView } from '@cpm/types';
-import { EmptyState } from '@cpm/ui';
+import { EmptyState, useBreakpoint } from '@cpm/ui';
 import { MessageCircle, PencilLine, Sparkles } from 'lucide-react';
 import type React from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -11,6 +11,7 @@ const SECTION_ORDER = ['star', 'values', 'honors', 'lottery', 'innovation'];
 
 export function PublicationsPage() {
   const nav = useNavigate();
+  const { isDesktop } = useBreakpoint();
   const q = useCurrentPublication();
 
   if (q.isLoading) {
@@ -27,8 +28,13 @@ export function PublicationsPage() {
   for (const s of sections) if (!byType.has(s.section.type)) byType.set(s.section.type, s);
   const ordered = SECTION_ORDER.map((t) => byType.get(t)).filter((s): s is SectionView => !!s);
 
+  const goNominate = () => nav('/publications/nominate');
+  const goPortrait = () => nav('/dna');
+  const goQA = () => nav('/publications/qa');
+  const goMine = () => nav('/publications/mine');
+
   return (
-    <div style={shell}>
+    <div style={isDesktop ? shellDesktop : shell}>
       {/* 渐变封面 */}
       <div style={cover}>
         <div style={coverGlow} />
@@ -36,43 +42,78 @@ export function PublicationsPage() {
           <div style={{ fontSize: 11, letterSpacing: 2, color: 'rgba(255,255,255,.8)', fontWeight: 600 }}>
             {publication.periodCode} · 季度刊
           </div>
-          <div style={coverTitle}>{publication.title}</div>
+          <div style={{ ...coverTitle, fontSize: isDesktop ? 30 : 26 }}>{publication.title}</div>
           {publication.introText && <p style={coverIntro}>{publication.introText}</p>}
           <span style={{ position: 'absolute', right: 0, top: -6, fontSize: 26 }}>✨</span>
         </div>
       </div>
 
-      {/* 提报 CTA */}
-      <button type="button" onClick={() => nav('/publications/nominate')} style={ctaStyle}>
-        <PencilLine size={18} />
-        提报本季文化星标
-      </button>
+      {/* 操作区：桌面端一行四个；移动端 CTA 独占 + 两个 AI 入口 */}
+      {isDesktop ? (
+        <div style={{ display: 'flex', gap: 12, marginBottom: 24 }}>
+          <button type="button" onClick={goNominate} style={{ ...ctaStyle, flex: 1.6, width: 'auto' }}>
+            <PencilLine size={18} />
+            提报本季文化星标
+          </button>
+          <button type="button" onClick={goPortrait} style={pillStyle}>
+            <Sparkles size={16} />
+            我的文化画像
+          </button>
+          <button type="button" onClick={goQA} style={pillStyle}>
+            <MessageCircle size={16} />
+            AI 文化官
+          </button>
+          <button type="button" onClick={goMine} style={pillStyle}>
+            我的提报
+          </button>
+        </div>
+      ) : (
+        <>
+          <button type="button" onClick={goNominate} style={ctaStyle}>
+            <PencilLine size={18} />
+            提报本季文化星标
+          </button>
+          <div style={{ display: 'flex', gap: 10, margin: '10px 0 22px' }}>
+            <button type="button" onClick={goPortrait} style={pillStyle}>
+              <Sparkles size={16} />
+              我的文化画像
+            </button>
+            <button type="button" onClick={goQA} style={pillStyle}>
+              <MessageCircle size={16} />
+              AI 文化官
+            </button>
+          </div>
+        </>
+      )}
 
-      {/* AI 双入口 */}
-      <div style={{ display: 'flex', gap: 10, margin: '10px 0 22px' }}>
-        <button type="button" onClick={() => nav('/dna')} style={pillStyle}>
-          <Sparkles size={16} />
-          我的文化画像
+      {/* 栏目：桌面端双列瀑布(按奇偶分列，避免网格空洞与卡片截断)；移动端单列 */}
+      {isDesktop ? (
+        <div style={{ display: 'flex', gap: 28, alignItems: 'flex-start' }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            {ordered
+              .filter((_, i) => i % 2 === 0)
+              .map((s) => (
+                <PubSection key={s.section.id} view={s} />
+              ))}
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            {ordered
+              .filter((_, i) => i % 2 === 1)
+              .map((s) => (
+                <PubSection key={s.section.id} view={s} />
+              ))}
+          </div>
+        </div>
+      ) : (
+        ordered.map((s) => <PubSection key={s.section.id} view={s} />)
+      )}
+
+      {/* 移动端：底部「我的提报」（桌面端已在顶部操作区） */}
+      {!isDesktop && (
+        <button type="button" onClick={goMine} style={{ ...pillStyle, width: '100%', marginTop: 6 }}>
+          我的提报 ›
         </button>
-        <button type="button" onClick={() => nav('/publications/qa')} style={pillStyle}>
-          <MessageCircle size={16} />
-          AI 文化官
-        </button>
-      </div>
-
-      {/* 固定顺序栏目 */}
-      {ordered.map((s) => (
-        <PubSection key={s.section.id} view={s} />
-      ))}
-
-      {/* 我的提报 */}
-      <button
-        type="button"
-        onClick={() => nav('/publications/mine')}
-        style={{ ...pillStyle, width: '100%', marginTop: 6 }}
-      >
-        我的提报 ›
-      </button>
+      )}
     </div>
   );
 }
@@ -84,6 +125,13 @@ const shell: React.CSSProperties = {
   boxSizing: 'border-box',
   padding: '12px 16px 90px',
   fontFamily: 'var(--cpm-font-sans)',
+};
+
+// 桌面端：更宽容器 + 更舒展留白（移动端 shell 不受影响）。
+const shellDesktop: React.CSSProperties = {
+  ...shell,
+  maxWidth: 1040,
+  padding: '24px 32px 56px',
 };
 
 const cover: React.CSSProperties = {
@@ -107,7 +155,6 @@ const coverGlow: React.CSSProperties = {
 };
 
 const coverTitle: React.CSSProperties = {
-  fontSize: 26,
   fontWeight: 900,
   lineHeight: 1.2,
   margin: '6px 0',
@@ -122,6 +169,7 @@ const coverIntro: React.CSSProperties = {
   color: 'rgba(255,255,255,.92)',
   lineHeight: 1.7,
   margin: '8px 0 0',
+  maxWidth: 720,
 };
 
 const ctaStyle: React.CSSProperties = {
